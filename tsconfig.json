@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "isolatedModules": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "baseUrl": "./",
+    "paths": {
+      "@mui/material/*": ["node_modules/@mui/material/*"],
+      "@mui/icons-material/*": ["node_modules/@mui/icons-material/*"]
+    }
+  },
+  "include": ["src"]
+}
