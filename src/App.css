@@ -23,6 +23,12 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+.bar-chart-container {
+  width: 60px; /* Set your desired width */
+  height: 40px; /* Set your desired height */
+  /* Additional styles as needed */
+}
+
 
 .App-link {
   color: #61dafb;
