@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 
 const HomePage = () => {
     return (
+        <div><img src="/public/Sensor1.jpg" alt="App Photo" style={{ maxWidth: '100%', height: 'auto' }} />
         <Grid container spacing={2}>
             <Grid item xs={12}>
                 <Paper elevation={6} style={{ padding: 16, textAlign: 'center' }}>
@@ -15,8 +16,9 @@ const HomePage = () => {
                     </p>
                 </Paper>
             </Grid>
-            <img src="/public/Sensor1.jpg" alt="App Photo" style={{ maxWidth: '100%', height: 'auto' }} />
+
         </Grid>
+        </div>
     );
 };
 
