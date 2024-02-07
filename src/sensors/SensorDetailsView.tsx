@@ -10,6 +10,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
+import ExportToExcel from "../export/ExportToExcel";
+import {exportData} from "../AppApi";
+import { Box } from '@mui/material';
 interface SensorDetails {
     sensorId: string;
     sensorName: string;
@@ -63,22 +66,33 @@ const SensorDetailsView: React.FC = () => {
                             <Button component={Link} to="/line-chart" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
                                 Graph
                             </Button>
-                            <Button component={Link} to="/bar-chart" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
-                                Max
-                            </Button>
-                            <Button component={Link} to="/bar-chart" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
+                            {/*<Button component={Link} to="/bar-chart" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>*/}
+                            {/*    Chart*/}
+                            {/*</Button>*/}
+                            <Button component={Link} to="/bar-chart-min" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
                                 Min
+                            </Button>
+                            <Button component={Link} to="/bar-chart-max" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
+                                Max
                             </Button>
                             <Button component={Link} to="/bar-chart" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
                                 Average
                             </Button>
                             <Typography>
-                                Choose for the "Location" of the sensor, "Daily" Temperatures and "Monthly" maximum, minimum and average temperatures.
+                                Choose for the "Location" of the sensor, "Daily" Temperatures and max, min and average "Charts".
                             </Typography>
+                            <Box sx={{marginRight: '10px',marginTop:'20px',marginBottom:'10px', alignContent:"flex-end"}}>
+                                <ExportToExcel data={exportData} fileName="exportedData" />
+                            </Box>
+                            <Typography>
+                                Export monthly data to csv.
+                            </Typography>
+
                         </div>
                     </Paper>
                 </Grid>
             </Grid>
+
         </div>
     );
 };

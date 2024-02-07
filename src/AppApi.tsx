@@ -7,5 +7,17 @@ const lineChartLabels: string[] = ['00:00', '01:00', '02:00', '03:00', '00:04', 
 const barChartData = [5, 7, 11, 14, 19, 25, 28, 32,25,19,12,10];
 const barChartLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July','August', 'September','October', 'November','December'];
 
+interface ExportData {
+    id: string;
+    data: string[];
+}
 
-export { lineChartData, lineChartLabels, barChartData, barChartLabels };
+const exportData: ExportData[] = [
+    { id: "1", data: ["23", "26"] },
+    // Add more data objects as needed
+];
+
+
+
+
+export { lineChartData, lineChartLabels, barChartData, barChartLabels,exportData };

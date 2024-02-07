@@ -47,6 +47,7 @@ const SensorsListView: React.FC = () => {
 
     const handleEditClick = (sensorId: string) => {
         // Handle edit action (you can navigate or perform any other action)
+        navigate(`/map`);
         console.log(`Edit button clicked for sensorId: ${sensorId}`);
     };
 

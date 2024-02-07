@@ -9,7 +9,7 @@ interface BarChartProps {
     className?: string;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, labels, className }) => {
+const BarChartMax: React.FC<BarChartProps> = ({ data, labels, className }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
 
@@ -28,10 +28,10 @@ const BarChart: React.FC<BarChartProps> = ({ data, labels, className }) => {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Minimum Temperatures ',
+                                label: 'Maximum Temperatures ',
                                 data: data,
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Red background color
+                                borderColor: 'rgba(255, 99, 132, 1)', // Red border color
                                 borderWidth: 1,
                             },
                         ],
@@ -59,8 +59,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, labels, className }) => {
     }, [data, labels]);
 
     return (
-
-        <div className={"barChart"} style={{marginTop: '100px', flex: "max-content"}}>
+        <div className={"barChart"} style={{ marginTop: '100px', flex: "max-content" }}>
             <Grid container spacing={6} justifyContent="center" alignItems="center">
                 <Grid item xs={8}>
                     <Paper className={className}>
@@ -72,4 +71,4 @@ const BarChart: React.FC<BarChartProps> = ({ data, labels, className }) => {
     );
 };
 
-export default BarChart;
+export default BarChartMax;
