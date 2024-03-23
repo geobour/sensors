@@ -1,20 +1,41 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
+import axios from "axios";
+import {SensorRecordDto} from "../api/ApiSensor";
+import {useParams} from "react-router-dom";
 
 interface LineChartProps {
-    data: number[];
-    labels: string[];
     className?: string;
 }
 
-const LineChart: React.FC<LineChartProps> = ({ data, labels, className }) => {
+const LineChart: React.FC<LineChartProps> = ({ className }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
+    const [sensorData, setSensorData] = useState<SensorRecordDto[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const { sensorId } = useParams<{ sensorId: string }>();
 
     useEffect(() => {
-        if (chartRef.current) {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get<SensorRecordDto[]>(`http://localhost:8080/api/sensor/reports/get-daily-data?sensorId=${sensorId}`);
+                setSensorData(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setError('Failed to fetch data. Please try again.');
+                setLoading(false); // Stop loading state in case of error
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        if (chartRef.current && sensorData.length > 0) {
             if (chartInstance.current) {
                 chartInstance.current.destroy();
             }
@@ -22,15 +43,18 @@ const LineChart: React.FC<LineChartProps> = ({ data, labels, className }) => {
             const ctx = chartRef.current.getContext('2d');
 
             if (ctx) {
+                const labels = sensorData.map(data => data.time);
+                const temperatures = sensorData.map(data => data.temperature);
+
                 chartInstance.current = new Chart(ctx, {
-                    type: 'line', // Change the chart type to 'line'
+                    type: 'line',
                     data: {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Daily Temperatures',
-                                data: data,
-                                fill: false, // Don't fill the area under the line
+                                label: 'Hourly Temperatures',
+                                data: temperatures,
+                                fill: false,
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 borderWidth: 2,
                                 pointBackgroundColor: 'rgba(75, 192, 192, 1)',
@@ -43,6 +67,7 @@ const LineChart: React.FC<LineChartProps> = ({ data, labels, className }) => {
                             x: {
                                 type: 'category',
                                 position: 'bottom',
+
                             },
                             y: {
                                 beginAtZero: true,
@@ -58,21 +83,25 @@ const LineChart: React.FC<LineChartProps> = ({ data, labels, className }) => {
                 chartInstance.current.destroy();
             }
         };
-    }, [data, labels]);
+    }, [sensorData]);
 
     return (
-
-        <div className={"lineChart"} style={{marginTop: '100px', flex: "max-content"}}>
+        <div className={"lineChart"} style={{ marginTop: '100px', flex: "max-content" }}>
             <Grid container spacing={6} justifyContent="center" alignItems="center">
                 <Grid item xs={8}>
-                    <Paper className={className}>
-                        <canvas ref={chartRef} />
-                    </Paper>
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : error ? (
+                        <p>Error: {error}</p>
+                    ) : (
+                        <Paper className={className}>
+                            <canvas ref={chartRef} />
+                        </Paper>
+                    )}
                 </Grid>
             </Grid>
         </div>
     );
-
 };
 
 export default LineChart;

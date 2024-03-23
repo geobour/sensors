@@ -9,37 +9,64 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
-import { Link } from 'react-router-dom';
-import ExportToExcel from "../export/ExportToExcel";
-import {exportData} from "../AppApi";
-import { Box } from '@mui/material';
-interface SensorDetails {
-    sensorId: string;
-    sensorName: string;
-    sensorArea: string;
-    sensorData: string[];
-}
+import {Link, useNavigate, useParams} from 'react-router-dom';
+import ExportToExcel from '../export/ExportToExcel';
+import {useQuery} from 'react-query'; // Import useQuery from react-query
+import {Box, Divider} from '@mui/material';
+import axios from 'axios';
+import {SensorDto} from "../api/ApiSensor";
 
-// Generate 30 data points
-const generateSensorData = () => {
-    const dataPoints = Array.from({length: 30}, (_, index) => `Data Point ${index + 1}`);
-    return dataPoints;
-};
-
-const mockSensorDetails: SensorDetails = {
-    sensorId: '1',
-    sensorName: 'Sensor 1',
-    sensorArea: 'Athens',
-    sensorData: generateSensorData(),
-};
 
 const SensorDetailsView: React.FC = () => {
+    const {sensorId} = useParams<{ sensorId: string }>();
+    const navigate = useNavigate();
+
+    const {data: sensors} = useQuery<SensorDto, Error>(
+        ['sensorData', sensorId],
+        async () => {
+            const response = await axios.get<SensorDto>(
+                `http://localhost:8080/api/sensor/get-sensor/${sensorId}`
+            );
+            console.log(sensorId)
+            return response.data;
+        }
+    );
+    const handleMinChart = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        navigate(`bar-chart-min`);
+    };
+
+    const handleMaxChart = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        navigate(`bar-chart-max`);
+    };
+    const handleAvgChart = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        navigate(`bar-chart-avg`);
+    };
+    const handleLineChart = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        navigate(`line-chart`);
+    };
+
     return (
         <div style={{marginTop: '100px'}}>
-            <Grid container justifyContent="center" alignItems="center" spacing={3} >
+            <Grid container justifyContent="center" alignItems="center" spacing={3}>
                 <Grid item xs={12} md={6}>
                     <Paper elevation={6} sx={{padding: 3}}>
-                        <Typography variant="h5" padding={3}>Sensor Details</Typography>
+                        <Typography variant="h5" padding={2}>
+                            Sensor Details
+                        </Typography>
+                        <Divider></Divider>
+                        <Box sx={{
+                            marginRight: '10px',
+                            marginTop: '20px',
+                            marginBottom: '10px',
+                            alignContent: 'flex-end'
+                        }}>
+                            {sensors && <ExportToExcel data={[sensors]} fileName="exportedSensors"/>}
+                            <Typography>Export monthly data to csv.</Typography>
+                        </Box>
                         <TableContainer component={Paper}>
                             <Table>
                                 <TableHead>
@@ -47,52 +74,63 @@ const SensorDetailsView: React.FC = () => {
                                         <TableCell>Sensor ID</TableCell>
                                         <TableCell>Sensor Name</TableCell>
                                         <TableCell>Sensor Area</TableCell>
+                                        <TableCell>Status</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell>{mockSensorDetails.sensorId}</TableCell>
-                                        <TableCell>{mockSensorDetails.sensorName}</TableCell>
-                                        <TableCell>{mockSensorDetails.sensorArea}</TableCell>
+                                        <TableCell>{sensors?.id}</TableCell>
+                                        <TableCell>{sensors?.name}</TableCell>
+                                        <TableCell>{sensors?.area}</TableCell>
+                                        <TableCell style={{ color: sensors?.status ? 'green' : 'red' }}>
+                                            {sensors?.status ? 'Active' : 'Inactive'}
+                                        </TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <div style={{marginTop: '20px', flex: "max-content"}}>
-                            {/* Wrap your Buttons with Link */}
-                            <Button component={Link} to="/map" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
+                        <div style={{marginTop: '20px', flex: 'max-content'}}>
+                            <Button component={Link} to="/map" variant="contained" color="primary"
+                                    sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}>
                                 Map
                             </Button>
-                            <Button component={Link} to="/line-chart" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
-                                Graph
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleLineChart}
+                                sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
+                            > Graph
                             </Button>
-                            {/*<Button component={Link} to="/bar-chart" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>*/}
-                            {/*    Chart*/}
-                            {/*</Button>*/}
-                            <Button component={Link} to="/bar-chart-min" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleMinChart}
+                                sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
+                            >
                                 Min
                             </Button>
-                            <Button component={Link} to="/bar-chart-max" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleMaxChart}
+                                sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
+                            >
                                 Max
                             </Button>
-                            <Button component={Link} to="/bar-chart" variant="contained" color="primary" sx={{marginRight: '10px',marginTop:'10px',marginBottom:'20px'}}>
-                                Average
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleAvgChart}
+                                sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
+                            >
+                                Avg
                             </Button>
-                            <Typography>
-                                Choose for the "Location" of the sensor, "Daily" Temperatures and max, min and average "Charts".
-                            </Typography>
-                            <Box sx={{marginRight: '10px',marginTop:'20px',marginBottom:'10px', alignContent:"flex-end"}}>
-                                <ExportToExcel data={exportData} fileName="exportedData" />
-                            </Box>
-                            <Typography>
-                                Export monthly data to csv.
-                            </Typography>
-
+                            <Typography>Choose for the "Location" of the sensor, "Daily" Temperatures and max, min and
+                                average "Charts".</Typography>
                         </div>
                     </Paper>
                 </Grid>
             </Grid>
-
         </div>
     );
 };

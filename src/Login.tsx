@@ -1,60 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import { TextField, Button, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Paper, Typography, TextField, Button } from '@mui/material';
+import { useNavigate } from "react-router-dom";
 
-// @ts-ignore
-function Login({ onLogin }) {
-    const [username, setUsername] = useState(localStorage.getItem('username') || '');
-    const [password, setPassword] = useState(localStorage.getItem('password') || '');
+function Login() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [name, setName] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        // Check if username and password are already stored in localStorage
-        const storedUsername = localStorage.getItem('username');
-        const storedPassword = localStorage.getItem('password');
-        if (storedUsername && storedPassword) {
-            // If credentials are found, automatically attempt login
-            setUsername(storedUsername);
-            setPassword(storedPassword);
-            handleLogin();
-        }
-    }, []); // Empty dependency array to run this effect only once, on component mount
+    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError('');
 
-    const handleLogin = () => {
-        // Perform your login logic here, for simplicity, let's assume a basic validation
-        if (username === 'admin' && password === 'password') {
-            // Store the credentials in localStorage
-            localStorage.setItem('username', username);
-            localStorage.setItem('password', password);
-            onLogin(); // Call the onLogin function passed as a prop from the parent component
-        } else {
+        try {
+            const response = await axios.post('http://localhost:8080/api/user/login', null, {
+                params: {
+                    username,
+                    password
+                }
+            });
+            setName(response.data);
+            setIsLoggedIn(true); // Set login status to true
+            navigate(`/`);
+
+        } catch (error) {
             setError('Invalid username or password');
         }
     };
 
+    const handleLogout = () => {
+        setIsLoggedIn(false); // Set login status to false
+        // Perform any other logout related tasks if needed
+    };
+
+    // If already logged in, don't display the login form
+    if (isLoggedIn) {
+        return (
+            <div>
+                <p>You are already logged in!</p>
+                <Button variant="contained" onClick={handleLogout}>Logout</Button>
+            </div>
+        );
+    }
+
     return (
-        <div style={{ textAlign: 'center' }}>
-            <Typography variant="h5">Login</Typography>
-            {error && <Typography style={{ color: 'red' }}>{error}</Typography>}
-            <form>
-                <TextField
-                    label="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    margin="normal"
-                    variant="outlined"
-                />
-                <br />
-                <TextField
-                    type="password"
-                    label="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    margin="normal"
-                    variant="outlined"
-                />
-                <br />
-                <Button variant="contained" color="primary" onClick={handleLogin}>Login</Button>
-            </form>
+        <div>
+            <Paper elevation={3} style={{ padding: '20px', maxWidth: '300px', margin: 'auto', marginTop: '50px' }}>
+                <Typography variant="h5" gutterBottom>Login</Typography>
+                <form onSubmit={handleLogin}>
+                    <div style={{ marginBottom: '20px' }}>
+                        <TextField
+                            label="Username"
+                            variant="outlined"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            fullWidth
+                        />
+                    </div>
+                    <div style={{ marginBottom: '20px' }}>
+                        <TextField
+                            type="password"
+                            label="Password"
+                            variant="outlined"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            fullWidth
+                        />
+                    </div>
+                    {error && <Typography style={{ color: 'red', marginBottom: '10px' }}>{error}</Typography>}
+                    <Button variant="contained" type="submit">Login</Button>
+                </form>
+            </Paper>
         </div>
     );
 }

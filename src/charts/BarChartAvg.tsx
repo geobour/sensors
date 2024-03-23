@@ -10,7 +10,8 @@ import {useParams} from "react-router-dom";
 interface BarChartProps {
     className?: string;
 }
-const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
+
+const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
     const { sensorId } = useParams<{ sensorId: string }>();
@@ -33,7 +34,7 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
 
             if (ctx) {
                 const labels = sensorData.map(data => `Month ${data.month}`);
-                const maxTemperatures = sensorData.map(data => data.maxTemperature || 0);
+                const avgTemperatures = sensorData.map(data => data.averageTemperature || 0);
 
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
@@ -41,10 +42,10 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Maximum Temperatures',
-                                data: maxTemperatures,
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Red background color
-                                borderColor: 'rgba(255, 99, 132, 1)', // Red border color
+                                label: 'Average Temperatures',
+                                data: avgTemperatures,
+                                backgroundColor: 'rgba(255, 206, 86, 0.2)', // Yellow background color
+                                borderColor: 'rgba(255, 206, 86, 1)', // Yellow border color
                                 borderWidth: 1,
                             },
                         ],
@@ -72,7 +73,7 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
     }, [sensorData]);
 
     return (
-        <div className={"barChartMax"} style={{ marginTop: '100px', flex: "max-content" }}>
+        <div className={"barChart"} style={{ marginTop: '100px', flex: "max-content" }}>
             <Grid container spacing={6} justifyContent="center" alignItems="center">
                 <Grid item xs={8}>
                     {isLoading ? (
@@ -90,4 +91,4 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
     );
 };
 
-export default BarChartMax;
+export default BarChartAvg;

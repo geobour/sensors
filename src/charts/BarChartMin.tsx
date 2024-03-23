@@ -2,19 +2,30 @@ import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
+import axios from "axios";
+import { useQuery } from 'react-query';
+import { SensorDataDto } from "../api/ApiSensor";
+import {useParams} from "react-router-dom";
 
 interface BarChartProps {
-    data: number[];
-    labels: string[];
     className?: string;
 }
 
-const BarChartMin: React.FC<BarChartProps> = ({ data, labels, className }) => {
+const BarChartMin: React.FC<BarChartProps> = ({ className }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
+    const { sensorId } = useParams<{ sensorId: string }>();
+
+    const { data: sensorData, isLoading, isError } = useQuery<SensorDataDto[], Error>(
+        ['sensorData', sensorId, 2024],
+        async () => {
+            const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2024`);
+            return response.data;
+        }
+    );
 
     useEffect(() => {
-        if (chartRef.current) {
+        if (chartRef.current && sensorData && sensorData.length > 0) {
             if (chartInstance.current) {
                 chartInstance.current.destroy();
             }
@@ -22,14 +33,17 @@ const BarChartMin: React.FC<BarChartProps> = ({ data, labels, className }) => {
             const ctx = chartRef.current.getContext('2d');
 
             if (ctx) {
+                const labels = sensorData.map(data => `Month ${data.month}`);
+                const minTemperatures = sensorData.map(data => data.minTemperature || 0);
+
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Minimum Temperatures ',
-                                data: data,
+                                label: 'Minimum Temperatures',
+                                data: minTemperatures,
                                 backgroundColor: 'rgba(54, 162, 235, 0.2)', // Blue background color
                                 borderColor: 'rgba(54, 162, 235, 1)', // Blue border color
                                 borderWidth: 1,
@@ -56,19 +70,26 @@ const BarChartMin: React.FC<BarChartProps> = ({ data, labels, className }) => {
                 chartInstance.current.destroy();
             }
         };
-    }, [data, labels]);
+    }, [sensorData]);
 
     return (
-        <div className={"barChart"} style={{ marginTop: '100px', flex: "max-content" }}>
+        <div className={"barChartMin"} style={{ marginTop: '100px', flex: "max-content" }}>
             <Grid container spacing={6} justifyContent="center" alignItems="center">
                 <Grid item xs={8}>
-                    <Paper className={className}>
-                        <canvas ref={chartRef} />
-                    </Paper>
+                    {isLoading ? (
+                        <p>Loading...</p>
+                    ) : isError ? (
+                        <p>Error: Failed to fetch data. Please try again.</p>
+                    ) : (
+                        <Paper className={className}>
+                            <canvas ref={chartRef} />
+                        </Paper>
+                    )}
                 </Grid>
             </Grid>
         </div>
     );
 };
+
 
 export default BarChartMin;

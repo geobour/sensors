@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -16,74 +16,89 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-
-interface SensorInfo {
-    sensorId: string;
-    sensorName: string;
-    sensorArea: string;
-}
+import RestoreIcon from '@mui/icons-material/Restore'; // Import RestoreIcon
+import axios from 'axios';
+import {SensorDto} from "../api/ApiSensor";
 
 const SensorsListView: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
+    const [sensorList, setSensorList] = useState<SensorDto[]>([]);
 
-    const sensorData: SensorInfo[] = [
-        { sensorId: '1', sensorName: 'Sensor 1', sensorArea: 'Athens' },
-        { sensorId: '2', sensorName: 'Sensor 2', sensorArea: 'Crete'},
-        { sensorId: '3', sensorName: 'Sensor 3', sensorArea: 'Thessaloniki'},
-        { sensorId: '4', sensorName: 'Sensor 4', sensorArea: 'Patra'},
-        { sensorId: '5', sensorName: 'Sensor 5', sensorArea: 'Ioannina'},
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get<SensorDto[]>('http://localhost:8080/api/sensor/show-sensors');
+                setSensorList(response.data);
+            } catch (error) {
+                console.error('Error fetching sensor list:', error);
+            }
+        };
 
-    ];
+        fetchData();
+    }, []);
 
-    const filteredSensors = sensorData.filter(sensor =>
-        sensor.sensorId.toLowerCase().includes(searchTerm.toLowerCase())
+    const handleDeleteClick = async (sensorId: number) => {
+        try {
+            await axios.delete(`http://localhost:8080/api/sensor/delete-sensor/${sensorId}`);
+            setSensorList(prevSensorList => prevSensorList.filter(sensor => sensor.id !== sensorId));
+            navigate(`/sensors`);
+        } catch (error) {
+            console.error(`Error deleting sensor with ID ${sensorId}:`, error);
+        }
+    };
+
+    const handleRestoreClick = async (e: React.MouseEvent<HTMLButtonElement>, sensorId: number) => {
+        e.stopPropagation();
+        try {
+            const sensorIndex = sensorList.findIndex(sensor => sensor.id === sensorId);
+
+            if (sensorIndex !== -1) {
+                const updatedSensorList = [...sensorList];
+                updatedSensorList[sensorIndex] = { ...updatedSensorList[sensorIndex], status: true };
+                const response = await axios.put(`http://localhost:8080/api/sensor/restore/${sensorId}`, updatedSensorList[sensorIndex]);
+                setSensorList(updatedSensorList);
+            } else {
+                console.error(`Sensor with ID ${sensorId} not found in the list.`);
+            }
+        } catch (error) {
+            console.error(`Error restoring sensor with ID ${sensorId}:`, error);
+        }
+    };
+
+
+    const filteredSensors = sensorList.filter(sensor =>
+        sensor.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleRowClick = (sensorId: string) => {
-        // Redirect to the specific page based on sensorId
-        navigate(`/sensors/${sensorId}`);
+    const handleRowClick = (sensorId: number) => {
+        navigate(`${sensorId}`);
     };
 
-    const handleEditClick = (sensorId: string) => {
-        // Handle edit action (you can navigate or perform any other action)
-        navigate(`/map`);
-        console.log(`Edit button clicked for sensorId: ${sensorId}`);
+    const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>, sensorId: number) => {
+        e.stopPropagation();
+        navigate(`${sensorId}/edit`);
     };
 
-    const handleDeleteClick = (sensorId: string) => {
-        // Handle delete action (you can navigate or perform any other action)
-        console.log(`Delete button clicked for sensorId: ${sensorId}`);
+    const handleAddSensorClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        navigate('add');
     };
 
-    const handleMapClick = (sensorId: string) => {
-        // Handle map action (you can navigate or perform any other action)
-        console.log(`Map button clicked for sensorId: ${sensorId}`);
-    };
-
-    const handleChartClick = (sensorId: string) => {
-        // Handle chart action (you can navigate or perform any other action)
-        console.log(`Chart button clicked for sensorId: ${sensorId}`);
-    };
-
-    const handleAddSensorClick = () => {
-        // Redirect to the page for adding a new sensor
-        navigate('/add-sensor');
-    };
-
+    // @ts-ignore
     return (
         <Container>
-            <Paper elevation={3} sx={{ mt: 4, backgroundColor: '#f0f0f0', padding: '10px' }}>
+            <Paper elevation={3} sx={{mt: 4, backgroundColor: '#f0f0f0', padding: '10px'}}>
                 <Typography variant="h4" align={"center"}>
                     Sensors List
                 </Typography>
             </Paper>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px'}}>
                 <Input
                     placeholder="Search by ID"
                     startAdornment={
                         <InputAdornment position="start">
-                            <SearchIcon />
+                            <SearchIcon/>
                         </InputAdornment>
                     }
                     value={searchTerm}
@@ -92,50 +107,61 @@ const SensorsListView: React.FC = () => {
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<AddIcon />}
+                    startIcon={<AddIcon/>}
                     onClick={handleAddSensorClick}
                 >
                     Add Sensor
                 </Button>
             </div>
-            <div style={{ marginTop: '20px' }} />
+            <div style={{marginTop: '20px'}}/>
             <TableContainer component={Paper} elevation={3}>
-                <Table sx={{ minWidth: 650 }} aria-label="sensor table">
+                <Table sx={{minWidth: 650}} aria-label="sensor table">
                     <TableHead>
                         <TableRow>
                             <TableCell>Sensor ID</TableCell>
                             <TableCell>Sensor Name</TableCell>
                             <TableCell>Sensor Area</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell>Status</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {filteredSensors.map((sensor) => (
                             <TableRow
-                                key={sensor.sensorId}
-                                onClick={() => handleRowClick(sensor.sensorId)}
-                                style={{ cursor: 'pointer' }}
+                                key={sensor.id}
+                                onClick={() => handleRowClick(sensor.id)}
+                                style={{cursor: 'pointer'}}
                             >
-                                <TableCell>{sensor.sensorId}</TableCell>
-                                <TableCell>{sensor.sensorName}</TableCell>
-                                <TableCell>{sensor.sensorArea}</TableCell>
+                                <TableCell>{sensor.id}</TableCell>
+                                <TableCell>{sensor.name}</TableCell>
+                                <TableCell>{sensor.area}</TableCell>
+                                <TableCell style={{ color: sensor.status ? 'green' : 'red' }}>
+                                    {sensor.status ? 'Active' : 'Inactive'}
+                                </TableCell>
                                 <TableCell>
-                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                    <div style={{display: 'flex', gap: '8px'}}>
                                         <Button
                                             variant="contained"
                                             color="primary"
-                                            startIcon={<EditIcon />}
-                                            onClick={() => handleEditClick(sensor.sensorId)}
+                                            startIcon={<EditIcon/>}
+                                            onClick={(e) => handleEditClick(e, sensor.id)}
                                         >
                                             Edit
                                         </Button>
+
                                         <Button
                                             variant="contained"
                                             color="warning"
-                                            startIcon={<DeleteIcon />}
-                                            onClick={() => handleDeleteClick(sensor.sensorId)}
+                                            startIcon={<DeleteIcon/>}
+                                            onClick={() => handleDeleteClick(sensor.id)}
                                         >
                                             Delete
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            startIcon={<RestoreIcon/>}
+                                            onClick={(e) => handleRestoreClick(e, sensor.id)}>
+                                            Restore
                                         </Button>
                                     </div>
                                 </TableCell>

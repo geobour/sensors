@@ -2,12 +2,11 @@ import React from 'react';
 import FileSaver from 'file-saver';
 import Button from "@mui/material/Button";
 import * as XLSX from 'xlsx';
-
-
+import { SensorDto } from '../api/ApiSensor';
 
 interface Props {
-    data: any[]; // Your data to export
-    fileName: string; // The name of the Excel file
+    data: SensorDto[];
+    fileName: string;
 }
 
 const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
