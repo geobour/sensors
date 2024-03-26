@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import axios from "axios";
 import { useQuery } from 'react-query';
 import { SensorDataDto } from "../api/ApiSensor";
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 interface BarChartProps {
     className?: string;
@@ -33,8 +33,9 @@ const BarChartMin: React.FC<BarChartProps> = ({ className }) => {
             const ctx = chartRef.current.getContext('2d');
 
             if (ctx) {
-                const labels = sensorData.map(data => `Month ${data.month}`);
-                const minTemperatures = sensorData.map(data => data.minTemperature || 0);
+                const filteredData = sensorData.filter(data => data.month !== undefined); // Filter out entries with undefined month
+                const labels = filteredData.map(data => data.month!); // Use ! to assert that month is not undefined
+                const minTemperatures = filteredData.map(data => data.minTemperature || 0);
 
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
@@ -90,6 +91,5 @@ const BarChartMin: React.FC<BarChartProps> = ({ className }) => {
         </div>
     );
 };
-
 
 export default BarChartMin;

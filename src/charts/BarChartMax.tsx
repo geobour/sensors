@@ -5,11 +5,12 @@ import Grid from '@mui/material/Grid';
 import axios from "axios";
 import { useQuery } from 'react-query';
 import { SensorDataDto } from "../api/ApiSensor";
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 interface BarChartProps {
     className?: string;
 }
+
 const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
@@ -32,8 +33,9 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
             const ctx = chartRef.current.getContext('2d');
 
             if (ctx) {
-                const labels = sensorData.map(data => `Month ${data.month}`);
-                const maxTemperatures = sensorData.map(data => data.maxTemperature || 0);
+                const filteredData = sensorData.filter(data => data.month !== undefined); // Filter out entries with undefined month
+                const labels = filteredData.map(data => data.month!); // Use ! to assert that month is not undefined
+                const maxTemperatures = filteredData.map(data => data.maxTemperature || 0);
 
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',

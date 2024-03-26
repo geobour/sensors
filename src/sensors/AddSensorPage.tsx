@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,8 +10,7 @@ const AddSensorPage: React.FC = () => {
         name: '',
         latitude: '',
         longitude: '',
-        area: '',
-        status: '',
+        area: ''
     });
     const [errors, setErrors] = useState<any>({});
 
@@ -41,9 +39,6 @@ const AddSensorPage: React.FC = () => {
         }
         if (!sensorData.area.trim()) {
             formErrors.area = 'Area is required';
-        }
-        if (!sensorData.status.trim()) {
-            formErrors.status = 'Status is required';
         }
 
         if (Object.keys(formErrors).length > 0) {
@@ -107,17 +102,17 @@ const AddSensorPage: React.FC = () => {
                     error={!!errors.area}
                     helperText={errors.area}
                 />
-                <TextField
-                    label="Status"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={sensorData.status}
-                    onChange={handleChange}
-                    name="status"
-                    error={!!errors.status}
-                    helperText={errors.status}
-                />
+                {/*<TextField*/}
+                {/*    label="Status"*/}
+                {/*    variant="outlined"*/}
+                {/*    fullWidth*/}
+                {/*    margin="normal"*/}
+                {/*    value={sensorData.status}*/}
+                {/*    onChange={handleChange}*/}
+                {/*    name="status"*/}
+                {/*    error={!!errors.status}*/}
+                {/*    helperText={errors.status}*/}
+                {/*/>*/}
                 <Button
                     type="submit"
                     variant="contained"

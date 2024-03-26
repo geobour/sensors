@@ -4,8 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AdbIcon from '@mui/icons-material/Adb';
 import { Link } from "react-router-dom";
 
-const avatarSettings = ['Information', 'Login', 'Logout'];
-const pages = ['Sensors', 'Information', 'Login'];
+const avatarSettings = ['Information', 'Logout'];
+const pages = ['HomePage','Sensors', 'Information', 'Login'];
 
 function ResponsiveAppBar() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -145,7 +145,6 @@ function ResponsiveAppBar() {
                         ))}
                     </Menu>
                 </Box>
-                {/* Removed the Login button here */}
             </Toolbar>
         </AppBar>
     );
