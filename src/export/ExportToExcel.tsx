@@ -1,17 +1,23 @@
 import React from 'react';
-import FileSaver from 'file-saver';
+import * as FileSaver from 'file-saver';
 import Button from "@mui/material/Button";
 import * as XLSX from 'xlsx';
-import { SensorDto } from '../api/ApiSensor';
+import { SensorRecordDto } from '../api/ApiSensor';
 
 interface Props {
-    data: SensorDto[];
+    data: SensorRecordDto[];
     fileName: string;
 }
 
 const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
     const exportToExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(data);
+        const worksheetData = data.map(record => [
+            record.id.toString(),
+            record.temperature !== undefined ? record.temperature.toString() : '',
+            record.time.toString()
+        ]);
+
+        const worksheet = XLSX.utils.aoa_to_sheet([['ID', 'Temperature', 'Time'], ...worksheetData]);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });

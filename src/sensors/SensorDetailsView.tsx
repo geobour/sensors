@@ -14,7 +14,7 @@ import ExportToExcel from '../export/ExportToExcel';
 import {useQuery} from 'react-query'; // Import useQuery from react-query
 import {Box, Divider} from '@mui/material';
 import axios from 'axios';
-import {SensorDto} from "../api/ApiSensor";
+import {SensorDto, SensorRecordDto} from "../api/ApiSensor";
 
 
 const SensorDetailsView: React.FC = () => {
@@ -27,10 +27,20 @@ const SensorDetailsView: React.FC = () => {
             const response = await axios.get<SensorDto>(
                 `http://localhost:8080/api/sensor/get-sensor/${sensorId}`
             );
-            console.log(sensorId)
             return response.data;
         }
     );
+    const { data: temp = [] } = useQuery<SensorRecordDto[], Error>(
+        ['data', sensorId],
+        async () => {
+            const response = await axios.get<SensorRecordDto[]>(
+                `http://localhost:8080/api/sensor/reports/get-month-data?sensorId=${sensorId}`
+            );
+            console.log(response.data)
+            return response.data;
+        }
+    );
+
     const handleMinChart = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         navigate(`bar-chart-min`);
@@ -48,6 +58,11 @@ const SensorDetailsView: React.FC = () => {
         e.stopPropagation();
         navigate(`line-chart`);
     };
+    const handleMap = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        navigate(`map`);
+    };
+
 
     return (
         <div style={{marginTop: '100px'}}>
@@ -64,8 +79,8 @@ const SensorDetailsView: React.FC = () => {
                             marginBottom: '10px',
                             alignContent: 'flex-end'
                         }}>
-                            {sensors && <ExportToExcel data={[sensors]} fileName="exportedSensors"/>}
-                            <Typography>Export monthly data to csv.</Typography>
+                            {sensors && <ExportToExcel data={temp || []} fileName="exportedSensors" />}
+                            <Typography>Export monthly data to CSV.</Typography>
                         </Box>
                         <TableContainer component={Paper}>
                             <Table>
@@ -90,9 +105,12 @@ const SensorDetailsView: React.FC = () => {
                             </Table>
                         </TableContainer>
                         <div style={{marginTop: '20px', flex: 'max-content'}}>
-                            <Button component={Link} to="/map" variant="contained" color="primary"
-                                    sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}>
-                                Map
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleMap}
+                                sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
+                            > Map
                             </Button>
                             <Button
                                 variant="contained"

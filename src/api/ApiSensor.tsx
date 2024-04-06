@@ -7,7 +7,7 @@ export interface SensorDataDto {
 }
 export  interface SensorRecordDto {
     id: number;
-    temperature: number;
+    temperature?: number;
     time: string;
 }
 export interface SensorDto {
@@ -19,3 +19,6 @@ export interface SensorDto {
     status:boolean;
     active:string;
 }
+
+
+
