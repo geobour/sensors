@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -18,7 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RestoreIcon from '@mui/icons-material/Restore'; // Import RestoreIcon
 import axios from 'axios';
-import {SensorDto} from "../api/ApiSensor";
+import { SensorDto } from '../api/ApiSensor';
 
 const SensorsListView: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>('');
@@ -85,20 +85,19 @@ const SensorsListView: React.FC = () => {
         navigate('add');
     };
 
-    // @ts-ignore
     return (
         <Container>
-            <Paper elevation={3} sx={{mt: 4, backgroundColor: '#f0f0f0', padding: '10px'}}>
-                <Typography variant="h4" align={"center"}>
+            <Paper elevation={3} sx={{ mt: 4, backgroundColor: '#f0f0f0', padding: '10px' }}>
+                <Typography variant="h4" align="center" fontWeight="bold" color="text.secondary">
                     Sensors List
                 </Typography>
             </Paper>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px'}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
                 <Input
                     placeholder="Search by ID"
                     startAdornment={
                         <InputAdornment position="start">
-                            <SearchIcon/>
+                            <SearchIcon />
                         </InputAdornment>
                     }
                     value={searchTerm}
@@ -107,69 +106,71 @@ const SensorsListView: React.FC = () => {
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<AddIcon/>}
+                    startIcon={<AddIcon />}
                     onClick={handleAddSensorClick}
                 >
                     Add Sensor
                 </Button>
             </div>
-            <div style={{marginTop: '20px'}}/>
-            <TableContainer component={Paper} elevation={3}>
-                <Table sx={{minWidth: 650}} aria-label="sensor table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Sensor ID</TableCell>
-                            <TableCell>Sensor Name</TableCell>
-                            <TableCell>Sensor Area</TableCell>
-                            <TableCell>Status</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {filteredSensors.map((sensor) => (
-                            <TableRow
-                                key={sensor.id}
-                                onClick={() => handleRowClick(sensor.id)}
-                                style={{cursor: 'pointer'}}
-                            >
-                                <TableCell>{sensor.id}</TableCell>
-                                <TableCell>{sensor.name}</TableCell>
-                                <TableCell>{sensor.area}</TableCell>
-                                <TableCell style={{ color: sensor.status ? 'green' : 'red' }}>
-                                    {sensor.status ? 'Active' : 'Inactive'}
-                                </TableCell>
-                                <TableCell>
-                                    <div style={{display: 'flex', gap: '8px'}}>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            startIcon={<EditIcon/>}
-                                            onClick={(e) => handleEditClick(e, sensor.id)}
-                                        >
-                                            Edit
-                                        </Button>
-
-                                        <Button
-                                            variant="contained"
-                                            color="warning"
-                                            startIcon={<DeleteIcon/>}
-                                            onClick={() => handleDeleteClick(sensor.id)}
-                                        >
-                                            Delete
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="secondary"
-                                            startIcon={<RestoreIcon/>}
-                                            onClick={(e) => handleRestoreClick(e, sensor.id)}>
-                                            Restore
-                                        </Button>
-                                    </div>
-                                </TableCell>
+            <div style={{ marginTop: '20px' }} />
+            <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                <TableContainer component={Paper} elevation={3}>
+                    <Table sx={{ minWidth: 650 }} aria-label="sensor table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Sensor ID</TableCell>
+                                <TableCell>Sensor Name</TableCell>
+                                <TableCell>Sensor Area</TableCell>
+                                <TableCell>Status</TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                        </TableHead>
+                        <TableBody>
+                            {filteredSensors.map((sensor) => (
+                                <TableRow
+                                    key={sensor.id}
+                                    onClick={() => handleRowClick(sensor.id)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <TableCell>{sensor.id}</TableCell>
+                                    <TableCell>{sensor.name}</TableCell>
+                                    <TableCell>{sensor.area}</TableCell>
+                                    <TableCell style={{ color: sensor.status ? 'green' : 'red' }}>
+                                        {sensor.status ? 'Active' : 'Inactive'}
+                                    </TableCell>
+                                    <TableCell>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                startIcon={<EditIcon />}
+                                                onClick={(e) => handleEditClick(e, sensor.id)}
+                                            >
+                                                Edit
+                                            </Button>
+
+                                            <Button
+                                                variant="contained"
+                                                color="warning"
+                                                startIcon={<DeleteIcon />}
+                                                onClick={() => handleDeleteClick(sensor.id)}
+                                            >
+                                                Delete
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="secondary"
+                                                startIcon={<RestoreIcon />}
+                                                onClick={(e) => handleRestoreClick(e, sensor.id)}>
+                                                Restore
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </div>
         </Container>
     );
 };

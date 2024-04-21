@@ -34,7 +34,7 @@ const BarChartMin: React.FC<BarChartProps> = ({ className }) => {
 
             if (ctx) {
                 const filteredData = sensorData.filter(data => data.month !== undefined); // Filter out entries with undefined month
-                const labels = filteredData.map(data => data.month!); // Use ! to assert that month is not undefined
+                const labels = filteredData.map(data => getMonthName(data.month!)); // Map numeric months to month names
                 const minTemperatures = filteredData.map(data => data.minTemperature || 0);
 
                 chartInstance.current = new Chart(ctx, {
@@ -72,6 +72,12 @@ const BarChartMin: React.FC<BarChartProps> = ({ className }) => {
             }
         };
     }, [sensorData]);
+
+    // Function to get month name from month number
+    const getMonthName = (monthNumber: number) => {
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        return months[monthNumber - 1];
+    };
 
     return (
         <div className={"barChartMin"} style={{ marginTop: '100px', flex: "max-content" }}>

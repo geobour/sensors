@@ -20,5 +20,12 @@ export interface SensorDto {
     active:string;
 }
 
+export  interface FileData {
+    min?: number;
+    max?: number;
+    avg?: number;
+
+}
+
 
 

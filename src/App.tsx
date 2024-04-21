@@ -10,7 +10,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <MainPage />
-            <Footer/>
+            {/*<Footer/>*/}
         </QueryClientProvider>
     );
 }

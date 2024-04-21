@@ -13,6 +13,7 @@ import Login from "../../src/Login";
 import EditSensorPage from "../../src/sensors/EditSensorPage";
 import BarChartAvg from "../charts/BarChartAvg";
 import SensorMapComponent from "../map/SensorMapComponent";
+import Footer from "./Footer";
 
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
@@ -57,6 +58,7 @@ function MainPage() {
                         <Route path="/logout" element={<Navigate to="/" replace/>}/>
                         <Route path="*" element={<Navigate to="/HomePage" replace/>}/>
                     </Routes>
+                    {/*<Footer/>*/}
                 </>
             ) : (
                 <Login onLogin={handleLogin}/>
