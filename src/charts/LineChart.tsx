@@ -44,7 +44,7 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
 
             if (ctx) {
                 const labels = sensorData.map(data => data.time);
-                const temperatures = sensorData.map(data => data.temperature);
+                const values = sensorData.map(data => data.value);
 
                 // @ts-ignore
                 chartInstance.current = new Chart(ctx, {
@@ -53,8 +53,8 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Hourly Temperatures',
-                                data: temperatures,
+                                label: 'Hourly Values',
+                                data: values,
                                 fill: false,
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 borderWidth: 2,

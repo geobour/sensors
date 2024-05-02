@@ -35,7 +35,7 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
             if (ctx) {
                 const filteredData = sensorData.filter(data => data.month !== undefined); // Filter out entries with undefined month
                 const labels = filteredData.map(data => getMonthName(data.month!)); // Map numeric months to month names
-                const maxTemperatures = filteredData.map(data => data.maxTemperature || 0);
+                const maxValues = filteredData.map(data => data.maxValue || 0);
 
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
@@ -43,8 +43,8 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Maximum Temperatures',
-                                data: maxTemperatures,
+                                label: 'Maximum Values',
+                                data: maxValues,
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)', // Red background color
                                 borderColor: 'rgba(255, 99, 132, 1)', // Red border color
                                 borderWidth: 1,

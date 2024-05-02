@@ -35,7 +35,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
             if (ctx) {
                 const filteredData = sensorData.filter(data => data.month !== undefined);
                 const labels = filteredData.map(data => getMonthName(data.month!)); // Map numeric months to month names
-                const avgTemperatures = filteredData.map(data => data.averageTemperature || 0);
+                const avgValues = filteredData.map(data => data.averageValue || 0);
 
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
@@ -43,8 +43,8 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Average Temperatures',
-                                data: avgTemperatures,
+                                label: 'Average Values',
+                                data: avgValues,
                                 backgroundColor: 'rgba(255, 206, 86, 0.2)', // Yellow background color
                                 borderColor: 'rgba(255, 206, 86, 1)', // Yellow border color
                                 borderWidth: 1,

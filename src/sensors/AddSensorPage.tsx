@@ -10,7 +10,9 @@ const AddSensorPage: React.FC = () => {
         name: '',
         latitude: '',
         longitude: '',
-        area: ''
+        area: '',
+        topic: '',
+        type: '',
     });
     const [errors, setErrors] = useState<any>({});
 
@@ -26,7 +28,6 @@ const AddSensorPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Basic form validation
         const formErrors: any = {};
         if (!sensorData.name.trim()) {
             formErrors.name = 'Name is required';
@@ -39,6 +40,12 @@ const AddSensorPage: React.FC = () => {
         }
         if (!sensorData.area.trim()) {
             formErrors.area = 'Area is required';
+        }
+        if (!sensorData.topic.trim()) {
+            formErrors.topic = 'Topic is required';
+        }
+        if (!sensorData.type.trim()) {
+            formErrors.type = 'Type is required';
         }
 
         if (Object.keys(formErrors).length > 0) {
@@ -102,17 +109,29 @@ const AddSensorPage: React.FC = () => {
                     error={!!errors.area}
                     helperText={errors.area}
                 />
-                {/*<TextField*/}
-                {/*    label="Status"*/}
-                {/*    variant="outlined"*/}
-                {/*    fullWidth*/}
-                {/*    margin="normal"*/}
-                {/*    value={sensorData.status}*/}
-                {/*    onChange={handleChange}*/}
-                {/*    name="status"*/}
-                {/*    error={!!errors.status}*/}
-                {/*    helperText={errors.status}*/}
-                {/*/>*/}
+                <TextField
+                    label="Topic"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={sensorData.topic}
+                    onChange={handleChange}
+                    name="topic"
+                    error={!!errors.topic}
+                    helperText={errors.topic}
+                />
+                <TextField
+                    label="Type"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={sensorData.type}
+                    onChange={handleChange}
+                    name="type"
+                    error={!!errors.type}
+                    helperText={errors.type}
+                />
+
                 <Button
                     type="submit"
                     variant="contained"

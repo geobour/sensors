@@ -13,11 +13,11 @@ const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
     const exportToExcel = () => {
         const worksheetData = data.map(record => [
             record.id.toString(),
-            record.temperature !== undefined ? record.temperature.toString() : '',
+            record.value !== undefined ? record.value.toString() : '',
             record.time.toString()
         ]);
 
-        const worksheet = XLSX.utils.aoa_to_sheet([['ID', 'Temperature', 'Time'], ...worksheetData]);
+        const worksheet = XLSX.utils.aoa_to_sheet([['ID', 'Value', 'Time'], ...worksheetData]);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });

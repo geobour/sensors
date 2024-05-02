@@ -38,7 +38,9 @@ const SensorsListView: React.FC = () => {
         fetchData();
     }, []);
 
-    const handleDeleteClick = async (sensorId: number) => {
+    const handleDeleteClick = async (e: React.MouseEvent<HTMLButtonElement>, sensorId: number) => {
+        e.stopPropagation();
+
         try {
             await axios.delete(`http://localhost:8080/api/sensor/delete-sensor/${sensorId}`);
             setSensorList(prevSensorList => prevSensorList.filter(sensor => sensor.id !== sensorId));
@@ -121,6 +123,8 @@ const SensorsListView: React.FC = () => {
                                 <TableCell>Sensor ID</TableCell>
                                 <TableCell>Sensor Name</TableCell>
                                 <TableCell>Sensor Area</TableCell>
+                                <TableCell>Topic</TableCell>
+                                <TableCell>Type</TableCell>
                                 <TableCell>Status</TableCell>
                             </TableRow>
                         </TableHead>
@@ -134,6 +138,8 @@ const SensorsListView: React.FC = () => {
                                     <TableCell>{sensor.id}</TableCell>
                                     <TableCell>{sensor.name}</TableCell>
                                     <TableCell>{sensor.area}</TableCell>
+                                    <TableCell>{sensor.topic}</TableCell>
+                                    <TableCell>{sensor.type}</TableCell>
                                     <TableCell style={{ color: sensor.status ? 'green' : 'red' }}>
                                         {sensor.status ? 'Active' : 'Inactive'}
                                     </TableCell>
@@ -152,7 +158,7 @@ const SensorsListView: React.FC = () => {
                                                 variant="contained"
                                                 color="warning"
                                                 startIcon={<DeleteIcon />}
-                                                onClick={() => handleDeleteClick(sensor.id)}
+                                                onClick={(e) => handleDeleteClick(e,sensor.id)}
                                             >
                                                 Delete
                                             </Button>

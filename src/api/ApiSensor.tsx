@@ -1,13 +1,13 @@
 export interface SensorDataDto {
     year?: number;
     month?: number;
-    maxTemperature?: number;
-    minTemperature?: number;
-    averageTemperature?: number;
+    maxValue?: number;
+    minValue?: number;
+    averageValue?: number;
 }
 export  interface SensorRecordDto {
     id: number;
-    temperature?: number;
+    value?: number;
     time: string;
 }
 export interface SensorDto {
@@ -15,6 +15,8 @@ export interface SensorDto {
     name: string;
     latitude: string;
     longitude: string;
+    type: string;
+    topic: string;
     area: string;
     status:boolean;
     active:string;
@@ -26,6 +28,23 @@ export  interface FileData {
     avg?: number;
 
 }
+export interface PredictionData {
+    january?: number;
+    february?: number;
+    march?: number;
+    april?: number;
+    may?: number;
+    june?: number;
+    july?: number;
+    august?: number;
+    september?: number;
+    october?: number;
+    november?: number;
+    december?: number;
+}
+
+
+
 
 
 

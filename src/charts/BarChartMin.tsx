@@ -35,7 +35,7 @@ const BarChartMin: React.FC<BarChartProps> = ({ className }) => {
             if (ctx) {
                 const filteredData = sensorData.filter(data => data.month !== undefined); // Filter out entries with undefined month
                 const labels = filteredData.map(data => getMonthName(data.month!)); // Map numeric months to month names
-                const minTemperatures = filteredData.map(data => data.minTemperature || 0);
+                const minValues = filteredData.map(data => data.minValue || 0);
 
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
@@ -43,8 +43,8 @@ const BarChartMin: React.FC<BarChartProps> = ({ className }) => {
                         labels: labels,
                         datasets: [
                             {
-                                label: 'Minimum Temperatures',
-                                data: minTemperatures,
+                                label: 'Minimum Values',
+                                data: minValues,
                                 backgroundColor: 'rgba(54, 162, 235, 0.2)', // Blue background color
                                 borderColor: 'rgba(54, 162, 235, 1)', // Blue border color
                                 borderWidth: 1,
