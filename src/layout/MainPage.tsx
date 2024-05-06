@@ -9,7 +9,7 @@ import SensorDetailsView from "./../sensors/SensorDetailsView";
 import BarChartMin from "./../charts/BarChartMin";
 import BarChartMax from "./../charts/BarChartMax";
 import LineChart from "./../charts/LineChart";
-import Login from "../../src/Login";
+import Login from "../login/Login";
 import EditSensorPage from "../../src/sensors/EditSensorPage";
 import BarChartAvg from "../charts/BarChartAvg";
 import SensorMapComponent from "../map/SensorMapComponent";
@@ -19,8 +19,8 @@ function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
 
     useEffect(() => {
-        // Check if user is already logged in (you may need to implement this based on your authentication mechanism)
-        const userLoggedIn = localStorage.getItem('isLoggedIn'); // Example: Check if a token is present
+        // Check if user is already logged in using localStorage
+        const userLoggedIn = localStorage.getItem('isLoggedIn') || sessionStorage.getItem('isLoggedIn');
         if (userLoggedIn) {
             setLoggedIn(true);
         }
@@ -28,15 +28,18 @@ function MainPage() {
 
     const handleLogin = () => {
         setLoggedIn(true);
-        // You may need to store login state in localStorage or sessionStorage for persistence across page refreshes
+        // Store login state in both localStorage and sessionStorage
         localStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('isLoggedIn', 'true');
     };
 
     const handleLogout = () => {
         setLoggedIn(false);
-        // Clear login state from localStorage or sessionStorage
+        // Clear login state from both localStorage and sessionStorage
         localStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('isLoggedIn');
     };
+
 
     return (
         <div>
@@ -58,7 +61,6 @@ function MainPage() {
                         <Route path="/logout" element={<Navigate to="/" replace/>}/>
                         <Route path="*" element={<Navigate to="/HomePage" replace/>}/>
                     </Routes>
-                    {/*<Footer/>*/}
                 </>
             ) : (
                 <Login onLogin={handleLogin}/>

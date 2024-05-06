@@ -1,23 +1,32 @@
 import React from 'react';
-import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx'; // Import all exports as XLSX
+import FileSaver from 'file-saver';
 import Button from "@mui/material/Button";
-import * as XLSX from 'xlsx';
-import { SensorRecordDto } from '../api/ApiSensor';
+
+interface PredictionData {
+    january?: number;
+    february?: number;
+    march?: number;
+    april?: number;
+}
 
 interface Props {
-    data: SensorRecordDto[];
+    data: PredictionData;
     fileName: string;
 }
 
 const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
     const exportToExcel = () => {
-        const worksheetData = data.map(record => [
-            record.id.toString(),
-            record.value !== undefined ? record.value.toString() : '',
-            record.time.toString()
-        ]);
+        const { january, february, march, april } = data;
 
-        const worksheet = XLSX.utils.aoa_to_sheet([['ID', 'Value', 'Time'], ...worksheetData]);
+        const worksheetData = [
+            ['January', january?.toString()],
+            ['February', february?.toString()],
+            ['March', march?.toString()],
+            ['April', april?.toString()],
+        ];
+
+        const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });

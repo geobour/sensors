@@ -6,6 +6,7 @@ import axios from "axios";
 import { useQuery } from 'react-query';
 import { SensorDataDto } from "../api/ApiSensor";
 import { useParams } from "react-router-dom";
+import Footer from "../layout/Footer";
 
 interface BarChartProps {
     className?: string;
@@ -94,6 +95,8 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
                     )}
                 </Grid>
             </Grid>
+            <Footer></Footer>
+
         </div>
     );
 };

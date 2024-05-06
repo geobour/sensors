@@ -22,18 +22,15 @@ import Footer from "../layout/Footer";
 const SensorDetailsView: React.FC = () => {
     const {sensorId} = useParams<{ sensorId: string }>();
     const navigate = useNavigate();
-    const [minValues, setMinValues] = useState<number[]>([]); // Define state for min values
-    const [maxValues, setMaxValues] = useState<number[]>([]); // Define state for max values
-    const [avgValues, setAvgValues] = useState<number[]>([]); // Define state for avg values
-    const [avgSensorValues, setSensorAvgValues] = useState<number[]>([]); // Define state for avg values
-    const [minSensorValues, setSensorMinValues] = useState<number[]>([]); // Define state for avg values
-    const [maxSensorValues, setSensorMaxValues] = useState<number[]>([]); // Define state for avg values
-    const [predictionData, setPredictionData] = useState<PredictionData[]>([]);
+    const [minValues, setMinValues] = useState<number[]>([]);
+    const [maxValues, setMaxValues] = useState<number[]>([]);
+    const [avgValues, setAvgValues] = useState<number[]>([]);
+    const [avgSensorValues, setSensorAvgValues] = useState<number[]>([]);
+    const [minSensorValues, setSensorMinValues] = useState<number[]>([]);
+    const [maxSensorValues, setSensorMaxValues] = useState<number[]>([]);
+    const [predictionData, setPredictionData] = useState<PredictionData>();
     const [selectedType, setSelectedType] = useState('');
-    const [values, setValues] = useState<{ min?: number; max?: number; avg?: number }>({});
-    const [selectedMonth, setSelectMonth] = useState('');
-    const [monthValues, setMonthValues] = useState<{ min?: number; max?: number; avg?: number }>({});
-
+    const [selectedYear, setSelectedYear] = useState('');
 
 
     const {data: sensors} = useQuery<SensorDto, Error>(
@@ -45,19 +42,20 @@ const SensorDetailsView: React.FC = () => {
             return response.data;
         }
     );
-    const {data: temp = []} = useQuery<SensorRecordDto[], Error>(
-        ['data', sensorId],
-        async () => {
-            const response = await axios.get<SensorRecordDto[]>(
-                `http://localhost:8080/api/sensor/reports/get-month-data?sensorId=${sensorId}`
-            );
-            return response.data;
-        }
-    );
+    // const {data: temp = []} = useQuery<SensorRecordDto[], Error>(
+    //     ['data', sensorId],
+    //     async () => {
+    //         const response = await axios.get<SensorRecordDto[]>(
+    //             `http://localhost:8080/api/sensor/reports/get-month-data?sensorId=${sensorId}`
+    //         );
+    //         return response.data;
+    //     }
+    // );
 
-    const handleLoadFileData = async () => {
+    const handlePrediction = async () => {
         try {
-            const response = await axios.get<PredictionData[]>('http://localhost:8080/api/predict');
+            const response = await axios.get<PredictionData>('http://localhost:8080/api/predict');
+            // @ts-ignore
             setPredictionData(response.data);
             console.log(response.data)
 
@@ -68,7 +66,30 @@ const SensorDetailsView: React.FC = () => {
     };
 
 
+    const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
+        ['sensorData', sensorId, 2024],
+        async () => {
+            const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2024`);
+            const avgSensorValues: number[] = response.data.map((item: SensorDataDto) => item.averageValue || 0);
+            setSensorAvgValues(avgSensorValues);
+            const minSensorValues: number[] = response.data.map((item: SensorDataDto) => item.minValue || 0);
+            setSensorMinValues(minSensorValues);
+            const maxSensorValues: number[] = response.data.map((item: SensorDataDto) => item.maxValue || 0);
+            setSensorMaxValues(maxSensorValues);
 
+            return response.data;
+        }
+    );
+
+
+    const handleChangeType = (event: SelectChangeEvent<string>) => {
+        setSelectedType(event.target.value);
+    };
+
+
+    const handleChangeYear = (event: SelectChangeEvent<string>) => {
+        setSelectedYear(event.target.value);
+    };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files;
@@ -106,26 +127,6 @@ const SensorDetailsView: React.FC = () => {
         }
     };
 
-    const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
-        ['sensorData', sensorId, 2024],
-        async () => {
-            const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2024`);
-            const avgSensorValues: number[] = response.data.map((item: SensorDataDto) => item.averageValue || 0);
-            setSensorAvgValues(avgSensorValues);
-            const minSensorValues: number[] = response.data.map((item: SensorDataDto) => item.minValue || 0);
-            setSensorMinValues(minSensorValues);
-            const maxSensorValues: number[] = response.data.map((item: SensorDataDto) => item.maxValue || 0);
-            setSensorMaxValues(maxSensorValues);
-
-            return response.data;
-        }
-    );
-
-
-    useEffect(() => {
-        console.log(predictionData.map(data => data.january))
-    }, [predictionData]);
-
 
     const handleMinChart = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -150,172 +151,57 @@ const SensorDetailsView: React.FC = () => {
     };
 
     useEffect(() => {
-        const ctx = document.getElementById('maxChart');
-        if (ctx) {
-            // Check if a chart instance already exists and destroy it
-            // @ts-ignore
-            const existingChart = Chart.getChart(ctx);
-            if (existingChart) {
-                existingChart.destroy();
-            }
+        const renderChart = () => {
+            const ctx = document.getElementById(selectedType === "Max" ? 'maxChart' : selectedType === "Min" ? 'minChart' : 'avgChart');
+            if (ctx) {
+                // Check if a chart instance already exists and destroy it
+                // @ts-ignore
+                const existingChart = Chart.getChart(ctx);
+                if (existingChart) {
+                    existingChart.destroy();
+                }
 
-
-            // @ts-ignore
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                    datasets: [
-                        {
-                            label: 'Prediction Values',
-                            data:predictionData.map(data => data.january),
-                            fill: false,
-                            borderColor: 'rgb(255, 99, 132)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Sensor Values',
-                            data: maxSensorValues,
-                            fill: false,
-                            borderColor: 'rgb(121, 176, 215)',
-                            tension: 0.1
-                        }
-                    ]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                // Render the appropriate chart
+                // @ts-ignore
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                        datasets: [
+                            {
+                                label: 'Prediction Values',
+                                data: Object.values(predictionData || {}),
+                                fill: false,
+                                borderColor: 'rgb(0, 255, 0)',
+                                tension: 0.1
+                            },
+                            {
+                                label: selectedType === "Max" ? 'Sensor Values (Max)' : selectedType === "Min" ? 'Sensor Values (Min)' : 'Sensor Values (Avg)',
+                                data: selectedType === "Max" ? maxSensorValues : selectedType === "Min" ? minSensorValues : avgSensorValues,
+                                fill: false,
+                                borderColor: selectedType === "Max" ? 'rgb(255, 99, 132)' : selectedType === "Min" ? 'rgb(70, 130, 180)' : 'rgb(255, 206, 86)', // Redish, Bluish, Yellowish
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
-            });
-        }
-    }, [maxValues,sensorData]);
-
-
-
-    useEffect(() => {
-        const ctx = document.getElementById('minChart');
-        if (ctx) {
-            // Check if a chart instance already exists and destroy it
-            // @ts-ignore
-            const existingChart = Chart.getChart(ctx);
-            if (existingChart) {
-                existingChart.destroy();
+                });
             }
+        };
 
-            // Create new chart with dynamic sensor data
-            // @ts-ignore
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                    datasets: [
-
-                        {
-                            label: 'Prediction Values',
-                            data: [4, 10, 16, 20, 22, 0, 0, 0, 0, 0, 0, 0],
-                            fill: false,
-                            borderColor: 'rgb(255, 99, 132)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Sensor Values',
-                            data: minSensorValues,
-                            fill: false,
-                            borderColor: 'rgb(121, 176, 215)',
-                            tension: 0.1
-                        }
-                    ]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-    }, [minValues,sensorData]);
-    useEffect(() => {
-        const ctx = document.getElementById('avgChart');
-        if (ctx) {
-            // Check if a chart instance already exists and destroy it
-            // @ts-ignore
-            const existingChart = Chart.getChart(ctx);
-            if (existingChart) {
-                existingChart.destroy();
-            }
-
-            // @ts-ignore
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                    datasets: [
-                        {
-                            label: 'Prediction Values',
-                            data: [15, 10, 16, 20, 22, 0, 0, 0, 0, 0, 0, 0],
-                            fill: false,
-                            borderColor: 'rgb(255, 99, 132)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Sensor Values',
-                            data: avgSensorValues,
-                            fill: false,
-                            borderColor: 'rgb(121, 176, 215)',
-                            tension: 0.1
-                        }
-                    ]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-    }, [avgValues,sensorData]);
+        renderChart();
+    }, [selectedType, maxSensorValues, minSensorValues, avgSensorValues, predictionData]);
 
 
 
 
-    const handleChangeType = (event: SelectChangeEvent<string>) => {
-        setSelectedType(event.target.value);
-        // Fetch min, max, avg values based on selected type
-        // For now, setting dummy values
-        if (event.target.value === '10') { // Max
-            setValues({ min: 50, max: 100, avg: 75 }); // Example values
-        } else if (event.target.value === '21') { // Min
-            setValues({ min: 20, max: 70, avg: 45 }); // Example values
-        } else if (event.target.value === '22') { // Avg
-            setValues({ min: 30, max: 80, avg: 55 }); // Example values
-        } else {
-            setValues({});
-        }
-    };
-    const handleChangeMonth = (event: SelectChangeEvent<string>) => {
-        setSelectMonth(event.target.value);
-        // Fetch min, max, avg values based on selected type
-        // For now, setting dummy values
-        // if (event.target.value === '10') { // Max
-        //     setValues({ min: 50, max: 100, avg: 75 }); // Example values
-        // } else if (event.target.value === '21') { // Min
-        //     setValues({ min: 20, max: 70, avg: 45 }); // Example values
-        // } else if (event.target.value === '22') { // Avg
-        //     setValues({ min: 30, max: 80, avg: 55 }); // Example values
-        // } else {
-        //     setValues({});
-        // }
-    };
-
-
-
+    // @ts-ignore
     return (
         <div style={{marginTop: '20px', marginBottom: '200px', overflowY: 'hidden'}}>
             <Grid container justifyContent="center" alignItems="center" spacing={3}>
@@ -435,12 +321,12 @@ const SensorDetailsView: React.FC = () => {
                             <input type="file" accept=".xlsx, .xls" onChange={handleChange}/>
                             <Box sx={{marginTop: '10px'}}>
                                 <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
-                                    Choose type, year, month
+                                    Select type/year
                                 </Typography>
                                 <FormControl sx={{ m: 1, minWidth: 100 }}>
                                     <InputLabel id="demo-simple-select-autowidth-label">Type</InputLabel>
                                     <Select
-                                        labelId="demo-simple-select-autowidth-label"
+                                        labelId="type-label"
                                         id="demo-simple-select-autowidth"
                                         value={selectedType}
                                         onChange={handleChangeType}
@@ -450,113 +336,67 @@ const SensorDetailsView: React.FC = () => {
                                         <MenuItem value="">
                                             <em>None</em>
                                         </MenuItem>
-                                        <MenuItem value={10}>Max</MenuItem>
-                                        <MenuItem value={21}>Min</MenuItem>
-                                        <MenuItem value={22}>Avg</MenuItem>
+                                        <MenuItem value="Max">Max</MenuItem>
+                                        <MenuItem value="Min">Min</MenuItem>
+                                        <MenuItem value="Avg">Avg</MenuItem>
                                     </Select>
                                 </FormControl>
                                 <FormControl sx={{ m: 1, minWidth: 100 }}>
-                                    <InputLabel id="demo-simple-select-autowidth-label">Month</InputLabel>
+                                    <InputLabel id="year-label">Year</InputLabel>
                                     <Select
-                                        labelId="demo-simple-select-autowidth-label"
+                                        labelId="yearr-label"
                                         id="demo-simple-select-autowidth"
-                                        // value={age}
-                                        // onChange={handleChange}
+                                        value={selectedYear}
+                                        onChange={handleChangeYear}
                                         autoWidth
-                                        label="Month"
+                                        label="Year"
                                     >
                                         <MenuItem value="">
                                             <em>None</em>
                                         </MenuItem>
-                                            <em>None</em>
-                                            <MenuItem value={10}>January</MenuItem>
-                                            <MenuItem value={21}>February</MenuItem>
-                                            <MenuItem value={32}>March</MenuItem>
-                                            <MenuItem value={43}>April</MenuItem>
-                                            <MenuItem value={54}>May</MenuItem>
-                                            <MenuItem value={65}>June</MenuItem>
-                                            <MenuItem value={76}>July</MenuItem>
-                                            <MenuItem value={87}>August</MenuItem>
-                                            <MenuItem value={98}>September</MenuItem>
-                                            <MenuItem value={109}>October</MenuItem>
-                                            <MenuItem value={111}>November</MenuItem>
-                                            <MenuItem value={112}>December</MenuItem>
+                                        <MenuItem value="2024">2024</MenuItem>
+                                        <MenuItem value="2023">2023</MenuItem>
 
                                     </Select>
                                 </FormControl>
-                                {1<2 ? (
-                                    <Grid container justifyContent="center" spacing={2}>
-                                        <Grid item>
-                                            <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
-                                                Max
-                                            </Typography>
-                                            <Box sx={{
-                                                width: '700px',
-                                                height: '400px',
-                                                boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
-                                                textAlign: 'center'
-                                            }}>
-                                                <canvas id="maxChart" width="700" height="400"></canvas>
-                                            </Box>
-                                        </Grid>
+                                <Grid container justifyContent="center" spacing={2}>
+                                    <Grid item>
+                                        <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
+                                            {selectedType === "Max" ? 'Max' : selectedType === "Min" ? 'Min' : 'Avg'}
+                                        </Typography>
+                                        <Box sx={{
+                                            width: '700px',
+                                            height: '400px',
+                                            boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
+                                            textAlign: 'center'
+                                        }}>
+                                            <canvas id={selectedType === "Max" ? 'maxChart' : selectedType === "Min" ? 'minChart' : 'avgChart'} width="700" height="400"></canvas>
+                                        </Box>
                                     </Grid>
-                                ) : (
-                                    <Grid container justifyContent="center" spacing={2}>
-                                        <Grid item>
-                                            <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
-                                                Min
-                                            </Typography>
-                                            <Box sx={{
-                                                width: '700px',
-                                                height: '400px',
-                                                boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
-                                                textAlign: 'center'
-                                            }}>
-                                                <canvas id="minChart" width="700" height="400"></canvas>
-                                            </Box>
-                                        </Grid>
-                                    </Grid>
-                                )}
-                                {/*: (*/}
-                                {/*<Grid container justifyContent="center" spacing={2}>*/}
-                                {/*    <Grid item>*/}
-                                {/*        <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">*/}
-                                {/*            Avg*/}
-                                {/*        </Typography>*/}
-                                {/*        <Box sx={{*/}
-                                {/*            width: '700px',*/}
-                                {/*            height: '400px',*/}
-                                {/*            boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',*/}
-                                {/*            textAlign: 'center'*/}
-                                {/*        }}>*/}
-                                {/*            <canvas id="avgChart" width="700" height="400"></canvas>*/}
-                                {/*        </Box>*/}
-                                {/*    </Grid>*/}
-                                {/*</Grid>*/}
-                                {/*)}*/}
+                                </Grid>
 
-                                <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
-                                    Run the algorithm
-                                </Typography>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleLoadFileData}
-                                    sx={{ marginTop: '10px' }}>
-                                    Run
-                                </Button>
-                                {/*<Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">*/}
-                                {/*    Export results in xlsx*/}
-                                {/*</Typography>*/}
-                                {/*<Box sx={{*/}
-                                {/*    marginRight: '10px',*/}
-                                {/*    marginTop: '10px',*/}
-                                {/*    marginBottom: '20px',*/}
-                                {/*    alignContent: 'flex-end'*/}
-                                {/*}}>*/}
-                                {/*    {sensors && <ExportToExcel data={temp || []} fileName="exportedSensors"/>}*/}
-                                {/*</Box>*/}
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    marginBottom: '20px',
+                                }}>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={handlePrediction}
+                                    >
+                                        Run
+                                    </Button>
+                                    <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary" sx={{ flexGrow: 1 }}>
+                                        Run the algorithm
+                                    </Typography>
+                                    <Box sx={{ marginRight: '10px', marginLeft: '10px' }}>
+                                        {predictionData &&
+                                            <ExportToExcel data={predictionData  || []} fileName="exportedSensors"/>
+                                        }
+                                    </Box>
 
+                                </Box>
                             </Box>
                         </Paper>
 

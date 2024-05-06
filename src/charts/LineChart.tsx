@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import axios from "axios";
 import {SensorRecordDto} from "../api/ApiSensor";
 import {useParams} from "react-router-dom";
+import Footer from "../layout/Footer";
 
 interface LineChartProps {
     className?: string;
@@ -101,6 +102,7 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
                     )}
                 </Grid>
             </Grid>
+            <Footer></Footer>
         </div>
     );
 };
