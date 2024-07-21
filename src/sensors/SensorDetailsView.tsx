@@ -14,7 +14,7 @@ import ExportToExcel from '../export/ExportToExcel';
 import {useQuery} from 'react-query';
 import {Box, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from '@mui/material';
 import axios from 'axios';
-import {SensorDto, SensorRecordDto, FileData, SensorDataDto, PredictionData} from "../api/ApiSensor";
+import {SensorDto, FileData, SensorDataDto, PredictionData} from "../api/ApiSensor";
 import Chart from "chart.js/auto";
 import Footer from "../layout/Footer";
 
@@ -321,17 +321,17 @@ const SensorDetailsView: React.FC = () => {
                             <input type="file" accept=".xlsx, .xls" onChange={handleChange}/>
                             <Box sx={{marginTop: '10px'}}>
                                 <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
-                                    Select type/year
+                                    Select metric/year
                                 </Typography>
                                 <FormControl sx={{ m: 1, minWidth: 100 }}>
-                                    <InputLabel id="demo-simple-select-autowidth-label">Type</InputLabel>
+                                    <InputLabel id="demo-simple-select-autowidth-label">Metric</InputLabel>
                                     <Select
-                                        labelId="type-label"
+                                        labelId="metric"
                                         id="demo-simple-select-autowidth"
                                         value={selectedType}
                                         onChange={handleChangeType}
                                         autoWidth
-                                        label="Type"
+                                        label="Metric"
                                     >
                                         <MenuItem value="">
                                             <em>None</em>
@@ -344,7 +344,7 @@ const SensorDetailsView: React.FC = () => {
                                 <FormControl sx={{ m: 1, minWidth: 100 }}>
                                     <InputLabel id="year-label">Year</InputLabel>
                                     <Select
-                                        labelId="yearr-label"
+                                        labelId="year-label"
                                         id="demo-simple-select-autowidth"
                                         value={selectedYear}
                                         onChange={handleChangeYear}

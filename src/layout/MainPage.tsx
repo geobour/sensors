@@ -13,7 +13,7 @@ import Login from "../login/Login";
 import EditSensorPage from "../../src/sensors/EditSensorPage";
 import BarChartAvg from "../charts/BarChartAvg";
 import SensorMapComponent from "../map/SensorMapComponent";
-import Footer from "./Footer";
+import Dashboard from "../charts/Dashboard";
 
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
@@ -48,6 +48,7 @@ function MainPage() {
                     <ButtonAppBar handleLogout={handleLogout} isLoggedIn={loggedIn}/>
                     <Routes>
                         <Route path="/HomePage" element={<HomePage/>}/>
+                        <Route path="dashboard" element={<Dashboard/>}/>
                         <Route path="/sensors" element={<SensorsListView/>}/>
                         <Route path="sensors/:sensorId" element={<SensorDetailsView/>}/>
                         <Route path="sensors/:sensorId/edit" element={<EditSensorPage/>}/>

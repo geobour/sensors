@@ -13,6 +13,8 @@ interface SensorDto {
     latitude: string;
     longitude: string;
     area: string;
+    topic: string; // Added topic field
+    type: string; // Added type field
 }
 
 const EditSensorPage: React.FC = () => {
@@ -24,6 +26,8 @@ const EditSensorPage: React.FC = () => {
         latitude: '',
         longitude: '',
         area: '',
+        topic: '', // Initialize topic field
+        type: '', // Initialize type field
     });
 
     useEffect(() => {
@@ -59,7 +63,7 @@ const EditSensorPage: React.FC = () => {
     };
 
     return (
-        <Paper elevation={6} sx={{ padding: '40px', maxWidth: '400px', margin: 'auto',marginTop: '20px' }}>
+        <Paper elevation={6} sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px' }}>
             <Typography variant="h4" align="center" gutterBottom>
                 Edit Sensor
             </Typography>
@@ -100,6 +104,25 @@ const EditSensorPage: React.FC = () => {
                     onChange={handleInputChange}
                     name="area"
                 />
+                <TextField
+                    label="Topic"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={sensor.topic}
+                    onChange={handleInputChange}
+                    name="topic"
+                />
+                <TextField
+                    label="Type"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={sensor.type}
+                    onChange={handleInputChange}
+                    name="type"
+                />
+
                 <Button
                     type="submit"
                     variant="contained"

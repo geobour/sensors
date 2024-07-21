@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import SensorsIcon from '@mui/icons-material/Sensors';
 
 const avatarSettings = ['Logout'];
-const pages = ['HomePage','Sensors', 'Information'];
+const pages = ['HomePage','Sensors','Dashboard', 'Information'];
 
 // @ts-ignore
 function ResponsiveAppBar({ isLoggedIn, handleLogout }) {
