@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -9,18 +9,17 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
-import {useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ExportToExcel from '../export/ExportToExcel';
-import {useQuery} from 'react-query';
-import {Box, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from '@mui/material';
+import { useQuery } from 'react-query';
+import { Box, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import axios from 'axios';
-import {SensorDto, FileData, SensorDataDto, PredictionData} from "../api/ApiSensor";
+import { SensorDto, FileData, SensorDataDto, PredictionData } from "../api/ApiSensor";
 import Chart from "chart.js/auto";
 import Footer from "../layout/Footer";
 
-
 const SensorDetailsView: React.FC = () => {
-    const {sensorId} = useParams<{ sensorId: string }>();
+    const { sensorId } = useParams<{ sensorId: string }>();
     const navigate = useNavigate();
     const [minValues, setMinValues] = useState<number[]>([]);
     const [maxValues, setMaxValues] = useState<number[]>([]);
@@ -32,8 +31,7 @@ const SensorDetailsView: React.FC = () => {
     const [selectedType, setSelectedType] = useState('');
     const [selectedYear, setSelectedYear] = useState('');
 
-
-    const {data: sensors} = useQuery<SensorDto, Error>(
+    const { data: sensors } = useQuery<SensorDto, Error>(
         ['sensorData', sensorId],
         async () => {
             const response = await axios.get<SensorDto>(
@@ -42,31 +40,18 @@ const SensorDetailsView: React.FC = () => {
             return response.data;
         }
     );
-    // const {data: temp = []} = useQuery<SensorRecordDto[], Error>(
-    //     ['data', sensorId],
-    //     async () => {
-    //         const response = await axios.get<SensorRecordDto[]>(
-    //             `http://localhost:8080/api/sensor/reports/get-month-data?sensorId=${sensorId}`
-    //         );
-    //         return response.data;
-    //     }
-    // );
 
     const handlePrediction = async () => {
         try {
             const response = await axios.get<PredictionData>('http://localhost:8080/api/predict');
-            // @ts-ignore
             setPredictionData(response.data);
             console.log(response.data)
-
         } catch (error) {
             console.error('Error loading file data:', error);
-            // Handle error, e.g., display an error message
         }
     };
 
-
-    const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
+    const { data: sensorData, isLoading, isError } = useQuery<SensorDataDto[], Error>(
         ['sensorData', sensorId, 2024],
         async () => {
             const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2024`);
@@ -76,16 +61,13 @@ const SensorDetailsView: React.FC = () => {
             setSensorMinValues(minSensorValues);
             const maxSensorValues: number[] = response.data.map((item: SensorDataDto) => item.maxValue || 0);
             setSensorMaxValues(maxSensorValues);
-
             return response.data;
         }
     );
 
-
     const handleChangeType = (event: SelectChangeEvent<string>) => {
         setSelectedType(event.target.value);
     };
-
 
     const handleChangeYear = (event: SelectChangeEvent<string>) => {
         setSelectedYear(event.target.value);
@@ -103,7 +85,6 @@ const SensorDetailsView: React.FC = () => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-
             const response = await axios.put<FileData[]>(
                 `http://localhost:8080/api/sensor/upload`,
                 formData,
@@ -113,20 +94,16 @@ const SensorDetailsView: React.FC = () => {
                     },
                 }
             );
-
-
             const minValues = response.data.map(data => data.min).filter(min => min !== undefined) as number[];
             const maxValues = response.data.map(data => data.max).filter(max => max !== undefined) as number[];
             const avgValues = response.data.map(data => data.avg).filter(avg => avg !== undefined) as number[];
             setMinValues(minValues);
             setMaxValues(maxValues);
             setAvgValues(avgValues);
-
         } catch (error) {
             console.error('Error uploading file:', error);
         }
     };
-
 
     const handleMinChart = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -198,21 +175,17 @@ const SensorDetailsView: React.FC = () => {
         renderChart();
     }, [selectedType, maxSensorValues, minSensorValues, avgSensorValues, predictionData]);
 
-
-
-
-    // @ts-ignore
     return (
-        <div style={{marginTop: '20px', marginBottom: '200px', overflowY: 'hidden'}}>
+        <div style={{  overflowY: 'hidden' }}>
             <Grid container justifyContent="center" alignItems="center" spacing={3}>
                 <Grid item xs={12}>
-                    <Paper elevation={6} sx={{padding: 3}}>
-                        <Paper elevation={6} sx={{padding: 3}}>
+                    <Paper elevation={6} sx={{ padding: 3, backgroundColor: '#333' }}>
+                        <Paper elevation={6} sx={{ padding: 3, backgroundColor: 'lightgray' }}>
                             <Typography variant="h5" padding={2} fontWeight="bold" color="text.secondary">
                                 Sensor Details
                             </Typography>
-                            <Divider/>
-                            <TableContainer component={Paper}>
+                            <Divider />
+                            <TableContainer component={Paper} sx={{ backgroundColor: 'lightgray' }}>
                                 <Table>
                                     <TableHead>
                                         <TableRow>
@@ -259,7 +232,7 @@ const SensorDetailsView: React.FC = () => {
                                             <TableCell>{sensors?.longitude}</TableCell>
                                             <TableCell>{sensors?.type}</TableCell>
                                             <TableCell>{sensors?.topic}</TableCell>
-                                            <TableCell style={{color: sensors?.status ? 'green' : 'red'}}>
+                                            <TableCell style={{ color: sensors?.status ? 'green' : 'red' }}>
                                                 {sensors?.status ? 'Active' : 'Inactive'}
                                             </TableCell>
                                         </TableRow>
@@ -267,59 +240,82 @@ const SensorDetailsView: React.FC = () => {
                                 </Table>
                             </TableContainer>
 
-                            <Divider/>
+                            <Divider />
 
-                            <div style={{marginTop: '20px', flex: 'max-content'}}>
+                            <div style={{ marginTop: '20px', flex: 'max-content' }}>
                                 <Button
                                     variant="contained"
-                                    color="primary"
                                     onClick={handleMap}
-                                    sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
-                                > Map
+                                    style={{
+                                        marginRight: '10px',
+                                        marginTop: '10px',
+                                        marginBottom: '20px',
+                                        // backgroundColor: '#55565B',
+                                        backgroundColor: '#FFD700',
+                                        color: '#55565B',
+                                    }}                                > Map
                                 </Button>
                                 <Button
                                     variant="contained"
-                                    color="primary"
                                     onClick={handleLineChart}
-                                    sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
-                                > Graph
+                                    style={{
+                                        marginRight: '10px',
+                                        marginTop: '10px',
+                                        marginBottom: '20px',
+                                        backgroundColor: '#FFD700',
+                                        color: '#55565B',
+                                    }}                                > Graph
                                 </Button>
                                 <Button
                                     variant="contained"
-                                    color="primary"
                                     onClick={handleMinChart}
-                                    sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
-                                >
+                                    style={{
+                                        marginRight: '10px',
+                                        marginTop: '10px',
+                                        marginBottom: '20px',
+                                        backgroundColor: '#FFD700',
+                                        color: '#55565B',
+                                    }}                                >
                                     Min
                                 </Button>
                                 <Button
                                     variant="contained"
-                                    color="primary"
                                     onClick={handleMaxChart}
-                                    sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
-                                >
+                                    style={{
+                                        marginRight: '10px',
+                                        marginTop: '10px',
+                                        marginBottom: '20px',
+                                        backgroundColor: '#FFD700',
+                                        color: '#55565B',
+                                    }}                                >
                                     Max
                                 </Button>
                                 <Button
                                     variant="contained"
-                                    color="primary"
                                     onClick={handleAvgChart}
-                                    sx={{marginRight: '10px', marginTop: '10px', marginBottom: '20px'}}
+                                    style={{
+                                        marginRight: '10px',
+                                        marginTop: '10px',
+                                        marginBottom: '20px',
+                                        backgroundColor: '#FFD700',
+                                        color: '#55565B',
+                                    }}
                                 >
                                     Avg
                                 </Button>
-                                <Divider/>
+
+                                <Divider />
 
                             </div>
                         </Paper>
-                        <Box sx={{marginBottom: '20px'}}></Box>
-                        <Paper elevation={6} sx={{padding: 3}}>
+                        <Box sx={{ marginBottom: '20px' }}></Box>
+                        <Paper elevation={6} sx={{ padding: 3, backgroundColor: 'lightgray' }}>
                             <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
                                 Upload file
                             </Typography>
 
-                            <input type="file" accept=".xlsx, .xls" onChange={handleChange}/>
-                            <Box sx={{marginTop: '10px'}}>
+                            <input type="file" accept=".xlsx, .xls" onChange={handleChange} />
+                            <Box sx={{ marginTop: '10px' }}>
                                 <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
                                     Select metric/year
                                 </Typography>
@@ -382,8 +378,14 @@ const SensorDetailsView: React.FC = () => {
                                 }}>
                                     <Button
                                         variant="contained"
-                                        color="primary"
                                         onClick={handlePrediction}
+                                        style={{
+                                            marginRight: '10px',
+                                            marginTop: '10px',
+                                            marginBottom: '20px',
+                                            backgroundColor: '#CCFF00',
+                                            color: '#55565B',
+                                        }}
                                     >
                                         Run
                                     </Button>
@@ -392,7 +394,7 @@ const SensorDetailsView: React.FC = () => {
                                     </Typography>
                                     <Box sx={{ marginRight: '10px', marginLeft: '10px' }}>
                                         {predictionData &&
-                                            <ExportToExcel data={predictionData  || []} fileName="exportedSensors"/>
+                                            <ExportToExcel data={predictionData || []} fileName="epredictionResults" />
                                         }
                                     </Box>
 
@@ -403,9 +405,8 @@ const SensorDetailsView: React.FC = () => {
                     </Paper>
                 </Grid>
             </Grid>
-            <Footer></Footer>
+            {/*<Footer></Footer>*/}
         </div>
-
     );
 };
 

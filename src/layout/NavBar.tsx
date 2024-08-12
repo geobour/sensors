@@ -30,14 +30,14 @@ function ResponsiveAppBar({ isLoggedIn, handleLogout }) {
     };
 
     const handleLogoutClick = () => {
-        handleLogout(); // Call the logout function passed from the parent component
-        handleCloseUserMenu(); // Close the user menu after logout
-        navigate("/login"); // Redirect to the login page after logout
+        handleLogout();
+        handleCloseUserMenu();
+        navigate("/login");
     };
 
-    // @ts-ignore
+
     return (
-        <AppBar position="static">
+        <AppBar position="static" sx={{ backgroundColor: 'gray' }}>
             <Toolbar disableGutters>
                 <div style={{ flex: 0.01 }}/>
                 <SensorsIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1}} />

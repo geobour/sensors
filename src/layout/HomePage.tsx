@@ -8,10 +8,11 @@ const HomePage = () => {
          
             <div style={{
                 height: '100vh',
-                background: `url("/Sensor1.jpg") center/cover no-repeat`,
-                margin: '20px 0',
+                background: `url("iot.png") center/cover no-repeat`,
+                margin: '0px 0',
                 paddingLeft: 20,
                 paddingRight: 20,
+                backgroundColor: '#333'
             }}></div>
             <Footer />
         </div>

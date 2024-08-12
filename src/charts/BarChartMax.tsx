@@ -81,22 +81,29 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
     };
 
     return (
-        <div className={"barChartMax"} style={{ marginTop: '100px', flex: "max-content" }}>
-            <Grid container spacing={6} justifyContent="center" alignItems="center">
-                <Grid item xs={8}>
+        <div className={"barChart"} style={{ overflowY: 'hidden', backgroundColor: '#333', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Grid container spacing={6} justifyContent="center" alignItems="center" style={{ height: '100%', width: '100%' }}>
+                <Grid item xs={12} md={10} lg={8} style={{ height: 'auto', maxWidth: '100%' }}>
                     {isLoading ? (
-                        <p>Loading...</p>
+                        <p style={{ color: '#fff' }}>Loading...</p>
                     ) : isError ? (
-                        <p>Error: Failed to fetch data. Please try again.</p>
+                        <p style={{ color: '#fff' }}>Error: Failed to fetch data. Please try again.</p>
                     ) : (
-                        <Paper className={className}>
+                        <Paper elevation={6} sx={{
+                            marginTop: 10,
+                            marginBottom: 30,
+                            padding: 3,
+                            backgroundColor: 'lightgray',                            height: 'auto',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>
                             <canvas ref={chartRef} />
                         </Paper>
                     )}
                 </Grid>
             </Grid>
-            <Footer></Footer>
-
+            <Footer />
         </div>
     );
 };

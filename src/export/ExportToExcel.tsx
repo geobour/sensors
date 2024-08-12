@@ -35,7 +35,16 @@ const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
     };
 
     return (
-        <Button variant="contained" color="primary" onClick={exportToExcel}>
+        <Button variant="contained"
+                onClick={exportToExcel}
+                style={{
+                    marginRight: '10px',
+                    marginTop: '10px',
+                    marginBottom: '20px',
+                    backgroundColor: '#FFD700',
+                    color: '#55565B',
+                }}
+        >
             Export
         </Button>
     );

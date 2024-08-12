@@ -9,8 +9,7 @@ const PageNotFound = () => {
                 <Paper elevation={3} style={{ padding: 16, textAlign: 'center' }}>
                     <header>
                         <h1>Page not Found</h1>
-                    </header>
-                   <p></p>
+                    </header><p></p>
                 </Paper>
             </Grid>
         </Grid>

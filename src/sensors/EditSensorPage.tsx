@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { Typography } from '@mui/material';
-import Paper from "@mui/material/Paper";
+import Paper from '@mui/material/Paper';
 
 interface SensorDto {
     id: number;
@@ -13,8 +12,8 @@ interface SensorDto {
     latitude: string;
     longitude: string;
     area: string;
-    topic: string; // Added topic field
-    type: string; // Added type field
+    topic: string;
+    type: string;
 }
 
 const EditSensorPage: React.FC = () => {
@@ -26,8 +25,8 @@ const EditSensorPage: React.FC = () => {
         latitude: '',
         longitude: '',
         area: '',
-        topic: '', // Initialize topic field
-        type: '', // Initialize type field
+        topic: '',
+        type: '',
     });
 
     useEffect(() => {
@@ -63,76 +62,78 @@ const EditSensorPage: React.FC = () => {
     };
 
     return (
-        <Paper elevation={6} sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px' }}>
-            <Typography variant="h4" align="center" gutterBottom>
-                Edit Sensor
-            </Typography>
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    label="Sensor Name"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={sensor.name}
-                    onChange={handleInputChange}
-                    name="name"
-                />
-                <TextField
-                    label="Latitude"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={sensor.latitude}
-                    onChange={handleInputChange}
-                    name="latitude"
-                />
-                <TextField
-                    label="Longitude"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={sensor.longitude}
-                    onChange={handleInputChange}
-                    name="longitude"
-                />
-                <TextField
-                    label="Area"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={sensor.area}
-                    onChange={handleInputChange}
-                    name="area"
-                />
-                <TextField
-                    label="Topic"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={sensor.topic}
-                    onChange={handleInputChange}
-                    name="topic"
-                />
-                <TextField
-                    label="Type"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={sensor.type}
-                    onChange={handleInputChange}
-                    name="type"
-                />
+        <div style={{ backgroundColor: '#333', minHeight: '100vh', padding: '20px' }}>
+            <Paper elevation={6} sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px' ,  backgroundColor: 'lightgray' }}>
+                <Typography variant="h4" align="center" gutterBottom>
+                    Edit Sensor
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        label="Sensor Name"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={sensor.name}
+                        onChange={handleInputChange}
+                        name="name"
+                    />
+                    <TextField
+                        label="Latitude"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={sensor.latitude}
+                        onChange={handleInputChange}
+                        name="latitude"
+                    />
+                    <TextField
+                        label="Longitude"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={sensor.longitude}
+                        onChange={handleInputChange}
+                        name="longitude"
+                    />
+                    <TextField
+                        label="Area"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={sensor.area}
+                        onChange={handleInputChange}
+                        name="area"
+                    />
+                    <TextField
+                        label="Topic"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={sensor.topic}
+                        onChange={handleInputChange}
+                        name="topic"
+                    />
+                    <TextField
+                        label="Type"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={sensor.type}
+                        onChange={handleInputChange}
+                        name="type"
+                    />
 
-                <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    style={{ marginTop: '20px' }}
-                >
-                    Save Changes
-                </Button>
-            </form>
-        </Paper>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        style={{ marginTop: '20px' }}
+                    >
+                        Save Changes
+                    </Button>
+                </form>
+            </Paper>
+        </div>
     );
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
@@ -15,7 +15,6 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart<'line'> | null>(null);
     const { sensorId } = useParams<{ sensorId: string }>();
-    const [lastUpdate, setLastUpdate] = useState<number | null>(null);
 
     const fetchData = async () => {
         try {
@@ -47,9 +46,9 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
                                 label: 'Hourly Values',
                                 data: values,
                                 fill: false,
-                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderColor: '#FFD700',
                                 borderWidth: 2,
-                                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                                pointBackgroundColor: '#FFD700',
                                 pointRadius: 4,
                             },
                         ],
@@ -70,16 +69,6 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
         }
     };
 
-    const updateChart = (newData: SensorRecordDto) => {
-        console.log('Updating chart with new data:', newData);
-
-        if (chartInstance.current) {
-            chartInstance.current.data.labels?.push(newData.time);
-            // @ts-ignore
-            chartInstance.current.data.datasets[0].data.push(newData.value);
-            chartInstance.current.update();
-        }
-    };
 
     const loadData = async () => {
         try {
@@ -105,7 +94,7 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
                 chartInstance.current.destroy();
             }
         };
-    }, [sensorId]);
+    }, [loadData, sensorId]);
 
     useEffect(() => {
         const eventSource = new EventSource(`http://localhost:8080/stream-sensor-data`);
@@ -129,10 +118,18 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
     }, []);
 
     return (
-        <div className="lineChart" style={{ marginTop: '100px', flex: "max-content" }}>
+        <div className="lineChart" style={{ overflowY: 'hidden', backgroundColor: '#333', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Grid container spacing={6} justifyContent="center" alignItems="center">
                 <Grid item xs={8}>
-                    <Paper className={className}>
+                    <Paper elevation={6} sx={{
+                        marginTop: 10,
+                        marginBottom: 30,
+                        padding: 3,
+                        backgroundColor: 'lightgray',                            height: 'auto',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
                         <canvas ref={chartRef} />
                     </Paper>
                 </Grid>
