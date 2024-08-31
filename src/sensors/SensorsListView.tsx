@@ -88,9 +88,9 @@ const SensorsListView: React.FC = () => {
     };
 
     return (
-        <Box sx={{backgroundColor: 'lightgray', minHeight: '100vh', padding: 2}}>
+        <Box sx={{backgroundColor: '#333', minHeight: '100vh', padding: 2}}>
             <Container>
-                <Paper elevation={3} sx={{mt: 4, backgroundColor: '#f0f0f0', padding: '10px'}}>
+                <Paper elevation={3} sx={{mt: 4, backgroundColor: 'lightgray', padding: '10px'}}>
                     <Typography variant="h4" align="center" fontWeight="bold" color="text.secondary">
                         Sensors List
                     </Typography>
@@ -101,11 +101,19 @@ const SensorsListView: React.FC = () => {
                         placeholder="Search by ID"
                         startAdornment={
                             <InputAdornment position="start">
-                                <SearchIcon/>
+                                <SearchIcon style={{ color: 'white' }} /> {/* Changes search icon color */}
                             </InputAdornment>
                         }
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        sx={{
+                            color: 'white',
+                            '& .MuiInputBase-input': {
+                                color: 'white',
+                            },
+                            '& .MuiInputBase-input::placeholder': {
+                                color: 'white',                            },
+                        }}
                     />
                     <Button
                         variant="contained"
@@ -115,8 +123,8 @@ const SensorsListView: React.FC = () => {
                             marginRight: '10px',
                             marginTop: '10px',
                             marginBottom: '20px',
-                            backgroundColor: '#FFD700',
-                            color: '#55565B',
+                            backgroundColor: ' #BC13FE',
+                            color: 'black',
                         }}
                     >
                         Add Sensor
@@ -124,17 +132,18 @@ const SensorsListView: React.FC = () => {
                 </div>
                 <div style={{marginTop: '20px'}}/>
                 <div style={{maxHeight: '500px', overflowY: 'auto'}}>
-                    <TableContainer component={Paper} elevation={3} sx={{backgroundColor: 'lightgray'}}>
+                    <TableContainer component={Paper} elevation={3} sx={{backgroundColor: '#333'}}>
                         <Table sx={{minWidth: 650}} aria-label="sensor table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Sensor ID</TableCell>
-                                    <TableCell>Sensor Name</TableCell>
-                                    <TableCell>Sensor Area</TableCell>
-                                    <TableCell>Topic</TableCell>
-                                    <TableCell>Type</TableCell>
-                                    <TableCell>Status</TableCell>
+                                    <TableCell style={{ color: 'white' }}>Sensor ID</TableCell>
+                                    <TableCell style={{ color: 'white' }}>Sensor Name</TableCell>
+                                    <TableCell style={{ color: 'white' }}>Sensor Area</TableCell>
+                                    <TableCell style={{ color: 'white' }}>Topic</TableCell>
+                                    <TableCell style={{ color: 'white' }}>Type</TableCell>
+                                    <TableCell style={{ color: 'white' }}>Status</TableCell>
                                 </TableRow>
+
                             </TableHead>
                             <TableBody>
                                 {filteredSensors.map((sensor) => (
@@ -143,11 +152,11 @@ const SensorsListView: React.FC = () => {
                                         onClick={() => handleRowClick(sensor.id)}
                                         style={{cursor: 'pointer'}}
                                     >
-                                        <TableCell>{sensor.id}</TableCell>
-                                        <TableCell>{sensor.name}</TableCell>
-                                        <TableCell>{sensor.area}</TableCell>
-                                        <TableCell>{sensor.topic}</TableCell>
-                                        <TableCell>{sensor.type}</TableCell>
+                                        <TableCell style={{ color: 'white' }}>{sensor.id}</TableCell>
+                                        <TableCell style={{ color: 'white' }}>{sensor.name}</TableCell>
+                                        <TableCell style={{ color: 'white' }}>{sensor.area}</TableCell>
+                                        <TableCell style={{ color: 'white' }}>{sensor.topic}</TableCell>
+                                        <TableCell style={{ color: 'white' }}>{sensor.type}</TableCell>
                                         <TableCell style={{color: sensor.status ? 'green' : 'red'}}>
                                             {sensor.status ? 'Active' : 'Inactive'}
                                         </TableCell>
@@ -161,8 +170,8 @@ const SensorsListView: React.FC = () => {
                                                         marginRight: '5px',
                                                         marginTop: '10px',
                                                         marginBottom: '10px',
-                                                        backgroundColor: '#FFD700',
-                                                        color: '#55565B',
+                                                        backgroundColor: ' #BC13FE',
+                                                        color: 'black',
                                                     }}
                                                 >
                                                     Edit
@@ -176,8 +185,8 @@ const SensorsListView: React.FC = () => {
                                                         marginRight: '5px',
                                                         marginTop: '10px',
                                                         marginBottom: '10px',
-                                                        backgroundColor: '#FFD700',
-                                                        color: '#55565B',
+                                                        backgroundColor: ' #BC13FE',
+                                                        color: 'black',
                                                     }}
                                                 >
                                                     Delete
@@ -191,8 +200,8 @@ const SensorsListView: React.FC = () => {
                                                         marginRight: '5px',
                                                         marginTop: '10px',
                                                         marginBottom: '10px',
-                                                        backgroundColor: '#FFD700',
-                                                        color: '#55565B',
+                                                        backgroundColor: ' #BC13FE',
+                                                        color: 'black',
                                                     }}
                                                 >
                                                     Restore

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -9,17 +9,17 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
-import { useNavigate, useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import ExportToExcel from '../export/ExportToExcel';
-import { useQuery } from 'react-query';
-import { Box, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import {useQuery} from 'react-query';
+import {Box, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from '@mui/material';
 import axios from 'axios';
-import { SensorDto, FileData, SensorDataDto, PredictionData } from "../api/ApiSensor";
+import {SensorDto, FileData, SensorDataDto, PredictionData} from "../api/ApiSensor";
 import Chart from "chart.js/auto";
 import Footer from "../layout/Footer";
 
 const SensorDetailsView: React.FC = () => {
-    const { sensorId } = useParams<{ sensorId: string }>();
+    const {sensorId} = useParams<{ sensorId: string }>();
     const navigate = useNavigate();
     const [minValues, setMinValues] = useState<number[]>([]);
     const [maxValues, setMaxValues] = useState<number[]>([]);
@@ -31,7 +31,7 @@ const SensorDetailsView: React.FC = () => {
     const [selectedType, setSelectedType] = useState('');
     const [selectedYear, setSelectedYear] = useState('');
 
-    const { data: sensors } = useQuery<SensorDto, Error>(
+    const {data: sensors} = useQuery<SensorDto, Error>(
         ['sensorData', sensorId],
         async () => {
             const response = await axios.get<SensorDto>(
@@ -51,7 +51,7 @@ const SensorDetailsView: React.FC = () => {
         }
     };
 
-    const { data: sensorData, isLoading, isError } = useQuery<SensorDataDto[], Error>(
+    const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
         ['sensorData', sensorId, 2024],
         async () => {
             const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2024`);
@@ -149,14 +149,14 @@ const SensorDetailsView: React.FC = () => {
                                 label: 'Prediction Values',
                                 data: Object.values(predictionData || {}),
                                 fill: false,
-                                borderColor: 'rgb(0, 255, 0)',
+                                borderColor: 'rgb(0, 128, 0)', // Darker Green
                                 tension: 0.1
                             },
                             {
                                 label: selectedType === "Max" ? 'Sensor Values (Max)' : selectedType === "Min" ? 'Sensor Values (Min)' : 'Sensor Values (Avg)',
                                 data: selectedType === "Max" ? maxSensorValues : selectedType === "Min" ? minSensorValues : avgSensorValues,
                                 fill: false,
-                                borderColor: selectedType === "Max" ? 'rgb(255, 99, 132)' : selectedType === "Min" ? 'rgb(70, 130, 180)' : 'rgb(255, 206, 86)', // Redish, Bluish, Yellowish
+                                borderColor: selectedType === "Max" ? 'rgb(255, 99, 132)' : selectedType === "Min" ? 'rgb(70, 130, 180)' : 'rgb(255, 165, 0)', // Redish, Bluish, Orang
                                 tension: 0.1
                             }
                         ]
@@ -176,16 +176,16 @@ const SensorDetailsView: React.FC = () => {
     }, [selectedType, maxSensorValues, minSensorValues, avgSensorValues, predictionData]);
 
     return (
-        <div style={{  overflowY: 'hidden' }}>
+        <div style={{overflowY: 'hidden'}}>
             <Grid container justifyContent="center" alignItems="center" spacing={3}>
                 <Grid item xs={12}>
-                    <Paper elevation={6} sx={{ padding: 3, backgroundColor: '#333' }}>
-                        <Paper elevation={6} sx={{ padding: 3, backgroundColor: 'lightgray' }}>
+                    <Paper elevation={6} sx={{padding: 3, backgroundColor: '#333'}}>
+                        <Paper elevation={6} sx={{padding: 3, backgroundColor: 'lightgray'}}>
                             <Typography variant="h5" padding={2} fontWeight="bold" color="text.secondary">
                                 Sensor Details
                             </Typography>
-                            <Divider />
-                            <TableContainer component={Paper} sx={{ backgroundColor: 'lightgray' }}>
+                            <Divider/>
+                            <TableContainer component={Paper} sx={{backgroundColor: 'lightgray'}}>
                                 <Table>
                                     <TableHead>
                                         <TableRow>
@@ -232,7 +232,7 @@ const SensorDetailsView: React.FC = () => {
                                             <TableCell>{sensors?.longitude}</TableCell>
                                             <TableCell>{sensors?.type}</TableCell>
                                             <TableCell>{sensors?.topic}</TableCell>
-                                            <TableCell style={{ color: sensors?.status ? 'green' : 'red' }}>
+                                            <TableCell style={{color: sensors?.status ? 'green' : 'red'}}>
                                                 {sensors?.status ? 'Active' : 'Inactive'}
                                             </TableCell>
                                         </TableRow>
@@ -240,9 +240,9 @@ const SensorDetailsView: React.FC = () => {
                                 </Table>
                             </TableContainer>
 
-                            <Divider />
+                            <Divider/>
 
-                            <div style={{ marginTop: '20px', flex: 'max-content' }}>
+                            <div style={{marginTop: '20px', flex: 'max-content'}}>
                                 <Button
                                     variant="contained"
                                     onClick={handleMap}
@@ -251,9 +251,9 @@ const SensorDetailsView: React.FC = () => {
                                         marginTop: '10px',
                                         marginBottom: '20px',
                                         // backgroundColor: '#55565B',
-                                        backgroundColor: '#FFD700',
-                                        color: '#55565B',
-                                    }}                                > Map
+                                        backgroundColor: ' #BC13FE',
+                                        color: 'black',
+                                    }}> Map
                                 </Button>
                                 <Button
                                     variant="contained"
@@ -262,9 +262,9 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#FFD700',
-                                        color: '#55565B',
-                                    }}                                > Graph
+                                        backgroundColor: ' #BC13FE',
+                                        color: 'black',
+                                    }}> Graph
                                 </Button>
                                 <Button
                                     variant="contained"
@@ -273,9 +273,9 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#FFD700',
-                                        color: '#55565B',
-                                    }}                                >
+                                        backgroundColor: ' #BC13FE',
+                                        color: 'black',
+                                    }}>
                                     Min
                                 </Button>
                                 <Button
@@ -285,9 +285,9 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#FFD700',
-                                        color: '#55565B',
-                                    }}                                >
+                                        backgroundColor: ' #BC13FE',
+                                        color: 'black',
+                                    }}>
                                     Max
                                 </Button>
                                 <Button
@@ -297,29 +297,29 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#FFD700',
-                                        color: '#55565B',
+                                        backgroundColor: ' #BC13FE',
+                                        color: 'black',
                                     }}
                                 >
                                     Avg
                                 </Button>
 
-                                <Divider />
+                                <Divider/>
 
                             </div>
                         </Paper>
-                        <Box sx={{ marginBottom: '20px' }}></Box>
-                        <Paper elevation={6} sx={{ padding: 3, backgroundColor: 'lightgray' }}>
+                        <Box sx={{marginBottom: '20px'}}></Box>
+                        <Paper elevation={6} sx={{padding: 3, backgroundColor: 'lightgray'}}>
                             <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
                                 Upload file
                             </Typography>
 
-                            <input type="file" accept=".xlsx, .xls" onChange={handleChange} />
-                            <Box sx={{ marginTop: '10px' }}>
+                            <input type="file" accept=".xlsx, .xls" onChange={handleChange}/>
+                            <Box sx={{marginTop: '10px'}}>
                                 <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
                                     Select metric/year
                                 </Typography>
-                                <FormControl sx={{ m: 1, minWidth: 100 }}>
+                                <FormControl sx={{m: 1, minWidth: 100}}>
                                     <InputLabel id="demo-simple-select-autowidth-label">Metric</InputLabel>
                                     <Select
                                         labelId="metric"
@@ -337,7 +337,7 @@ const SensorDetailsView: React.FC = () => {
                                         <MenuItem value="Avg">Avg</MenuItem>
                                     </Select>
                                 </FormControl>
-                                <FormControl sx={{ m: 1, minWidth: 100 }}>
+                                <FormControl sx={{m: 1, minWidth: 100}}>
                                     <InputLabel id="year-label">Year</InputLabel>
                                     <Select
                                         labelId="year-label"
@@ -366,7 +366,9 @@ const SensorDetailsView: React.FC = () => {
                                             boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
                                             textAlign: 'center'
                                         }}>
-                                            <canvas id={selectedType === "Max" ? 'maxChart' : selectedType === "Min" ? 'minChart' : 'avgChart'} width="700" height="400"></canvas>
+                                            <canvas
+                                                id={selectedType === "Max" ? 'maxChart' : selectedType === "Min" ? 'minChart' : 'avgChart'}
+                                                width="700" height="400"></canvas>
                                         </Box>
                                     </Grid>
                                 </Grid>
@@ -383,18 +385,19 @@ const SensorDetailsView: React.FC = () => {
                                             marginRight: '10px',
                                             marginTop: '10px',
                                             marginBottom: '20px',
-                                            backgroundColor: '#CCFF00',
-                                            color: '#55565B',
+                                            backgroundColor: ' #BC13FE',
+                                            color: 'black',
                                         }}
                                     >
                                         Run
                                     </Button>
-                                    <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary" sx={{ flexGrow: 1 }}>
+                                    <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary"
+                                                sx={{flexGrow: 1}}>
                                         Run the algorithm
                                     </Typography>
-                                    <Box sx={{ marginRight: '10px', marginLeft: '10px' }}>
+                                    <Box sx={{marginRight: '10px', marginLeft: '10px'}}>
                                         {predictionData &&
-                                            <ExportToExcel data={predictionData || []} fileName="epredictionResults" />
+                                            <ExportToExcel data={predictionData || []} fileName="epredictionResults"/>
                                         }
                                     </Box>
 

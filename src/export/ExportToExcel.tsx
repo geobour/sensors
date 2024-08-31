@@ -41,8 +41,8 @@ const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
                     marginRight: '10px',
                     marginTop: '10px',
                     marginBottom: '20px',
-                    backgroundColor: '#FFD700',
-                    color: '#55565B',
+                    backgroundColor: ' #BC13FE',
+                    color: 'black',
                 }}
         >
             Export

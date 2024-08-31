@@ -6,7 +6,7 @@ import { SensorDto } from "../api/ApiSensor";
 import Grid from '@mui/material/Grid';
 import { Typography } from '@mui/material';
 
-export interface SensorTemperatures {
+export interface SensorValues {
     [key: string]: number;
 }
 
@@ -108,7 +108,7 @@ const PieChartComponent: React.FC<{ data: any, options: any }> = React.memo(({ d
 });
 
 const ChartGrid: React.FC = React.memo(() => {
-    const [temperatures, setTemperatures] = useState<SensorTemperatures>({});
+    const [values, setValues] = useState<SensorValues>({});
     const [sensorData, setSensorData] = useState<SensorDto[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -122,12 +122,12 @@ const ChartGrid: React.FC = React.memo(() => {
         }
     };
 
-    const fetchTemperatures = async () => {
+    const fetchValues = async () => {
         try {
-            const response = await axios.get<SensorTemperatures>('http://localhost:8080/api/dashboard/current-temperatures');
-            setTemperatures(response.data);
+            const response = await axios.get<SensorValues>('http://localhost:8080/api/dashboard/current-values');
+            setValues(response.data);
         } catch (error) {
-            console.error('Error fetching temperatures:', error);
+            console.error('Error fetching values:', error);
         }
     };
 
@@ -136,7 +136,7 @@ const ChartGrid: React.FC = React.memo(() => {
             try {
                 console.log("Refreshing data...");
                 await fetchSensorData();
-                await fetchTemperatures();
+                await fetchValues();
                 console.log("Data refreshed successfully");
             } catch (error) {
                 console.error("Error refreshing data:", error);
@@ -236,12 +236,12 @@ const ChartGrid: React.FC = React.memo(() => {
         ],
     };
 
-    const temperatureChartData = {
-        labels: Object.keys(temperatures),
+    const valuesChartData = {
+        labels: Object.keys(values),
         datasets: [
             {
-                label: 'Current Temperatures',
-                data: Object.values(temperatures),
+                label: 'Current Values',
+                data: Object.values(values),
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1,
@@ -249,7 +249,7 @@ const ChartGrid: React.FC = React.memo(() => {
         ],
     };
 
-    const temperatureChartOptions = {
+    const valuesChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
@@ -310,8 +310,8 @@ const ChartGrid: React.FC = React.memo(() => {
                 <Grid item xs={12} style={{ marginLeft: '8px', marginRight: '8px' }}>
                     <div style={{ height: '300px' }}>
                         <ChartComponent
-                            data={temperatureChartData}
-                            options={temperatureChartOptions}
+                            data={valuesChartData}
+                            options={valuesChartOptions}
                         />
                     </div>
                 </Grid>
