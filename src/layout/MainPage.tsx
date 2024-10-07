@@ -57,7 +57,7 @@ function MainPage() {
                         <Route path="sensors/:sensorId/bar-chart-avg" element={<BarChartAvg/>}/>
                         <Route path="sensors/:sensorId/bar-chart-min" element={<BarChartMin/>}/>
                         <Route path="sensors/:sensorId/line-chart" element={<LineChart/>}/>
-                        <Route path="information" element={<InformationScreen/>}/>
+                        <Route path="Documentation" element={<InformationScreen/>}/>
                         <Route path="sensors/:sensorId/map" element={<SensorMapComponent/>}/>
                         <Route path="/logout" element={<Navigate to="/" replace/>}/>
                         <Route path="*" element={<Navigate to="/HomePage" replace/>}/>

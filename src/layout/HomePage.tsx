@@ -8,6 +8,7 @@ const HomePage = () => {
          
             <div style={{
                 height: '100vh',
+                overflow: 'hidden',
                 background: `url("growtika-S2mxfA7tDEI-unsplash.jpg") center/cover no-repeat`,
                 margin: '0px 0',
                 paddingLeft: 20,
