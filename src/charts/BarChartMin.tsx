@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Chart from 'chart.js/auto';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
@@ -24,6 +24,15 @@ const BarChartMin: React.FC<BarChartProps> = ({ className }) => {
             return response.data;
         }
     );
+
+    // Use effect for refreshing the page every 2 minutes
+    useEffect(() => {
+        const refreshInterval = setInterval(() => {
+            window.location.reload();
+        }, 60000); // Refresh the page every 2 minutes
+        console.log("rendering the page every 2 minutes")
+        return () => clearInterval(refreshInterval);
+    }, []);
 
     useEffect(() => {
         if (chartRef.current && sensorData && sensorData.length > 0) {

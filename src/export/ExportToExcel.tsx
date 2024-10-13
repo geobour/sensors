@@ -8,6 +8,14 @@ interface PredictionData {
     february?: number;
     march?: number;
     april?: number;
+    may?: number;
+    june?: number;
+    july?: number;
+    august?: number;
+    september?: number;
+    october?: number;
+    november?: number;
+    december?: number;
 }
 
 interface Props {
@@ -17,13 +25,26 @@ interface Props {
 
 const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
     const exportToExcel = () => {
-        const { january, february, march, april } = data;
+        const {
+            january, february, march, april,
+            may, june, july, august,
+            september, october, november, december
+        } = data;
 
         const worksheetData = [
+            ['Month', 'Value'], // Header row
             ['January', january?.toString()],
             ['February', february?.toString()],
             ['March', march?.toString()],
             ['April', april?.toString()],
+            ['May', may?.toString()],
+            ['June', june?.toString()],
+            ['July', july?.toString()],
+            ['August', august?.toString()],
+            ['September', september?.toString()],
+            ['October', october?.toString()],
+            ['November', november?.toString()],
+            ['December', december?.toString()],
         ];
 
         const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
@@ -41,7 +62,7 @@ const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
                     marginRight: '10px',
                     marginTop: '10px',
                     marginBottom: '20px',
-                    backgroundColor: ' #BC13FE',
+                    backgroundColor: '#BC13FE',
                     color: 'black',
                 }}
         >

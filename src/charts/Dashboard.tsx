@@ -2,14 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import Footer from "../layout/Footer";
 import axios from "axios";
-import { SensorDto } from "../api/ApiSensor";
+import { DashboardDto, SensorDto } from "../api/ApiSensor";
 import Grid from '@mui/material/Grid';
 import { Typography } from '@mui/material';
 
-export interface SensorValues {
-    [key: string]: number;
-}
-
+// Clock Component
 const Clock: React.FC = () => {
     const [currentDateTime, setCurrentDateTime] = useState({
         date: new Date().toLocaleDateString(),
@@ -45,6 +42,7 @@ const Clock: React.FC = () => {
     );
 };
 
+// Chart Component
 const ChartComponent: React.FC<{ data: any, options: any }> = React.memo(({ data, options }) => {
     const chartRef = useRef<HTMLCanvasElement>(null);
     const chartInstanceRef = useRef<Chart<'bar'> | null>(null);
@@ -76,6 +74,7 @@ const ChartComponent: React.FC<{ data: any, options: any }> = React.memo(({ data
     return <canvas ref={chartRef}></canvas>;
 });
 
+// Pie Chart Component
 const PieChartComponent: React.FC<{ data: any, options: any }> = React.memo(({ data, options }) => {
     const pieChartRef = useRef<HTMLCanvasElement>(null);
     const pieChartInstanceRef = useRef<Chart<'pie'> | null>(null);
@@ -107,8 +106,9 @@ const PieChartComponent: React.FC<{ data: any, options: any }> = React.memo(({ d
     return <canvas ref={pieChartRef}></canvas>;
 });
 
+// Main ChartGrid Component
 const ChartGrid: React.FC = React.memo(() => {
-    const [values, setValues] = useState<SensorValues>({});
+    const [values, setValues] = useState<DashboardDto[]>([]);  // Holds array of DashboardDto
     const [sensorData, setSensorData] = useState<SensorDto[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -124,8 +124,8 @@ const ChartGrid: React.FC = React.memo(() => {
 
     const fetchValues = async () => {
         try {
-            const response = await axios.get<SensorValues>('http://localhost:8080/api/dashboard/current-values');
-            setValues(response.data);
+            const response = await axios.get<DashboardDto[]>('http://localhost:8080/api/dashboard/current-values');  // Fetch array
+            setValues(response.data);  // Set array of DashboardDto
         } catch (error) {
             console.error('Error fetching values:', error);
         }
@@ -146,16 +146,14 @@ const ChartGrid: React.FC = React.memo(() => {
         // Fetch initial data
         refreshData();
 
-        // Set up an interval to refresh data every 5 minutes
+        // Set up an interval to refresh data every 2 minutes
         const interval = setInterval(() => {
             refreshData();
-        }, 5 * 60 * 1000);
+        }, 60 * 1000); // 1 minute in milliseconds
 
         // Clear the interval when the component unmounts
         return () => clearInterval(interval);
     }, []);
-
-
 
     const pieChartOptions = {
         responsive: true,
@@ -236,14 +234,15 @@ const ChartGrid: React.FC = React.memo(() => {
         ],
     };
 
+    // Include sensor type in the labels
     const valuesChartData = {
-        labels: Object.keys(values),
+        labels: values.map(value => `${value.name} (${value.type})`),  // Show name and type
         datasets: [
             {
                 label: 'Current Values',
-                data: Object.values(values),
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                data: values.map(value => value.currentValue),
+                backgroundColor: 'rgba(255, 165, 0, 0.2)', // Light orange background color
+                borderColor: 'rgba(255, 165, 0, 1)', // Solid orange border color
                 borderWidth: 1,
             },
         ],
@@ -297,7 +296,7 @@ const ChartGrid: React.FC = React.memo(() => {
                 </Grid>
             </Grid>
             <Grid container spacing={2} style={{ marginTop: '20px' }}>
-                <Grid item xs={12} style={{ marginLeft: '8px', marginRight: '8px' }}>
+                <Grid item xs={12}>
                     <div style={{ height: '300px' }}>
                         <ChartComponent
                             data={barChartData}
@@ -305,9 +304,7 @@ const ChartGrid: React.FC = React.memo(() => {
                         />
                     </div>
                 </Grid>
-            </Grid>
-            <Grid container spacing={2} style={{ marginTop: '20px' }}>
-                <Grid item xs={12} style={{ marginLeft: '8px', marginRight: '8px' }}>
+                <Grid item xs={12}>
                     <div style={{ height: '300px' }}>
                         <ChartComponent
                             data={valuesChartData}

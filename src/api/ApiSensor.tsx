@@ -43,6 +43,11 @@ export interface PredictionData {
     december?: number;
 }
 
+export interface DashboardDto {
+    name: string;
+    type: string;
+    currentValue: number;
+}
 
 
 

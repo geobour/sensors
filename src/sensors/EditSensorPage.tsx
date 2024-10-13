@@ -14,6 +14,7 @@ interface SensorDto {
     area: string;
     topic: string;
     type: string;
+    // Exclude records here since we're not sending them in the update
 }
 
 const EditSensorPage: React.FC = () => {
@@ -53,7 +54,18 @@ const EditSensorPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:8080/api/sensor/update-sensor/${sensorId}`, sensor);
+            // Send only the necessary fields, excluding 'records'
+            const { id, name, latitude, longitude, area, topic, type } = sensor; // Destructure to exclude records
+            await axios.put(`http://localhost:8080/api/sensor/update-sensor/${sensorId}`, {
+                id,
+                name,
+                latitude,
+                longitude,
+                area,
+                topic,
+                type
+                // No records included
+            });
             console.log('Sensor updated successfully');
             navigate('/sensors'); // Redirect to sensors list page after successful update
         } catch (error) {
@@ -63,7 +75,7 @@ const EditSensorPage: React.FC = () => {
 
     return (
         <div style={{ backgroundColor: '#333', minHeight: '100vh', padding: '20px' }}>
-            <Paper elevation={6} sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px' ,  backgroundColor: 'lightgray' }}>
+            <Paper elevation={6} sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px', backgroundColor: 'lightgray' }}>
                 <Typography variant="h4" align="center" gutterBottom>
                     Edit Sensor
                 </Typography>

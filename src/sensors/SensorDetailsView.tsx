@@ -397,7 +397,7 @@ const SensorDetailsView: React.FC = () => {
                                     </Typography>
                                     <Box sx={{marginRight: '10px', marginLeft: '10px'}}>
                                         {predictionData &&
-                                            <ExportToExcel data={predictionData || []} fileName="epredictionResults"/>
+                                            <ExportToExcel data={predictionData || []} fileName="predictionResults"/>
                                         }
                                     </Box>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
@@ -16,6 +16,7 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
     const chartInstance = useRef<Chart<'line'> | null>(null);
     const { sensorId } = useParams<{ sensorId: string }>();
 
+    // Fetch data from the API
     const fetchData = async () => {
         try {
             const response = await axios.get<SensorRecordDto[]>(`http://localhost:8080/api/sensor/reports/get-daily-data?sensorId=${sensorId}`);
@@ -26,6 +27,25 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
         }
     };
 
+    // Track the current date and time
+    const [currentDateTime, setCurrentDateTime] = useState({
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+    });
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date();
+            setCurrentDateTime({
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+            });
+        }, 60000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // Initialize the chart with the fetched data
     const initializeChart = (sensorData: SensorRecordDto[]) => {
         console.log('Initializing chart with data:', sensorData);
 
@@ -69,7 +89,7 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
         }
     };
 
-
+    // Load data from the API and initialize the chart
     const loadData = async () => {
         try {
             const data = await fetchData();
@@ -82,12 +102,13 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
     useEffect(() => {
         loadData();
 
-        // Refresh data every minute
+        // Refresh data every 2 minutes (120000 milliseconds)
         const interval = setInterval(() => {
             console.log('Refreshing data...');
             loadData();
-        }, 60000); // 60000 milliseconds = 1 minute
+        }, 120000); // Refresh every 2 minutes
 
+        // Cleanup on component unmount or chartInstance destruction
         return () => {
             clearInterval(interval);
             if (chartInstance.current) {
@@ -96,6 +117,7 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
         };
     }, [loadData, sensorId]);
 
+    // Handle server-sent events for real-time updates
     useEffect(() => {
         const eventSource = new EventSource(`http://localhost:8080/stream-sensor-data`);
         console.log('stream-sensor-data:');
@@ -103,8 +125,6 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
         eventSource.onmessage = (event) => {
             const newData: SensorRecordDto = JSON.parse(event.data);
             console.log('newData:', newData);
-
-
         };
 
         eventSource.onerror = (error) => {
@@ -112,6 +132,7 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
             eventSource.close();
         };
 
+        // Close the EventSource when the component unmounts
         return () => {
             eventSource.close();
         };
@@ -125,7 +146,8 @@ const LineChart: React.FC<LineChartProps> = ({ className }) => {
                         marginTop: 10,
                         marginBottom: 30,
                         padding: 3,
-                        backgroundColor: 'lightgray',                            height: 'auto',
+                        backgroundColor: 'lightgray',
+                        height: 'auto',
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center'

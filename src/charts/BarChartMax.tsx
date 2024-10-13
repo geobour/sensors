@@ -1,29 +1,39 @@
-import React, { useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Chart from 'chart.js/auto';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import axios from "axios";
-import { useQuery } from 'react-query';
-import { SensorDataDto } from "../api/ApiSensor";
-import { useParams } from "react-router-dom";
+import {useQuery} from 'react-query';
+import {SensorDataDto} from "../api/ApiSensor";
+import {useParams} from "react-router-dom";
 import Footer from "../layout/Footer";
 
 interface BarChartProps {
     className?: string;
 }
 
-const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
+const BarChartMax: React.FC<BarChartProps> = ({className}) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
-    const { sensorId } = useParams<{ sensorId: string }>();
+    const {sensorId} = useParams<{ sensorId: string }>();
 
-    const { data: sensorData, isLoading, isError } = useQuery<SensorDataDto[], Error>(
+    const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
         ['sensorData', sensorId, 2024],
         async () => {
             const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2024`);
             return response.data;
         }
     );
+
+
+    // Use effect for refreshing the page every 2 minutes
+    useEffect(() => {
+        const refreshInterval = setInterval(() => {
+            window.location.reload();
+        }, 60000); // Refresh the page every 2 minutes
+        console.log("rendering the page every 2 minutes")
+        return () => clearInterval(refreshInterval);
+    }, []);
 
     useEffect(() => {
         if (chartRef.current && sensorData && sensorData.length > 0) {
@@ -72,7 +82,7 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
                 chartInstance.current.destroy();
             }
         };
-    }, [sensorData]);
+    }, [sensorData]); // Ensure chart updates when new data arrives
 
     // Function to get month name from month number
     const getMonthName = (monthNumber: number) => {
@@ -81,29 +91,38 @@ const BarChartMax: React.FC<BarChartProps> = ({ className }) => {
     };
 
     return (
-        <div className={"barChart"} style={{ overflowY: 'hidden', backgroundColor: '#333', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Grid container spacing={6} justifyContent="center" alignItems="center" style={{ height: '100%', width: '100%' }}>
-                <Grid item xs={12} md={10} lg={8} style={{ height: 'auto', maxWidth: '100%' }}>
+        <div className={"barChart"} style={{
+            overflowY: 'hidden',
+            backgroundColor: '#333',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        }}>
+            <Grid container spacing={6} justifyContent="center" alignItems="center"
+                  style={{height: '100%', width: '100%'}}>
+                <Grid item xs={12} md={10} lg={8} style={{height: 'auto', maxWidth: '100%'}}>
                     {isLoading ? (
-                        <p style={{ color: '#fff' }}>Loading...</p>
+                        <p style={{color: '#fff'}}>Loading...</p>
                     ) : isError ? (
-                        <p style={{ color: '#fff' }}>Error: Failed to fetch data. Please try again.</p>
+                        <p style={{color: '#fff'}}>Error: Failed to fetch data. Please try again.</p>
                     ) : (
                         <Paper elevation={6} sx={{
                             marginTop: 10,
                             marginBottom: 30,
                             padding: 3,
-                            backgroundColor: 'lightgray',                            height: 'auto',
+                            backgroundColor: 'lightgray',
+                            height: 'auto',
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center'
                         }}>
-                            <canvas ref={chartRef} />
+                            <canvas ref={chartRef}/>
                         </Paper>
                     )}
                 </Grid>
             </Grid>
-            <Footer />
+            <Footer/>
         </div>
     );
 };
