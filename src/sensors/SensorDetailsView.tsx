@@ -12,11 +12,22 @@ import Button from '@mui/material/Button';
 import {useNavigate, useParams} from 'react-router-dom';
 import ExportToExcel from '../export/ExportToExcel';
 import {useQuery} from 'react-query';
-import {Box, Divider, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from '@mui/material';
+import {
+    Box,
+    Dialog,
+    DialogContent, DialogTitle,
+    Divider,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    SelectChangeEvent
+} from '@mui/material';
 import axios from 'axios';
 import {SensorDto, FileData, SensorDataDto, PredictionData} from "../api/ApiSensor";
 import Chart from "chart.js/auto";
-import Footer from "../layout/Footer";
+import IconButton from '@mui/material/IconButton';
+import InfoIcon from '@mui/icons-material/Info';
 
 const SensorDetailsView: React.FC = () => {
     const {sensorId} = useParams<{ sensorId: string }>();
@@ -64,7 +75,15 @@ const SensorDetailsView: React.FC = () => {
             return response.data;
         }
     );
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+    const handleDialogOpen = () => {
+        setIsDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setIsDialogOpen(false);
+    };
     const handleChangeType = (event: SelectChangeEvent<string>) => {
         setSelectedType(event.target.value);
     };
@@ -319,6 +338,7 @@ const SensorDetailsView: React.FC = () => {
                                 <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
                                     Select metric/year
                                 </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <FormControl sx={{m: 1, minWidth: 100}}>
                                     <InputLabel id="demo-simple-select-autowidth-label">Metric</InputLabel>
                                     <Select
@@ -355,6 +375,40 @@ const SensorDetailsView: React.FC = () => {
 
                                     </Select>
                                 </FormControl>
+                                <IconButton
+                                    onClick={handleDialogOpen}
+                                    style={{
+                                        marginRight: '10px',
+                                        marginTop: '10px',
+                                        marginBottom: '10px',
+                                        color: 'black',
+                                    }}
+                                >
+                                    <InfoIcon/>
+                                    <Typography>Info</Typography>
+                                </IconButton>
+                                <Dialog
+                                    open={isDialogOpen}
+                                    onClose={handleDialogClose}
+                                    sx={{'& .MuiDialog-paper': {width: '600px', height: '400px'}}}
+                                >
+                                    <DialogTitle>
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                            Upload File Instructions
+                                        </Typography>
+                                    </DialogTitle>
+                                    <DialogContent>
+                                        <Typography variant="body1">
+                                            In the first row of the Excel file, list the months starting with January, followed by February, and so on.
+                                            In the subsequent rows, fill in the cells with values. Each row represents a year.
+                                            For example, if you want to provide data from the last ten years, start with 2014 in the second row and continue accordingly.
+                                            <br /><br />
+                                            If the values you inserted are of type "Max," select the appropriate metric type from the dropdown,
+                                            and after uploading the file, press the "Run" button.
+                                        </Typography>
+                                    </DialogContent>
+                                </Dialog>
+                                </Box>
                                 <Grid container justifyContent="center" spacing={2}>
                                     <Grid item>
                                         <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">

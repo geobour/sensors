@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
-import Footer from "../layout/Footer";
 import axios from "axios";
 import { DashboardDto, SensorDto } from "../api/ApiSensor";
 import Grid from '@mui/material/Grid';
 import { Typography } from '@mui/material';
+import Button from "@mui/material/Button";
 
 // Clock Component
 const Clock: React.FC = () => {
@@ -108,50 +108,58 @@ const PieChartComponent: React.FC<{ data: any, options: any }> = React.memo(({ d
 
 // Main ChartGrid Component
 const ChartGrid: React.FC = React.memo(() => {
-    const [values, setValues] = useState<DashboardDto[]>([]);  // Holds array of DashboardDto
+    const [values, setValues] = useState<DashboardDto[]>([]);
     const [sensorData, setSensorData] = useState<SensorDto[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const fetchSensorData = async () => {
+        setLoading(true);
         try {
             const response = await axios.get<SensorDto[]>('http://localhost:8080/api/sensor/show-sensors');
             setSensorData(response.data);
-            setLoading(false);
+            setErrorMessage(null); // Reset error on success
         } catch (error) {
+            setErrorMessage('Failed to fetch sensor data');
+        } finally {
             setLoading(false);
         }
     };
 
     const fetchValues = async () => {
+        setLoading(true);
         try {
-            const response = await axios.get<DashboardDto[]>('http://localhost:8080/api/dashboard/current-values');  // Fetch array
-            setValues(response.data);  // Set array of DashboardDto
+            const response = await axios.get<DashboardDto[]>('http://localhost:8080/api/dashboard/current-values');
+            setValues(response.data);
+            setErrorMessage(null);
         } catch (error) {
-            console.error('Error fetching values:', error);
+            setErrorMessage('Failed to fetch values');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const checkStatus = async () => {
+        try {
+            const response = await axios.get<SensorDto[]>('http://localhost:8080/api/sensor/check');
+            console.log(response.status);
+            await fetchSensorData(); // Refresh data after checking status
+        } catch (error) {
+            console.error('Error checking status:', error);
         }
     };
 
     useEffect(() => {
         const refreshData = async () => {
-            try {
-                console.log("Refreshing data...");
-                await fetchSensorData();
-                await fetchValues();
-                console.log("Data refreshed successfully");
-            } catch (error) {
-                console.error("Error refreshing data:", error);
-            }
+            console.log("Refreshing data...");
+            await fetchSensorData();
+            await fetchValues();
+            console.log("Data refreshed successfully");
         };
 
-        // Fetch initial data
         refreshData();
+        const interval = setInterval(refreshData, 60 * 1000);
 
-        // Set up an interval to refresh data every 2 minutes
-        const interval = setInterval(() => {
-            refreshData();
-        }, 60 * 1000); // 1 minute in milliseconds
-
-        // Clear the interval when the component unmounts
         return () => clearInterval(interval);
     }, []);
 
@@ -233,60 +241,25 @@ const ChartGrid: React.FC = React.memo(() => {
             },
         ],
     };
-
-    // Include sensor type in the labels
-    const valuesChartData = {
-        labels: values.map(value => `${value.name} (${value.type})`),  // Show name and type
-        datasets: [
-            {
-                label: 'Current Values',
-                data: values.map(value => value.currentValue),
-                backgroundColor: 'rgba(255, 165, 0, 0.2)', // Light orange background color
-                borderColor: 'rgba(255, 165, 0, 1)', // Solid orange border color
-                borderWidth: 1,
-            },
-        ],
-    };
-
-    const valuesChartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    color: '#fff',
-                },
-                grid: {
-                    display: false,
-                },
-            },
-            x: {
-                ticks: {
-                    color: '#fff',
-                },
-                grid: {
-                    display: false,
-                },
-            },
-        },
-        plugins: {
-            legend: {
-                display: true,
-                labels: {
-                    color: '#fff',
-                },
-            },
-        },
-    };
-
+    
     return (
         <div style={{ backgroundColor: '#333', minHeight: '100vh', padding: '20px' }}>
-            <Grid container spacing={2} style={{ marginTop: '20px' }}>
-                <Grid item xs={6}>
+
+            <Grid container spacing={2} justifyContent="center" alignItems="center" style={{ marginTop: '20px' }}>
+                <Grid item xs={4}>
                     <Clock />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={4} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Button
+                        onClick={checkStatus}
+                        variant="contained"
+                        color="error"
+                        style={{ padding: '10px 20px' }}
+                    >
+                        Check Status
+                    </Button>
+                </Grid>
+                <Grid item xs={4}>
                     <div style={{ height: '300px' }}>
                         <PieChartComponent
                             data={pieChartData}
@@ -295,6 +268,7 @@ const ChartGrid: React.FC = React.memo(() => {
                     </div>
                 </Grid>
             </Grid>
+
             <Grid container spacing={2} style={{ marginTop: '20px' }}>
                 <Grid item xs={12}>
                     <div style={{ height: '300px' }}>
@@ -304,17 +278,41 @@ const ChartGrid: React.FC = React.memo(() => {
                         />
                     </div>
                 </Grid>
-                <Grid item xs={12}>
-                    <div style={{ height: '300px' }}>
-                        <ChartComponent
-                            data={valuesChartData}
-                            options={valuesChartOptions}
-                        />
-                    </div>
+                <Grid container spacing={2} style={{ marginTop: '20px' }}>
+                    {values.map((value, index) => (
+                        <Grid key={index} item xs={2}>
+                            <div
+                                style={{
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    padding: '20px',
+                                    borderRadius: '8px',
+                                    textAlign: 'center',
+                                    height: '150px',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    color: '#fff',
+                                }}
+                            >
+                                <div>
+                                    <Typography variant="h6" gutterBottom>
+                                        {value.name}
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {value.type === 'temperature' && `${value.currentValue}°C`}
+                                        {value.type === 'humidity' && `${parseFloat(String(value.currentValue)).toFixed(1)}%`}
+                                        {value.type !== 'temperature' && value.type !== 'humidity' && value.currentValue}
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {value.type}
+                                    </Typography>
+                                </div>
+                            </div>
+                        </Grid>
+                    ))}
                 </Grid>
             </Grid>
             <div style={{ height: '100px' }}></div>
-            <Footer />
         </div>
     );
 });
