@@ -41,6 +41,7 @@ const SensorDetailsView: React.FC = () => {
     const [predictionData, setPredictionData] = useState<PredictionData>();
     const [selectedType, setSelectedType] = useState('');
     const [selectedYear, setSelectedYear] = useState('');
+    const [type, setType] = useState('');
 
     const {data: sensors} = useQuery<SensorDto, Error>(
         ['sensorData', sensorId],
@@ -48,6 +49,7 @@ const SensorDetailsView: React.FC = () => {
             const response = await axios.get<SensorDto>(
                 `http://localhost:8080/api/sensor/get-sensor/${sensorId}`
             );
+            setType(response.data.type)
             return response.data;
         }
     );
@@ -168,14 +170,14 @@ const SensorDetailsView: React.FC = () => {
                                 label: 'Prediction Values',
                                 data: Object.values(predictionData || {}),
                                 fill: false,
-                                borderColor: 'rgb(0, 128, 0)', // Darker Green
+                                borderColor: 'rgb(0, 128, 0)',
                                 tension: 0.1
                             },
                             {
                                 label: selectedType === "Max" ? 'Sensor Values (Max)' : selectedType === "Min" ? 'Sensor Values (Min)' : 'Sensor Values (Avg)',
                                 data: selectedType === "Max" ? maxSensorValues : selectedType === "Min" ? minSensorValues : avgSensorValues,
                                 fill: false,
-                                borderColor: selectedType === "Max" ? 'rgb(255, 99, 132)' : selectedType === "Min" ? 'rgb(70, 130, 180)' : 'rgb(255, 165, 0)', // Redish, Bluish, Orang
+                                borderColor: selectedType === "Max" ? 'rgb(255, 99, 132)' : selectedType === "Min" ? 'rgb(70, 130, 180)' : 'rgb(255, 165, 0)', // Redish, Bluish, Orange
                                 tension: 0.1
                             }
                         ]
@@ -183,7 +185,18 @@ const SensorDetailsView: React.FC = () => {
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+
+                                        if (type === 'temperature') {
+                                            return value + ' °C';
+                                        } else if (type === 'humidity') {
+                                            return value + ' %';
+                                        }
+                                        return value;
+                                    }
+                                }
                             }
                         }
                     }
@@ -193,6 +206,7 @@ const SensorDetailsView: React.FC = () => {
 
         renderChart();
     }, [selectedType, maxSensorValues, minSensorValues, avgSensorValues, predictionData]);
+
 
     return (
         <div style={{overflowY: 'hidden'}}>
@@ -390,21 +404,26 @@ const SensorDetailsView: React.FC = () => {
                                 <Dialog
                                     open={isDialogOpen}
                                     onClose={handleDialogClose}
-                                    sx={{'& .MuiDialog-paper': {width: '600px', height: '400px'}}}
+                                    sx={{'& .MuiDialog-paper': {width: '600px', height: '500px'}}}
                                 >
                                     <DialogTitle>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                            Upload File Instructions
+                                              Upload File Instructions
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent>
                                         <Typography variant="body1">
-                                            In the first row of the Excel file, list the months starting with January, followed by February, and so on.
-                                            In the subsequent rows, fill in the cells with values. Each row represents a year.
-                                            For example, if you want to provide data from the last ten years, start with 2014 in the second row and continue accordingly.
+                                            In the first row of the Excel file, list the months starting with January, followed by February, and so on. In the subsequent rows, fill in the cells with values. Each row represents a year. For example, if you want to provide data from the last ten years in a specific place, start with 2014 in the second row and continue accordingly.
                                             <br /><br />
-                                            If the values you inserted are of type "Max," select the appropriate metric type from the dropdown,
-                                            and after uploading the file, press the "Run" button.
+                                            If the values you inserted are of type "Average" select the appropriate metric type from the dropdown, and after uploading the file, press the "Run" button. To download the results as a CSV file, click the "Export" button
+                                        </Typography>
+                                        <DialogTitle>
+                                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                                Algorithm
+                                            </Typography>
+                                        </DialogTitle>
+                                        <Typography variant="body1">
+                                            The algorithm uses linear regression with one variable to predict the next values for each month and displays them in a diagram. The diagram also shows the current month's values from the selected sensor, corresponding to the location from which the data was collected. This allows you to compare the predicted values with the actual sensor data.
                                         </Typography>
                                     </DialogContent>
                                 </Dialog>

@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import axios from "axios";
 import { useQuery } from 'react-query';
-import { SensorDataDto } from "../api/ApiSensor";
+import {SensorDataDto, SensorDto} from "../api/ApiSensor";
 import { useParams } from "react-router-dom";
 import Footer from "../layout/Footer";
 
@@ -16,7 +16,18 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
     const { sensorId } = useParams<{ sensorId: string }>();
+    const [type, setType] = useState('');
 
+    const {data: sensors} = useQuery<SensorDto, Error>(
+        ['sensorData', sensorId],
+        async () => {
+            const response = await axios.get<SensorDto>(
+                `http://localhost:8080/api/sensor/get-sensor/${sensorId}`
+            );
+            setType(response.data.type)
+            return response.data;
+        }
+    );
     const { data: sensorData, isLoading, isError } = useQuery<SensorDataDto[], Error>(
         ['sensorData', sensorId, 2024],
         async () => {
@@ -24,6 +35,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
             return response.data;
         }
     );
+
 
     // Use effect for refreshing the page every 2 minutes
     useEffect(() => {
@@ -69,6 +81,17 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
                             },
                             y: {
                                 beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        // Check the measurement type and format accordingly
+                                        if (type === 'temperature') {
+                                            return value + ' °C';  // Celsius symbol for temperature
+                                        } else if (type === 'humidity') {
+                                            return value + ' %';  // Percentage symbol for humidity
+                                        }
+                                        return value; // Fallback if measurement type is neither
+                                    }
+                                }
                             },
                         },
                     },
@@ -81,7 +104,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
                 chartInstance.current.destroy();
             }
         };
-    }, [sensorData]);
+    }, [sensorData, type]);
 
     // Function to get month name from month number
     const getMonthName = (monthNumber: number) => {
