@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import {useNavigate, useParams} from 'react-router-dom';
 import ExportToExcel from '../export/ExportToExcel';
 import {useQuery} from 'react-query';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import {
     Box,
     Dialog,
@@ -28,9 +29,11 @@ import {SensorDto, FileData, SensorDataDto, PredictionData} from "../api/ApiSens
 import Chart from "chart.js/auto";
 import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
-
+import FileSaver from "file-saver";
+import Tooltip from '@mui/material/Tooltip';
 const SensorDetailsView: React.FC = () => {
     const {sensorId} = useParams<{ sensorId: string }>();
+    const [year, setYear] = useState<number>(2024);
     const navigate = useNavigate();
     const [minValues, setMinValues] = useState<number[]>([]);
     const [maxValues, setMaxValues] = useState<number[]>([]);
@@ -40,7 +43,7 @@ const SensorDetailsView: React.FC = () => {
     const [maxSensorValues, setSensorMaxValues] = useState<number[]>([]);
     const [predictionData, setPredictionData] = useState<PredictionData>();
     const [selectedType, setSelectedType] = useState('');
-    const [selectedYear, setSelectedYear] = useState('');
+    // const [selectedYear, setSelectedYear] = useState('');
     const [type, setType] = useState('');
 
     const {data: sensors} = useQuery<SensorDto, Error>(
@@ -64,10 +67,15 @@ const SensorDetailsView: React.FC = () => {
         }
     };
 
+
+    const handleChangeYear = (event: SelectChangeEvent<number>) => {
+        setYear(Number(event.target.value)); // Convert value to a number
+    };
+
     const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
-        ['sensorData', sensorId, 2024],
+        ['sensorData', sensorId, year],
         async () => {
-            const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2024`);
+            const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/${year}`);
             const avgSensorValues: number[] = response.data.map((item: SensorDataDto) => item.averageValue || 0);
             setSensorAvgValues(avgSensorValues);
             const minSensorValues: number[] = response.data.map((item: SensorDataDto) => item.minValue || 0);
@@ -90,15 +98,15 @@ const SensorDetailsView: React.FC = () => {
         setSelectedType(event.target.value);
     };
 
-    const handleChangeYear = (event: SelectChangeEvent<string>) => {
-        setSelectedYear(event.target.value);
-    };
+    // const handleChangeYear = (event: SelectChangeEvent<string>) => {
+    //     setSelectedYear(event.target.value);
+    // };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files;
         if (fileList && fileList.length > 0) {
-            const file = fileList[0]; // Get the first file from the list
-            handleUpload(file); // Pass the file to the handleUpload function
+            const file = fileList[0];
+            handleUpload(file); 
         }
     };
 
@@ -148,18 +156,26 @@ const SensorDetailsView: React.FC = () => {
         navigate(`map`);
     };
 
+    const [isNoDataDialogOpen, setIsNoDataDialogOpen] = useState(false);
+
+
+
+
+
+    const handleNoDataDialogClose = () => {
+        setIsNoDataDialogOpen(false);
+    };
+
     useEffect(() => {
         const renderChart = () => {
             const ctx = document.getElementById(selectedType === "Max" ? 'maxChart' : selectedType === "Min" ? 'minChart' : 'avgChart');
             if (ctx) {
-                // Check if a chart instance already exists and destroy it
                 // @ts-ignore
                 const existingChart = Chart.getChart(ctx);
                 if (existingChart) {
                     existingChart.destroy();
                 }
 
-                // Render the appropriate chart
                 // @ts-ignore
                 new Chart(ctx, {
                     type: 'line',
@@ -205,67 +221,180 @@ const SensorDetailsView: React.FC = () => {
         };
 
         renderChart();
-    }, [selectedType, maxSensorValues, minSensorValues, avgSensorValues, predictionData]);
+    }, [selectedType, maxSensorValues, minSensorValues, avgSensorValues, predictionData, type]);
+    const handleDownloadTemplate = () => {
+        const csvHeaders = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const csvContent = csvHeaders.join(",") + "\n";
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        FileSaver.saveAs(blob, 'template.csv');
+    };
 
-
+    // @ts-ignore
+    // @ts-ignore
     return (
         <div style={{overflowY: 'hidden'}}>
             <Grid container justifyContent="center" alignItems="center" spacing={3}>
                 <Grid item xs={12}>
                     <Paper elevation={6} sx={{padding: 3, backgroundColor: '#333'}}>
-                        <Paper elevation={6} sx={{padding: 3, backgroundColor: 'lightgray'}}>
+                        <Paper elevation={6} sx={{ padding: 3, backgroundColor: 'lightgray' }}>
                             <Typography variant="h5" padding={2} fontWeight="bold" color="text.secondary">
                                 Sensor Details
                             </Typography>
-                            <Divider/>
-                            <TableContainer component={Paper} sx={{backgroundColor: 'lightgray'}}>
+                            <Divider />
+                            <TableContainer component={Paper} sx={{ backgroundColor: 'lightgray' }}>
                                 <Table>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>
                                                 <Typography variant="h6" fontWeight="bold" color="text.secondary">
-                                                    ID</Typography>
+                                                    ID
+                                                </Typography>
                                             </TableCell>
                                             <TableCell>
                                                 <Typography variant="h6" fontWeight="bold" color="text.secondary">
-                                                    Name</Typography>
+                                                    Name
+                                                </Typography>
                                             </TableCell>
                                             <TableCell>
                                                 <Typography variant="h6" fontWeight="bold" color="text.secondary">
-                                                    Area</Typography>
+                                                    Area
+                                                </Typography>
                                             </TableCell>
                                             <TableCell>
                                                 <Typography variant="h6" fontWeight="bold" color="text.secondary">
-                                                    Latitude</Typography>
+                                                    Latitude
+                                                </Typography>
                                             </TableCell>
                                             <TableCell>
                                                 <Typography variant="h6" fontWeight="bold" color="text.secondary">
-                                                    Longitude</Typography>
+                                                    Longitude
+                                                </Typography>
                                             </TableCell>
                                             <TableCell>
                                                 <Typography variant="h6" fontWeight="bold" color="text.secondary">
-                                                    Type</Typography>
+                                                    Type
+                                                </Typography>
                                             </TableCell>
                                             <TableCell>
                                                 <Typography variant="h6" fontWeight="bold" color="text.secondary">
-                                                    Topic</Typography>
+                                                    Topic
+                                                </Typography>
                                             </TableCell>
                                             <TableCell>
-                                                <Typography variant="h6" fontWeight="bold"
-                                                            color="text.secondary">Status</Typography>
+                                                <Typography variant="h6" fontWeight="bold" color="text.secondary">
+                                                    Status
+                                                </Typography>
                                             </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         <TableRow>
-                                            <TableCell>{sensors?.id}</TableCell>
-                                            <TableCell>{sensors?.name}</TableCell>
-                                            <TableCell>{sensors?.area}</TableCell>
-                                            <TableCell>{sensors?.latitude}</TableCell>
-                                            <TableCell>{sensors?.longitude}</TableCell>
-                                            <TableCell>{sensors?.type}</TableCell>
-                                            <TableCell>{sensors?.topic}</TableCell>
-                                            <TableCell style={{color: sensors?.status ? 'green' : 'red'}}>
+                                            <TableCell>
+                                                <Tooltip title={sensors?.id || ''} arrow>
+                            <span
+                                style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    display: 'block',
+                                    maxWidth: '100px', // Adjust width as needed
+                                }}
+                            >
+                                {sensors?.id}
+                            </span>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Tooltip title={sensors?.name || ''} arrow>
+                            <span
+                                style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    display: 'block',
+                                    maxWidth: '100px',
+                                }}
+                            >
+                                {sensors?.name}
+                            </span>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Tooltip title={sensors?.area || ''} arrow>
+                            <span
+                                style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    display: 'block',
+                                    maxWidth: '100px',
+                                }}
+                            >
+                                {sensors?.area}
+                            </span>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Tooltip title={sensors?.latitude || ''} arrow>
+                            <span
+                                style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    display: 'block',
+                                    maxWidth: '100px',
+                                }}
+                            >
+                                {sensors?.latitude}
+                            </span>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Tooltip title={sensors?.longitude || ''} arrow>
+                            <span
+                                style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    display: 'block',
+                                    maxWidth: '100px',
+                                }}
+                            >
+                                {sensors?.longitude}
+                            </span>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Tooltip title={sensors?.type || ''} arrow>
+                            <span
+                                style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    display: 'block',
+                                    maxWidth: '100px',
+                                }}
+                            >
+                                {sensors?.type}
+                            </span>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Tooltip title={sensors?.topic || ''} arrow>
+                            <span
+                                style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    display: 'block',
+                                    maxWidth: '100px',
+                                }}
+                            >
+                                {sensors?.topic}
+                            </span>
+                                                </Tooltip>
+                                            </TableCell>
+                                            <TableCell style={{ color: sensors?.status ? 'green' : 'red' }}>
                                                 {sensors?.status ? 'Active' : 'Inactive'}
                                             </TableCell>
                                         </TableRow>
@@ -273,9 +402,9 @@ const SensorDetailsView: React.FC = () => {
                                 </Table>
                             </TableContainer>
 
-                            <Divider/>
+                            <Divider />
 
-                            <div style={{marginTop: '20px', flex: 'max-content'}}>
+                            <div style={{ marginTop: '20px', flex: 'max-content' }}>
                                 <Button
                                     variant="contained"
                                     onClick={handleMap}
@@ -283,10 +412,11 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        // backgroundColor: '#55565B',
-                                        backgroundColor: ' #BC13FE',
+                                        backgroundColor: '#BC13FE',
                                         color: 'black',
-                                    }}> Map
+                                    }}
+                                >
+                                    Map
                                 </Button>
                                 <Button
                                     variant="contained"
@@ -295,9 +425,11 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: ' #BC13FE',
+                                        backgroundColor: '#BC13FE',
                                         color: 'black',
-                                    }}> Graph
+                                    }}
+                                >
+                                    Graph
                                 </Button>
                                 <Button
                                     variant="contained"
@@ -306,9 +438,10 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: ' #BC13FE',
+                                        backgroundColor: '#BC13FE',
                                         color: 'black',
-                                    }}>
+                                    }}
+                                >
                                     Min
                                 </Button>
                                 <Button
@@ -318,9 +451,10 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: ' #BC13FE',
+                                        backgroundColor: '#BC13FE',
                                         color: 'black',
-                                    }}>
+                                    }}
+                                >
                                     Max
                                 </Button>
                                 <Button
@@ -330,17 +464,15 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: ' #BC13FE',
+                                        backgroundColor: '#BC13FE',
                                         color: 'black',
                                     }}
                                 >
                                     Avg
                                 </Button>
-
-                                <Divider/>
-
                             </div>
                         </Paper>
+
                         <Box sx={{marginBottom: '20px'}}></Box>
                         <Paper elevation={6} sx={{padding: 3, backgroundColor: 'lightgray'}}>
                             <Typography variant="h5" padding={1} fontWeight="bold" color="text.secondary">
@@ -353,42 +485,54 @@ const SensorDetailsView: React.FC = () => {
                                     Select metric/year
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <FormControl sx={{m: 1, minWidth: 100}}>
-                                    <InputLabel id="demo-simple-select-autowidth-label">Metric</InputLabel>
-                                    <Select
-                                        labelId="metric"
-                                        id="demo-simple-select-autowidth"
-                                        value={selectedType}
-                                        onChange={handleChangeType}
-                                        autoWidth
-                                        label="Metric"
-                                    >
-                                        <MenuItem value="">
-                                            <em>None</em>
-                                        </MenuItem>
-                                        <MenuItem value="Max">Max</MenuItem>
-                                        <MenuItem value="Min">Min</MenuItem>
-                                        <MenuItem value="Avg">Avg</MenuItem>
-                                    </Select>
-                                </FormControl>
-                                <FormControl sx={{m: 1, minWidth: 100}}>
-                                    <InputLabel id="year-label">Year</InputLabel>
-                                    <Select
-                                        labelId="year-label"
-                                        id="demo-simple-select-autowidth"
-                                        value={selectedYear}
-                                        onChange={handleChangeYear}
-                                        autoWidth
-                                        label="Year"
-                                    >
-                                        <MenuItem value="">
-                                            <em>None</em>
-                                        </MenuItem>
-                                        <MenuItem value="2024">2024</MenuItem>
-                                        <MenuItem value="2023">2023</MenuItem>
+                                    <FormControl sx={{m: 1, minWidth: 100}}>
+                                        <InputLabel id="demo-simple-select-autowidth-label">Metric</InputLabel>
+                                        <Select
+                                            labelId="metric"
+                                            id="demo-simple-select-autowidth"
+                                            value={selectedType}
+                                            onChange={handleChangeType}
+                                            autoWidth
+                                            label="Metric"
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem value="Max">Max</MenuItem>
+                                            <MenuItem value="Min">Min</MenuItem>
+                                            <MenuItem value="Avg">Avg</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl sx={{ m: 1, minWidth: 100 }}>
+                                        <InputLabel id="year-label">Year</InputLabel>
+                                        <Select
+                                            labelId="year-label"
+                                            id="demo-simple-select-autowidth"
+                                            value={year}
+                                            onChange={handleChangeYear}
+                                            autoWidth
+                                            label="Year"
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            <MenuItem value={2024}>Current</MenuItem>
+                                            <MenuItem value={2023}>Previous</MenuItem>
+                                        </Select>
+                                    </FormControl>
 
-                                    </Select>
-                                </FormControl>
+                                    <IconButton
+                                        onClick={handleDownloadTemplate}
+                                        style={{
+                                            marginRight: '10px',
+                                            marginTop: '10px',
+                                            marginBottom: '10px',
+                                            color: 'black',
+                                        }}
+                                    >
+                                        <CloudDownloadIcon />
+                                        <Typography style={{ marginLeft: '5px' }}>Download Template</Typography>
+                                    </IconButton>
                                 <IconButton
                                     onClick={handleDialogOpen}
                                     style={{
@@ -475,13 +619,27 @@ const SensorDetailsView: React.FC = () => {
                                     </Box>
 
                                 </Box>
+                                {/* Dialog for No Data */}
+                                <Dialog
+                                    open={isNoDataDialogOpen}
+                                    onClose={handleNoDataDialogClose}
+                                    aria-labelledby="no-data-dialog-title"
+                                >
+                                    <DialogTitle id="no-data-dialog-title">
+                                        No Previous Year Data
+                                    </DialogTitle>
+                                    <DialogContent>
+                                        <Typography>
+                                            There is no data available for the selected previous year. Please upload the required data or select another option.
+                                        </Typography>
+                                    </DialogContent>
+                                </Dialog>
                             </Box>
                         </Paper>
 
                     </Paper>
                 </Grid>
             </Grid>
-            {/*<Footer></Footer>*/}
         </div>
     );
 };

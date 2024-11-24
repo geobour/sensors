@@ -5,8 +5,8 @@ import { DashboardDto, SensorDto } from "../api/ApiSensor";
 import Grid from '@mui/material/Grid';
 import { Typography } from '@mui/material';
 import Button from "@mui/material/Button";
+import Tooltip from '@mui/material/Tooltip';
 
-// Clock Component
 const Clock: React.FC = () => {
     const [currentDateTime, setCurrentDateTime] = useState({
         date: new Date().toLocaleDateString(),
@@ -230,7 +230,9 @@ const ChartGrid: React.FC = React.memo(() => {
     };
 
     const barChartData = {
-        labels: sensorData.map(sensor => sensor.name),
+        labels: sensorData.map(sensor => {
+            return sensor.name.length > 10 ? `${sensor.name.substring(0, 10)}...` : sensor.name;
+        }),
         datasets: [
             {
                 label: 'Sensor Status',
@@ -241,7 +243,7 @@ const ChartGrid: React.FC = React.memo(() => {
             },
         ],
     };
-    
+
     return (
         <div style={{ backgroundColor: '#333', minHeight: '100vh', padding: '20px' }}>
 
@@ -295,22 +297,46 @@ const ChartGrid: React.FC = React.memo(() => {
                                 }}
                             >
                                 <div>
-                                    <Typography variant="h6" gutterBottom>
-                                        {value.name}
-                                    </Typography>
+                                    <Tooltip title={value.name} placement="top" arrow>
+                                        <Typography
+                                            variant="h6"
+                                            gutterBottom
+                                            style={{
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                width: '100px',
+                                            }}
+                                        >
+                                            {value.name}
+                                        </Typography>
+                                    </Tooltip>
                                     <Typography variant="body1">
                                         {value.type === 'temperature' && `${value.currentValue}°C`}
                                         {value.type === 'humidity' && `${parseFloat(String(value.currentValue)).toFixed(1)}%`}
                                         {value.type !== 'temperature' && value.type !== 'humidity' && value.currentValue}
                                     </Typography>
-                                    <Typography variant="body1">
-                                        {value.type}
-                                    </Typography>
+                                    <Tooltip title=  {value.type} placement="top" arrow>
+                                        <Typography
+                                            variant="h6"
+                                            gutterBottom
+                                            style={{
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                width: '100px',
+                                            }}
+                                        >
+                                            {value.type}
+                                        </Typography>
+                                    </Tooltip>
+
                                 </div>
                             </div>
                         </Grid>
                     ))}
                 </Grid>
+
             </Grid>
             <div style={{ height: '100px' }}></div>
         </div>

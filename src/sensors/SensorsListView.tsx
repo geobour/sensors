@@ -20,6 +20,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import axios from 'axios';
 import {SensorDto} from '../api/ApiSensor';
 import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
 
 const SensorsListView: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>('');
@@ -150,21 +151,35 @@ const SensorsListView: React.FC = () => {
                                     <TableRow
                                         key={sensor.id}
                                         onClick={() => handleRowClick(sensor.id)}
-                                        style={{cursor: 'pointer'}}
+                                        style={{ cursor: 'pointer' }}
                                     >
-                                        <TableCell style={{ color: 'white' }}>{sensor.id}</TableCell>
-                                        <TableCell style={{ color: 'white' }}>{sensor.name}</TableCell>
-                                        <TableCell style={{ color: 'white' }}>{sensor.area}</TableCell>
-                                        <TableCell style={{ color: 'white' }}>{sensor.topic}</TableCell>
-                                        <TableCell style={{ color: 'white' }}>{sensor.type}</TableCell>
-                                        <TableCell style={{color: sensor.status ? 'green' : 'red'}}>
+                                        <TableCell sx={{ color: 'white' }}>{sensor.id}</TableCell>
+                                        <TableCell sx={{ color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                            <Tooltip title={sensor.name} arrow>
+                                                <span>{sensor.name}</span>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell sx={{ color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                            <Tooltip title={sensor.area} arrow>
+                                                <span>{sensor.area}</span>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell sx={{ color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                            <Tooltip title={sensor.topic} arrow>
+                                                <span>{sensor.topic}</span>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell sx={{ color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                            {sensor.type}
+                                        </TableCell>
+                                        <TableCell sx={{ color: sensor.status ? 'green' : 'red' }}>
                                             {sensor.status ? 'Active' : 'Inactive'}
                                         </TableCell>
                                         <TableCell>
-                                            <div style={{display: 'flex', gap: '8px'}}>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
                                                 <Button
                                                     variant="contained"
-                                                    startIcon={<EditIcon/>}
+                                                    startIcon={<EditIcon />}
                                                     onClick={(e) => handleEditClick(e, sensor.id)}
                                                     style={{
                                                         marginRight: '5px',
@@ -179,7 +194,7 @@ const SensorsListView: React.FC = () => {
 
                                                 <Button
                                                     variant="contained"
-                                                    startIcon={<DeleteIcon/>}
+                                                    startIcon={<DeleteIcon />}
                                                     onClick={(e) => handleDeleteClick(e, sensor.id)}
                                                     style={{
                                                         marginRight: '5px',
@@ -194,7 +209,7 @@ const SensorsListView: React.FC = () => {
                                                 <Button
                                                     variant="contained"
                                                     color="secondary"
-                                                    startIcon={<RestoreIcon/>}
+                                                    startIcon={<RestoreIcon />}
                                                     onClick={(e) => handleRestoreClick(e, sensor.id)}
                                                     style={{
                                                         marginRight: '5px',
@@ -211,6 +226,7 @@ const SensorsListView: React.FC = () => {
                                     </TableRow>
                                 ))}
                             </TableBody>
+
                         </Table>
                     </TableContainer>
                 </div>

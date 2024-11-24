@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import axios from 'axios';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const AddSensorPage: React.FC = () => {
     const [sensorData, setSensorData] = useState({
@@ -19,7 +19,7 @@ const AddSensorPage: React.FC = () => {
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setSensorData(prevState => ({
             ...prevState,
             [name]: value
@@ -29,24 +29,8 @@ const AddSensorPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formErrors: any = {};
-        if (!sensorData.name.trim()) {
-            formErrors.name = 'Name is required';
-        }
-        if (!sensorData.latitude.trim()) {
-            formErrors.latitude = 'Latitude is required';
-        }
-        if (!sensorData.longitude.trim()) {
-            formErrors.longitude = 'Longitude is required';
-        }
-        if (!sensorData.area.trim()) {
-            formErrors.area = 'Area is required';
-        }
-        if (!sensorData.topic.trim()) {
-            formErrors.topic = 'Topic is required';
-        }
-        if (!sensorData.type.trim()) {
-            formErrors.type = 'Type is required';
-        }
+
+
 
         if (Object.keys(formErrors).length > 0) {
             setErrors(formErrors);
@@ -63,7 +47,7 @@ const AddSensorPage: React.FC = () => {
     };
 
     return (
-        <div style={{backgroundColor: '#333', minHeight: '100vh', padding: '20px'}}>
+        <div style={{ backgroundColor: '#333', minHeight: '100vh', padding: '20px' }}>
 
             <Paper elevation={6} sx={{
                 padding: '40px',
@@ -84,6 +68,7 @@ const AddSensorPage: React.FC = () => {
                         name="name"
                         error={!!errors.name}
                         helperText={errors.name}
+                        inputProps={{ maxLength: 30 }} // Set maxLength to 30
                     />
                     <TextField
                         label="Latitude"
@@ -95,6 +80,7 @@ const AddSensorPage: React.FC = () => {
                         name="latitude"
                         error={!!errors.latitude}
                         helperText={errors.latitude}
+                        inputProps={{ maxLength: 30 }} // Set maxLength to 30
                     />
                     <TextField
                         label="Longitude"
@@ -106,6 +92,7 @@ const AddSensorPage: React.FC = () => {
                         name="longitude"
                         error={!!errors.longitude}
                         helperText={errors.longitude}
+                        inputProps={{ maxLength: 30 }} // Set maxLength to 30
                     />
                     <TextField
                         label="Area"
@@ -117,6 +104,7 @@ const AddSensorPage: React.FC = () => {
                         name="area"
                         error={!!errors.area}
                         helperText={errors.area}
+                        inputProps={{ maxLength: 30 }} // Set maxLength to 30
                     />
                     <TextField
                         label="Topic"
@@ -128,6 +116,7 @@ const AddSensorPage: React.FC = () => {
                         name="topic"
                         error={!!errors.topic}
                         helperText={errors.topic}
+                        inputProps={{ maxLength: 30 }} // Set maxLength to 30
                     />
                     <TextField
                         label="Type"
@@ -139,20 +128,19 @@ const AddSensorPage: React.FC = () => {
                         name="type"
                         error={!!errors.type}
                         helperText={errors.type}
+                        inputProps={{ maxLength: 30 }} // Set maxLength to 30
                     />
-
-                    <Button
+                <Button
                         type="submit"
                         variant="contained"
                         color="primary"
-                        style={{marginTop: '20px'}}
+                        style={{ marginTop: '20px' }}
                     >
                         Add Sensor
                     </Button>
                 </form>
             </Paper>
         </div>
-
     );
 };
 
