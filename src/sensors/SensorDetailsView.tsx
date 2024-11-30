@@ -43,7 +43,6 @@ const SensorDetailsView: React.FC = () => {
     const [maxSensorValues, setSensorMaxValues] = useState<number[]>([]);
     const [predictionData, setPredictionData] = useState<PredictionData>();
     const [selectedType, setSelectedType] = useState('');
-    // const [selectedYear, setSelectedYear] = useState('');
     const [type, setType] = useState('');
 
     const {data: sensors} = useQuery<SensorDto, Error>(
@@ -69,7 +68,7 @@ const SensorDetailsView: React.FC = () => {
 
 
     const handleChangeYear = (event: SelectChangeEvent<number>) => {
-        setYear(Number(event.target.value)); // Convert value to a number
+        setYear(Number(event.target.value));
     };
 
     const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
@@ -229,8 +228,7 @@ const SensorDetailsView: React.FC = () => {
         FileSaver.saveAs(blob, 'template.csv');
     };
 
-    // @ts-ignore
-    // @ts-ignore
+
     return (
         <div style={{overflowY: 'hidden'}}>
             <Grid container justifyContent="center" alignItems="center" spacing={3}>
@@ -412,7 +410,7 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#BC13FE',
+                                        backgroundColor: '#D3A1FF',
                                         color: 'black',
                                     }}
                                 >
@@ -425,7 +423,7 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#BC13FE',
+                                        backgroundColor: '#D3A1FF',
                                         color: 'black',
                                     }}
                                 >
@@ -438,7 +436,7 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#BC13FE',
+                                        backgroundColor: '#D3A1FF',
                                         color: 'black',
                                     }}
                                 >
@@ -451,7 +449,7 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#BC13FE',
+                                        backgroundColor: '#D3A1FF',
                                         color: 'black',
                                     }}
                                 >
@@ -464,7 +462,7 @@ const SensorDetailsView: React.FC = () => {
                                         marginRight: '10px',
                                         marginTop: '10px',
                                         marginBottom: '20px',
-                                        backgroundColor: '#BC13FE',
+                                        backgroundColor: '#D3A1FF',
                                         color: 'black',
                                     }}
                                 >
@@ -602,7 +600,7 @@ const SensorDetailsView: React.FC = () => {
                                             marginRight: '10px',
                                             marginTop: '10px',
                                             marginBottom: '20px',
-                                            backgroundColor: ' #BC13FE',
+                                            backgroundColor: ' #D3A1FF',
                                             color: 'black',
                                         }}
                                     >

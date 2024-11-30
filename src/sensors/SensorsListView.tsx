@@ -89,9 +89,9 @@ const SensorsListView: React.FC = () => {
     };
 
     return (
-        <Box sx={{backgroundColor: '#333', minHeight: '100vh', padding: 2}}>
+        <Box sx={{backgroundColor: '#cccccc', minHeight: '100vh', padding: 2}}>
             <Container>
-                <Paper elevation={3} sx={{mt: 4, backgroundColor: 'lightgray', padding: '10px'}}>
+                <Paper elevation={3} sx={{mt: 4, backgroundColor: '#a5a5a5', padding: '10px'}}>
                     <Typography variant="h4" align="center" fontWeight="bold" color="text.secondary">
                         Sensors List
                     </Typography>
@@ -102,19 +102,12 @@ const SensorsListView: React.FC = () => {
                         placeholder="Search by ID"
                         startAdornment={
                             <InputAdornment position="start">
-                                <SearchIcon style={{ color: 'white' }} /> {/* Changes search icon color */}
+                                <SearchIcon   /> {/* Changes search icon color */}
                             </InputAdornment>
                         }
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        sx={{
-                            color: 'white',
-                            '& .MuiInputBase-input': {
-                                color: 'white',
-                            },
-                            '& .MuiInputBase-input::placeholder': {
-                                color: 'white',                            },
-                        }}
+
                     />
                     <Button
                         variant="contained"
@@ -124,7 +117,7 @@ const SensorsListView: React.FC = () => {
                             marginRight: '10px',
                             marginTop: '10px',
                             marginBottom: '20px',
-                            backgroundColor: ' #BC13FE',
+                            backgroundColor: ' #D3A1FF',
                             color: 'black',
                         }}
                     >
@@ -133,16 +126,16 @@ const SensorsListView: React.FC = () => {
                 </div>
                 <div style={{marginTop: '20px'}}/>
                 <div style={{maxHeight: '500px', overflowY: 'auto'}}>
-                    <TableContainer component={Paper} elevation={3} sx={{backgroundColor: '#333'}}>
+                    <TableContainer component={Paper} elevation={3} sx={{backgroundColor: '#cccccc'}}>
                         <Table sx={{minWidth: 650}} aria-label="sensor table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell style={{ color: 'white' }}>Sensor ID</TableCell>
-                                    <TableCell style={{ color: 'white' }}>Sensor Name</TableCell>
-                                    <TableCell style={{ color: 'white' }}>Sensor Area</TableCell>
-                                    <TableCell style={{ color: 'white' }}>Topic</TableCell>
-                                    <TableCell style={{ color: 'white' }}>Type</TableCell>
-                                    <TableCell style={{ color: 'white' }}>Status</TableCell>
+                                    <TableCell >Sensor ID</TableCell>
+                                    <TableCell >Sensor Name</TableCell>
+                                    <TableCell >Sensor Area</TableCell>
+                                    <TableCell>Topic</TableCell>
+                                    <TableCell >Type</TableCell>
+                                    <TableCell >Status</TableCell>
                                 </TableRow>
 
                             </TableHead>
@@ -153,23 +146,23 @@ const SensorsListView: React.FC = () => {
                                         onClick={() => handleRowClick(sensor.id)}
                                         style={{ cursor: 'pointer' }}
                                     >
-                                        <TableCell sx={{ color: 'white' }}>{sensor.id}</TableCell>
-                                        <TableCell sx={{ color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                        <TableCell >{sensor.id}</TableCell>
+                                        <TableCell sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
                                             <Tooltip title={sensor.name} arrow>
                                                 <span>{sensor.name}</span>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell sx={{ color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                        <TableCell sx={{  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
                                             <Tooltip title={sensor.area} arrow>
                                                 <span>{sensor.area}</span>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell sx={{ color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                        <TableCell sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
                                             <Tooltip title={sensor.topic} arrow>
                                                 <span>{sensor.topic}</span>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell sx={{ color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
+                                        <TableCell sx={{  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100px' }}>
                                             {sensor.type}
                                         </TableCell>
                                         <TableCell sx={{ color: sensor.status ? 'green' : 'red' }}>
@@ -185,7 +178,7 @@ const SensorsListView: React.FC = () => {
                                                         marginRight: '5px',
                                                         marginTop: '10px',
                                                         marginBottom: '10px',
-                                                        backgroundColor: ' #BC13FE',
+                                                        backgroundColor: ' #D3A1FF',
                                                         color: 'black',
                                                     }}
                                                 >
@@ -200,7 +193,7 @@ const SensorsListView: React.FC = () => {
                                                         marginRight: '5px',
                                                         marginTop: '10px',
                                                         marginBottom: '10px',
-                                                        backgroundColor: ' #BC13FE',
+                                                        backgroundColor: ' #D3A1FF',
                                                         color: 'black',
                                                     }}
                                                 >
@@ -215,7 +208,7 @@ const SensorsListView: React.FC = () => {
                                                         marginRight: '5px',
                                                         marginTop: '10px',
                                                         marginBottom: '10px',
-                                                        backgroundColor: ' #BC13FE',
+                                                        backgroundColor: '#D3A1FF',
                                                         color: 'black',
                                                     }}
                                                 >
