@@ -33,7 +33,7 @@ import FileSaver from "file-saver";
 import Tooltip from '@mui/material/Tooltip';
 const SensorDetailsView: React.FC = () => {
     const {sensorId} = useParams<{ sensorId: string }>();
-    const [year, setYear] = useState<number>(2024);
+    const [year, setYear] = useState<number>(2025);
     const navigate = useNavigate();
     const [minValues, setMinValues] = useState<number[]>([]);
     const [maxValues, setMaxValues] = useState<number[]>([]);
@@ -514,8 +514,8 @@ const SensorDetailsView: React.FC = () => {
                                             <MenuItem value="">
                                                 <em>None</em>
                                             </MenuItem>
-                                            <MenuItem value={2024}>Current</MenuItem>
-                                            <MenuItem value={2023}>Previous</MenuItem>
+                                            <MenuItem value={2025}>Current</MenuItem>
+                                            <MenuItem value={2024}>Previous</MenuItem>
                                         </Select>
                                     </FormControl>
 

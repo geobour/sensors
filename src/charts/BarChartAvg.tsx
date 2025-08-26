@@ -18,7 +18,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({className}) => {
     const chartInstance = useRef<Chart | null>(null);
     const {sensorId} = useParams<{ sensorId: string }>();
     const [type, setType] = useState('');
-    const [year, setYear] = useState<number>(2024);
+    const [year, setYear] = useState<number>(2025);
 
     const {data: sensors} = useQuery<SensorDto, Error>(
         ['sensorData', sensorId],
@@ -31,9 +31,9 @@ const BarChartAvg: React.FC<BarChartProps> = ({className}) => {
         }
     );
     const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
-        ['sensorData', sensorId, 2024],
+        ['sensorData', sensorId, 2025],
         async () => {
-            const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2024`);
+            const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/2025`);
             return response.data;
         }
     );
@@ -157,6 +157,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({className}) => {
                         '& .MuiSelect-icon': {color: '#333'},
                     }}
                 >
+                    <MenuItem value={2025}>2025</MenuItem>
                     <MenuItem value={2024}>2024</MenuItem>
                     <MenuItem value={2023}>2023</MenuItem>
                     <MenuItem value={2022}>2022</MenuItem>
