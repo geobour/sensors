@@ -21,7 +21,14 @@ export interface SensorDto {
     status:boolean;
     active:string;
 }
-
+export interface SensorInput {
+    name: string;
+    latitude: string;
+    longitude: string;
+    area: string;
+    topic: string;
+    type: string;
+}
 export  interface FileData {
     min?: number;
     max?: number;

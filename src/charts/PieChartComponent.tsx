@@ -1,126 +1,85 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useRef, useEffect} from 'react';
+import {Grid, Paper} from '@mui/material';
 import Chart from 'chart.js/auto';
-import axios from 'axios';
 import Footer from "../layout/Footer";
-import { Grid } from '@mui/material'; // Import Grid from Material-UI
+import {useSensorPieData} from "../hooks/useSensorData";
 
-const ChartGrid: React.FC = () => {
-    const ChartComponent: React.FC<{ data: any, options: any }> = ({ data, options }) => {
-        const chartRef = useRef<HTMLCanvasElement>(null);
-        const chartInstanceRef = useRef<Chart | null>(null);
+interface ChartProps {
+    data: any;
+    options: any;
+    type: 'bar' | 'pie';
+}
 
-        useEffect(() => {
-            if (chartRef.current) {
-                const ctx = chartRef.current.getContext('2d');
-
-                if (ctx) {
-                    if (chartInstanceRef.current) {
-                        chartInstanceRef.current.destroy();
-                    }
-
-                    chartInstanceRef.current = new Chart(ctx, {
-                        type: 'bar', // Changed this to 'bar'
-                        data,
-                        options,
-                    });
-                }
-            }
-
-            return () => {
-                if (chartInstanceRef.current) {
-                    chartInstanceRef.current.destroy();
-                }
-            };
-        }, [data, options]);
-
-        return <canvas ref={chartRef}></canvas>;
-    };
-
-    const PieChartComponent: React.FC<{ data: any, options: any }> = ({ data, options }) => {
-        const pieChartRef = useRef<HTMLCanvasElement>(null);
-        const pieChartInstanceRef = useRef<Chart | null>(null);
-
-        useEffect(() => {
-            if (pieChartRef.current) {
-                const ctx = pieChartRef.current.getContext('2d');
-
-                if (ctx) {
-                    if (pieChartInstanceRef.current) {
-                        pieChartInstanceRef.current.destroy();
-                    }
-                    // @ts-ignore
-                    pieChartInstanceRef.current = new Chart(ctx, {
-                        type: 'pie',
-                        data,
-                        options,
-                    });
-                }
-            }
-
-            return () => {
-                if (pieChartInstanceRef.current) {
-                    pieChartInstanceRef.current.destroy();
-                }
-            };
-        }, [data, options]);
-
-        return <canvas ref={pieChartRef}></canvas>;
-    };
-
-    const [sensorData, setSensorData] = useState<any[]>([]); // State to hold sensor data
+const ChartComponent: React.FC<ChartProps> = ({data, options, type}) => {
+    const chartRef = useRef<HTMLCanvasElement>(null);
+    const chartInstanceRef = useRef<Chart | null>(null);
 
     useEffect(() => {
-        const fetchSensorData = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/api/sensor/all');
-                setSensorData(response.data); // Assuming response.data is an array of sensor data objects
-            } catch (error) {
-                console.error('Error fetching sensor data:', error);
+        if (chartRef.current) {
+            const ctx = chartRef.current.getContext('2d');
+            if (ctx) {
+                if (chartInstanceRef.current) chartInstanceRef.current.destroy();
+                // @ts-ignore
+                chartInstanceRef.current = new Chart(ctx, {type, data, options});
             }
+        }
+
+        return () => {
+            if (chartInstanceRef.current) chartInstanceRef.current.destroy();
         };
+    }, [data, options, type]);
 
-        fetchSensorData();
-    }, []);
+    return <canvas ref={chartRef}></canvas>;
+};
 
-    const barChartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-    };
+const ChartGrid: React.FC = () => {
+    const {data: sensorData = [], isLoading, isError} = useSensorPieData();
 
-    const pieChartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-        },
-    };
+    const barChartOptions = {responsive: true, maintainAspectRatio: false};
+    const pieChartOptions = {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'top'}}};
+
+    if (isLoading) return <p>Loading sensor data...</p>;
+    if (isError) return <p>Error loading sensor data.</p>;
 
     return (
         <div>
-            <Grid container spacing={2} style={{ margin: '20px' }}>
-                {sensorData.map((sensor, index) => (
+            {/* Bar Charts */}
+            <Grid container spacing={2} style={{margin: '20px'}}>
+                {sensorData.map((sensor: any, index: number) => (
                     <Grid item xs={12} md={4} key={index}>
-                        <div style={{ height: '300px' }}>
-                            <ChartComponent data={sensor.chartData} options={barChartOptions} />
-                        </div>
+                        <Paper elevation={6} style={{
+                            height: '300px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: 10
+                        }}>
+                            <ChartComponent data={sensor.chartData} options={barChartOptions} type="bar"/>
+                        </Paper>
                     </Grid>
                 ))}
             </Grid>
 
-            <Grid container spacing={2} style={{ marginTop: '20px', margin: '20px' }}>
-                {sensorData.map((sensor, index) => (
+            {/* Pie Charts */}
+            <Grid container spacing={2} style={{marginTop: '20px', margin: '20px'}}>
+                {sensorData.map((sensor: any, index: number) => (
                     <Grid item xs={12} md={4} key={index}>
-                        <div style={{ height: '300px' }}>
-                            <PieChartComponent data={sensor.pieChartData} options={pieChartOptions} />
-                        </div>
+                        <Paper elevation={6} style={{
+                            height: '300px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: 10
+                        }}>
+                            <ChartComponent data={sensor.pieChartData} options={pieChartOptions} type="pie"/>
+                        </Paper>
                     </Grid>
                 ))}
             </Grid>
 
-            <div style={{ height: '100px' }}></div> {/* Gap between the charts and the footer */}
-            <Footer />
+            <div style={{height: '100px'}}/>
+            {/* Spacer */}
+            <Footer/>
         </div>
     );
 };

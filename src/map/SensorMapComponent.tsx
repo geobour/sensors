@@ -1,7 +1,7 @@
 import React from "react";
 import GoogleMapReact from 'google-map-react';
 import {useParams} from "react-router-dom";
-import {useSensor} from "../hooks/useSensor ";
+import {useSensor} from "../hooks/useSensor";
 
 const Marker = ({lat, lng, text}: { lat: number; lng: number; text: string }) => (
     <div>

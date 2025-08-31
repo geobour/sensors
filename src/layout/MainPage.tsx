@@ -43,7 +43,7 @@ function MainPage() {
 
     return (
         <div>
-            {!loggedIn ? (
+            {1<2 ? (
                 <>
                     <ButtonAppBar handleLogout={handleLogout} isLoggedIn={loggedIn}/>
                     <Routes>

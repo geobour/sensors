@@ -6,7 +6,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import { useNavigate } from 'react-router-dom';
-import {useAddSensor} from "../hooks/useAddSensor ";
+import {useAddSensor} from "../hooks/useAddSensor";
 
 const AddSensorPage: React.FC = () => {
     const [sensorData, setSensorData] = useState({
