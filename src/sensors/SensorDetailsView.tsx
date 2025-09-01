@@ -178,7 +178,9 @@ const SensorDetailsView: React.FC = () => {
                                 <TableHead>
                                     <TableRow>
                                         {['ID','Name','Area','Latitude','Longitude','Type','Topic','Status'].map(col => (
-                                            <TableCell key={col}><Typography variant="h6" fontWeight="bold">{col}</Typography></TableCell>
+                                            <TableCell key={col} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                                                {col}
+                                            </TableCell>
                                         ))}
                                     </TableRow>
                                 </TableHead>
@@ -202,15 +204,72 @@ const SensorDetailsView: React.FC = () => {
                         <Divider sx={{ my: 2 }} />
 
                         <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                            <Button variant="contained" onClick={handleMap} style={{ backgroundColor: '#D3A1FF', color:'black' }}>Map</Button>
-                            <Button variant="contained" onClick={handleLineChart} style={{ backgroundColor: '#D3A1FF', color:'black' }}>Graph</Button>
-                            <Button variant="contained" onClick={handleMinChart} style={{ backgroundColor: '#D3A1FF', color:'black' }}>Min</Button>
-                            <Button variant="contained" onClick={handleMaxChart} style={{ backgroundColor: '#D3A1FF', color:'black' }}>Max</Button>
-                            <Button variant="contained" onClick={handleAvgChart} style={{ backgroundColor: '#D3A1FF', color:'black' }}>Avg</Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleMap}
+                                sx={{
+                                    backgroundColor: '#D3A1FF',
+                                    color: 'text.secondary',
+                                    '&:hover': { backgroundColor: '#c089f2' },
+                                }}
+                            >
+                                Map
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                onClick={handleLineChart}
+                                sx={{
+                                    backgroundColor: '#D3A1FF',
+                                    color: 'text.secondary',
+                                    '&:hover': { backgroundColor: '#c089f2' },
+                                }}
+                            >
+                                Graph
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                onClick={handleMinChart}
+                                sx={{
+                                    backgroundColor: '#D3A1FF',
+                                    color: 'text.secondary',
+                                    '&:hover': { backgroundColor: '#c089f2' },
+                                }}
+                            >
+                                Min
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                onClick={handleMaxChart}
+                                sx={{
+                                    backgroundColor: '#D3A1FF',
+                                    color: 'text.secondary',
+                                    '&:hover': { backgroundColor: '#c089f2' },
+                                }}
+                            >
+                                Max
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                onClick={handleAvgChart}
+                                sx={{
+                                    backgroundColor: '#D3A1FF',
+                                    color: 'text.secondary',
+                                    '&:hover': { backgroundColor: '#c089f2' },
+                                }}
+                            >
+                                Avg
+                            </Button>
                         </div>
 
+
                         <Paper elevation={6} sx={{ padding: 3, mt: 3 }}>
-                            <Typography variant="h5" fontWeight="bold">Upload File</Typography>
+                            <Typography variant="h5" fontWeight="bold" color="text.secondary">
+                                Upload File
+                            </Typography>
                             <input type="file" accept=".xlsx, .xls" onChange={handleChange} />
 
                             <Box sx={{ display: 'flex', alignItems:'center', mt:2, gap:2 }}>
@@ -245,20 +304,36 @@ const SensorDetailsView: React.FC = () => {
                             <Box sx={{ width: '700px', height: '400px', mt:2 }}>
                                 <canvas id={selectedType === "Max" ? 'maxChart' : selectedType === "Min" ? 'minChart' : 'avgChart'} width="700" height="400"></canvas>
                             </Box>
-
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
                                 <Button
                                     variant="contained"
                                     onClick={handlePrediction}
-                                    sx={{ backgroundColor: '#D3A1FF', color: 'black' }}
+                                    sx={{
+                                        backgroundColor: '#D3A1FF',
+                                        color: 'text.secondary',
+                                        mt: 1.2,
+                                        '&:hover': {
+                                            backgroundColor: '#b87de0',
+                                        },
+                                    }}
                                 >
                                     Run
                                 </Button>
-
                                 {predictionData && (
-                                    <Box sx={{ display: 'flex', alignItems: 'center' ,mt: 1.2 }}>
-                                        <ExportToExcel data={predictionData} fileName="predictionResults" />
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 1.2 }}>
+                                        <ExportToExcel
+                                            data={predictionData}
+                                            fileName="predictionResults"
+                                            buttonProps={{
+                                                sx: {
+                                                    backgroundColor: '#D3A1FF',
+                                                    color: 'text.secondary',
+                                                    '&:hover': { backgroundColor: '#c089f2' },
+                                                },
+                                            }}
+                                        />
                                     </Box>
+
                                 )}
                             </Box>
 

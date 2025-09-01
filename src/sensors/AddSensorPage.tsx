@@ -6,7 +6,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import { useNavigate } from 'react-router-dom';
-import {useAddSensor} from "../hooks/useAddSensor";
+import { useAddSensor } from "../hooks/useAddSensor";
+
+const MAX_LENGTH = 20;
 
 const AddSensorPage: React.FC = () => {
     const [sensorData, setSensorData] = useState({
@@ -17,7 +19,8 @@ const AddSensorPage: React.FC = () => {
         topic: '',
         type: '',
     });
-    const [errors, setErrors] = useState<any>({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [fieldWarnings, setFieldWarnings] = useState<Record<string, boolean>>({});
     const [openModal, setOpenModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [modalSuccess, setModalSuccess] = useState(true);
@@ -26,19 +29,31 @@ const AddSensorPage: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+
         setSensorData(prev => ({ ...prev, [name]: value }));
+
+        setFieldWarnings(prev => ({
+            ...prev,
+            [name]: value.length >= MAX_LENGTH
+        }));
+
+        setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const formErrors: any = {};
-        if (!sensorData.name) formErrors.name = 'Name is required';
-        if (!sensorData.latitude) formErrors.latitude = 'Latitude is required';
-        if (!sensorData.longitude) formErrors.longitude = 'Longitude is required';
+        const formErrors: Record<string, string> = {};
+        Object.keys(sensorData).forEach(field => {
+            const value = sensorData[field as keyof typeof sensorData];
+            if (!value || String(value).trim() === '') {
+                formErrors[field] = 'This field is required';
+            }
+        });
+
+        setErrors(formErrors);
 
         if (Object.keys(formErrors).length > 0) {
-            setErrors(formErrors);
             setModalMessage('Please fill in required fields.');
             setModalSuccess(false);
             setOpenModal(true);
@@ -71,10 +86,10 @@ const AddSensorPage: React.FC = () => {
     }, [openModal, modalSuccess, navigate]);
 
     return (
-        <div style={{ backgroundColor: '#333', minHeight: '100vh', padding: '20px' }}>
+        <div style={{ backgroundColor: 'white', minHeight: '100vh', padding: '20px' }}>
             <Paper
                 elevation={6}
-                sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px', backgroundColor: 'lightgray' }}
+                sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px', backgroundColor: 'white' }}
             >
                 <form onSubmit={handleSubmit}>
                     {['name','latitude','longitude','area','topic','type'].map((field) => (
@@ -88,27 +103,43 @@ const AddSensorPage: React.FC = () => {
                             onChange={handleChange}
                             name={field}
                             error={!!errors[field]}
-                            helperText={errors[field]}
-                            inputProps={{ maxLength: 30 }}
+                            helperText={
+                                errors[field] ? errors[field] :
+                                    (fieldWarnings[field] ? `Maximum ${MAX_LENGTH} characters reached` : '')
+                            }
+                            inputProps={{ maxLength: MAX_LENGTH }}
+                            required
+                            sx={{
+                                '& .MuiInputLabel-root': { color: 'text.secondary' },
+                                '& .MuiFormHelperText-root': { color: 'text.secondary' },
+                                color: 'text.secondary',
+                            }}
                         />
+
                     ))}
 
                     <Button
                         type="submit"
                         variant="contained"
-                        color="primary"
-                        style={{ marginTop: '20px' }}
+                        sx={{
+                            marginTop: '20px',
+                            backgroundColor: '#D3A1FF',
+                            color: 'text.secondary',
+                            '&:hover': { backgroundColor: '#c089f2' },
+                        }}
                         disabled={mutation.isLoading}
                     >
-                        {mutation.isLoading ? 'Adding...' : 'Add Sensor'}
+                        {mutation.isLoading ? 'Saving...' : 'Save'}
                     </Button>
+
                 </form>
             </Paper>
+
             <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-                <DialogTitle style={{ color: modalSuccess ? 'green' : 'red' }}>
+                <DialogTitle sx={{ color: modalSuccess ? 'green' : 'red' }}>
                     {modalSuccess ? 'Success' : 'Error'}
                 </DialogTitle>
-                <DialogContent style={{ color: modalSuccess ? 'green' : 'red' }}>
+                <DialogContent sx={{ color: modalSuccess ? 'green' : 'red' }}>
                     {modalMessage}
                 </DialogContent>
             </Dialog>

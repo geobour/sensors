@@ -1,4 +1,4 @@
-// hooks/useSensorData.ts
+
 import axios from 'axios';
 import { SensorDataDto, SensorRecordDto } from "../api/ApiSensor";
 import { useQuery } from 'react-query';

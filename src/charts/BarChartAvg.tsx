@@ -5,10 +5,8 @@ import Grid from '@mui/material/Grid';
 import {useParams} from "react-router-dom";
 import {FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
 import {useSensorData} from '../hooks/useSensorData';
+import {BarChartProps} from "../api/ApiSensor";
 
-interface BarChartProps {
-    className?: string;
-}
 
 const BarChartAvg: React.FC<BarChartProps> = ({className}) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);

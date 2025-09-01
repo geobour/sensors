@@ -5,10 +5,8 @@ import Grid from '@mui/material/Grid';
 import {useParams} from 'react-router-dom';
 import Footer from '../layout/Footer';
 import {useLineChartData} from '../hooks/useSensorData';
+import {LineChartProps} from "../api/ApiSensor";
 
-interface LineChartProps {
-    className?: string;
-}
 
 const LineChart: React.FC<LineChartProps> = ({className}) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);

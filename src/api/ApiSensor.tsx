@@ -57,6 +57,10 @@ export interface DashboardDto {
 }
 
 
+export interface BarChartProps {
+    className?: string;
+}
 
-
-
+export interface LineChartProps {
+    className?: string;
+}

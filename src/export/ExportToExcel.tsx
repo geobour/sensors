@@ -1,7 +1,7 @@
 import React from 'react';
-import * as XLSX from 'xlsx'; // Import all exports as XLSX
+import * as XLSX from 'xlsx';
 import FileSaver from 'file-saver';
-import Button from "@mui/material/Button";
+import Button, { ButtonProps } from "@mui/material/Button";
 
 interface PredictionData {
     january?: number;
@@ -21,9 +21,10 @@ interface PredictionData {
 interface Props {
     data: PredictionData;
     fileName: string;
+    buttonProps?: ButtonProps; // optional extra props for the button
 }
 
-const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
+const ExportToExcel: React.FC<Props> = ({ data, fileName, buttonProps }) => {
     const exportToExcel = () => {
         const {
             january, february, march, april,
@@ -32,7 +33,7 @@ const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
         } = data;
 
         const worksheetData = [
-            ['Month', 'Value'], // Header row
+            ['Month', 'Value'],
             ['January', january?.toString()],
             ['February', february?.toString()],
             ['March', march?.toString()],
@@ -56,15 +57,10 @@ const ExportToExcel: React.FC<Props> = ({ data, fileName }) => {
     };
 
     return (
-        <Button variant="contained"
-                onClick={exportToExcel}
-                style={{
-                    marginRight: '10px',
-                    marginTop: '10px',
-                    marginBottom: '20px',
-                    backgroundColor: '#D3A1FF',
-                    color: 'black',
-                }}
+        <Button
+            variant="contained"
+            onClick={exportToExcel}
+            {...buttonProps}
         >
             Export
         </Button>
