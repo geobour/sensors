@@ -40,8 +40,8 @@ const BarChartMax: React.FC = () => {
                             {
                                 label: 'Maximum Values',
                                 data: maxValues,
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
                                 borderWidth: 1,
                             },
                         ],
@@ -53,7 +53,7 @@ const BarChartMax: React.FC = () => {
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function (value) {
-                                        if (type === 'temperature') return value + ' °C';
+                                        if (!type || type === 'temperature') return value + ' °C';
                                         if (type === 'humidity') return value + ' %';
                                         return value;
                                     },

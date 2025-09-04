@@ -43,8 +43,8 @@ const BarChartAvg: React.FC<BarChartProps> = ({className}) => {
                             {
                                 label: 'Average Values',
                                 data: avgValues,
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                borderColor: 'rgba(255, 206, 86, 1)',
                                 borderWidth: 1,
                             },
                         ],
@@ -56,7 +56,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({className}) => {
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function (value) {
-                                        if (type === 'temperature') return value + ' °C';
+                                        if (!type || type === 'temperature') return value + ' °C';
                                         if (type === 'humidity') return value + ' %';
                                         return value;
                                     },

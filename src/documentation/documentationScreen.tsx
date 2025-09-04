@@ -25,7 +25,7 @@ const DocumentationScreen = () => {
                         To send data without a username or password, use the following command:
                     </Typography>
                     <pre style={{ textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
-{`mosquitto_pub -h "broker-ip-address" -p 1883 -t "sensors/topic1" -m "{\"id\":523,\"value\":99.5,\"time\":\"2024-06-14 10:24:55\"}"`}
+{`mosquitto_pub -h "broker-ip-address" -p 1883 -t "sensors/topic1" -m "{\"id\":523,\"value\":20.5,\"time\":\"2025-09-04 10:24:55\"}"`}
                     </pre>
                     <Typography paragraph color="text.secondary">
                         This command publishes a message to the topic <strong>"sensors/topic1"</strong> on the MQTT broker with the
@@ -34,8 +34,8 @@ const DocumentationScreen = () => {
                     <pre style={{ textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
 {`{
     "id": 523,
-    "value": 99.5,
-    "time": "2024-06-14 10:24:55"
+    "value": 20.5,
+    "time": "2025-09-04 10:24:55"
 }`}
                     </pre>
                     <Typography paragraph color="text.secondary">

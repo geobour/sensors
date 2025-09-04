@@ -53,7 +53,7 @@ const BarChartMin: React.FC = () => {
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function (value) {
-                                        if (type === 'temperature') return value + ' °C';
+                                        if (!type || type === 'temperature') return value + ' °C';
                                         if (type === 'humidity') return value + ' %';
                                         return value;
                                     },
