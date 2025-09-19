@@ -25,7 +25,6 @@ export const useSensorData = (sensorId: string | number, year: number) => {
     };
 };
 
-// Fetch line chart data
 export const useLineChartData = (sensorId: string) => {
     return useQuery<SensorRecordDto[], Error>(
         ['lineChartData', sensorId],
@@ -33,7 +32,7 @@ export const useLineChartData = (sensorId: string) => {
             const response = await axios.get<SensorRecordDto[]>(`${API_SENSOR}/reports/get-daily-data?sensorId=${sensorId}`);
             return response.data;
         },
-        { refetchInterval: 120000 } // every 2 minutes
+        { refetchInterval: 20000 } // every 2 minutes
     );
 };
 

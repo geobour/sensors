@@ -5,7 +5,7 @@ import { SensorDto } from "../api/ApiSensor";
 const API_BASE = 'http://localhost:8080/api';
 const API_SENSOR = `${API_BASE}/sensor`;
 
-// Fetch single sensor
+
 export const useSensor = (sensorId: string | number) => {
     const query = useQuery<SensorDto, Error>(
         ['sensor', sensorId],
@@ -23,7 +23,6 @@ export const useSensor = (sensorId: string | number) => {
     };
 };
 
-// Update sensor
 export const useUpdateSensor = () => {
     const queryClient = useQueryClient();
 

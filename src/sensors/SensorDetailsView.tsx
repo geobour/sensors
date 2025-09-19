@@ -47,6 +47,8 @@ const SensorDetailsView: React.FC = () => {
     const [type, setType] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isNoDataDialogOpen, setIsNoDataDialogOpen] = useState(false);
+    const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const { data: sensors } = useQuery<SensorDto, Error>(
         ['sensorData', sensorId],
@@ -86,8 +88,22 @@ const SensorDetailsView: React.FC = () => {
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files;
-        if (fileList && fileList.length > 0) handleUpload(fileList[0]);
+        if (fileList && fileList.length > 0) {
+            const file = fileList[0];
+            const allowedExtensions = /(\.xlsx|\.xls|\.ods)$/i;
+
+            if (!allowedExtensions.exec(file.name)) {
+                setErrorMessage("Invalid file format. Please upload an Excel (.xlsx, .xls) or LibreOffice (.ods) file.");
+                setIsErrorDialogOpen(true);
+                return;
+            }
+
+            handleUpload(file);
+        }
     };
+
+
+
 
     const handleUpload = async (file: File) => {
         try {
@@ -355,6 +371,12 @@ const SensorDetailsView: React.FC = () => {
                             <DialogTitle>No Previous Year Data</DialogTitle>
                             <DialogContent>
                                 <Typography>No data available for the selected previous year. Please upload required data.</Typography>
+                            </DialogContent>
+                        </Dialog>
+                        <Dialog open={isErrorDialogOpen} onClose={() => setIsErrorDialogOpen(false)}>
+                            <DialogTitle>Error</DialogTitle>
+                            <DialogContent>
+                                <Typography>{errorMessage}</Typography>
                             </DialogContent>
                         </Dialog>
                     </Paper>

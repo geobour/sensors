@@ -101,7 +101,15 @@ const ChartGrid: React.FC = React.memo(() => {
     const barChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        scales: { y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { display: false } }, x: { ticks: { color: '#fff' }, grid: { display: false } } },
+        scales: { y: { beginAtZero: true, ticks: {
+                    color: '#fff',
+                    stepSize: 1,          // ensures only 0, 1, 2, … appear
+                    callback: function(value:any) {
+                        // Only show 0 or 1
+                        if (value === 0 || value === 1) return value;
+                        return '';
+                    },
+                }, grid: { display: false } }, x: { ticks: { color: '#fff' }, grid: { display: false } } },
         plugins: { legend: { display: true, labels: { color: '#fff' } } },
     };
 

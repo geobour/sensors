@@ -45,7 +45,8 @@ function MainPage() {
                 <>
                     <ButtonAppBar handleLogout={handleLogout} isLoggedIn={loggedIn}/>
                     <Routes>
-                        <Route path="/HomePage" element={<HomePage/>}/>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/HomePage" element={<HomePage />} />
                         <Route path="/dashboard" element={<Dashboard/>}/>
                         <Route path="/sensors" element={<SensorsListView/>}/>
                         <Route path="/sensors/:sensorId" element={<SensorDetailsView/>}/>

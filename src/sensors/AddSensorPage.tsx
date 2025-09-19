@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAddSensor } from "../hooks/useAddSensor";
 
@@ -92,7 +93,8 @@ const AddSensorPage: React.FC = () => {
                 sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px', backgroundColor: 'white' }}
             >
                 <form onSubmit={handleSubmit}>
-                    {['name','latitude','longitude','area','topic','type'].map((field) => (
+                    {/* Text Inputs */}
+                    {['name','latitude','longitude','area','topic'].map((field) => (
                         <TextField
                             key={field}
                             label={field.charAt(0).toUpperCase() + field.slice(1)}
@@ -115,8 +117,25 @@ const AddSensorPage: React.FC = () => {
                                 color: 'text.secondary',
                             }}
                         />
-
                     ))}
+
+                    {/* Type Select */}
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="type-label">Type</InputLabel>
+                        <Select
+                            labelId="type-label"
+                            id="type-select"
+                            name="type"
+                            value={sensorData.type}
+                            onChange={(e) =>
+                                setSensorData(prev => ({ ...prev, type: e.target.value }))
+                            }
+                            required
+                        >
+                            <MenuItem value="temperature">Temperature</MenuItem>
+                            <MenuItem value="humidity">Humidity</MenuItem>
+                        </Select>
+                    </FormControl>
 
                     <Button
                         type="submit"
@@ -131,7 +150,6 @@ const AddSensorPage: React.FC = () => {
                     >
                         {mutation.isLoading ? 'Saving...' : 'Save'}
                     </Button>
-
                 </form>
             </Paper>
 

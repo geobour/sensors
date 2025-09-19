@@ -1,18 +1,17 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import {useParams} from 'react-router-dom';
-import {FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from '@mui/material';
-import {useSensorData} from "../hooks/useSensorData";
+import { useParams } from 'react-router-dom';
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { useSensorData } from "../hooks/useSensorData";
 
 const BarChartMax: React.FC = () => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
-    const {sensorId} = useParams<{ sensorId: string }>();
-    const [type, setType] = useState('');
+    const { sensorId } = useParams<{ sensorId: string }>();
     const [year, setYear] = useState<number>(2025);
-    const {sensorData, isLoading, isError, refetch} = useSensorData(sensorId || '', year);
+    const { sensorData, isLoading, isError, refetch } = useSensorData(sensorId || '', year);
 
     const handleChangeYear = (event: SelectChangeEvent<number>) => {
         const newYear = Number(event.target.value);
@@ -21,54 +20,55 @@ const BarChartMax: React.FC = () => {
     };
 
     useEffect(() => {
-        if (chartRef.current && sensorData && sensorData.length > 0) {
-            if (chartInstance.current) {
-                chartInstance.current.destroy();
-            }
+        if (!chartRef.current || !sensorData || sensorData.length === 0) return;
 
-            const ctx = chartRef.current.getContext('2d');
-            if (ctx) {
-                const filteredData = sensorData.filter((data) => data.month !== undefined);
-                const labels = filteredData.map((data) => getMonthName(data.month!));
-                const maxValues = filteredData.map((data) => data.maxValue || 0);
+        if (chartInstance.current) chartInstance.current.destroy();
 
-                chartInstance.current = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Maximum Values',
-                                data: maxValues,
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1,
-                            },
-                        ],
+        const ctx = chartRef.current.getContext('2d');
+        if (!ctx) return;
+
+        const filteredData = sensorData.filter(data => data.month !== undefined);
+        const labels = filteredData.map(data => getMonthName(data.month!));
+        const maxValues = filteredData.map(data => data.maxValue || 0);
+
+        // Dynamically get the type from the first record
+        const chartType = filteredData[0]?.type || 'temperature';
+
+        chartInstance.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Maximum Values',
+                        data: maxValues,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
                     },
-                    options: {
-                        scales: {
-                            x: {type: 'category', position: 'bottom'},
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function (value) {
-                                        if (!type || type === 'temperature') return value + ' °C';
-                                        if (type === 'humidity') return value + ' %';
-                                        return value;
-                                    },
-                                },
+                ],
+            },
+            options: {
+                scales: {
+                    x: { type: 'category', position: 'bottom' },
+                    y: {
+                        beginAtZero: false, // allows negative values
+                        ticks: {
+                            callback: function (value) {
+                                if (chartType === 'temperature') return value + ' °C';
+                                if (chartType === 'humidity') return value + ' %';
+                                return value;
                             },
                         },
                     },
-                });
-            }
-        }
+                },
+            },
+        });
 
         return () => {
             if (chartInstance.current) chartInstance.current.destroy();
         };
-    }, [sensorData, type]);
+    }, [sensorData]);
 
     const getMonthName = (monthNumber: number) => {
         const months = [
@@ -91,7 +91,7 @@ const BarChartMax: React.FC = () => {
                 minHeight: '100vh',
             }}
         >
-            <FormControl sx={{m: 2, minWidth: 120, borderRadius: 2, marginBottom: '16px'}}>
+            <FormControl sx={{ m: 2, minWidth: 120, borderRadius: 2, marginBottom: '16px' }}>
                 <InputLabel id="year-label">Year</InputLabel>
                 <Select
                     labelId="year-label"
@@ -107,8 +107,8 @@ const BarChartMax: React.FC = () => {
                 </Select>
             </FormControl>
 
-            <Grid container spacing={6} justifyContent="center" alignItems="center" style={{width: '100%'}}>
-                <Grid item xs={12} md={10} lg={8} style={{height: 'auto', maxWidth: '100%'}}>
+            <Grid container spacing={6} justifyContent="center" alignItems="center" style={{ width: '100%' }}>
+                <Grid item xs={12} md={10} lg={8} style={{ height: 'auto', maxWidth: '100%' }}>
                     {isLoading ? (
                         <p>Loading...</p>
                     ) : isError ? (
@@ -125,7 +125,7 @@ const BarChartMax: React.FC = () => {
                                 maxWidth: '100%',
                             }}
                         >
-                            <canvas ref={chartRef}/>
+                            <canvas ref={chartRef} />
                         </Paper>
                     )}
                 </Grid>

@@ -13,7 +13,7 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
     const chartInstance = useRef<Chart<'line'> | null>(null);
     const {sensorId} = useParams<{ sensorId: string }>();
     const {data: sensorData = [], isLoading, isError} = useLineChartData(sensorId || '');
-
+console.log(sensorData)
 
     useEffect(() => {
         if (chartRef.current && sensorData.length > 0) {
@@ -45,7 +45,7 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
                 options: {
                     scales: {
                         x: {type: 'category', position: 'bottom'},
-                        y: {beginAtZero: true},
+                        y: {beginAtZero: false},
                     },
                 },
             });

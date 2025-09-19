@@ -4,6 +4,7 @@ export interface SensorDataDto {
     maxValue?: number;
     minValue?: number;
     averageValue?: number;
+    type?:string;
 }
 export  interface SensorRecordDto {
     id: number;

@@ -6,6 +6,7 @@ import Paper from '@mui/material/Paper';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
+import { MenuItem, Select, SelectChangeEvent, InputLabel, FormControl } from '@mui/material';
 import { SensorDto } from '../api/ApiSensor';
 import { useSensor, useUpdateSensor } from "../hooks/useSensor";
 
@@ -40,14 +41,17 @@ const EditSensorPage: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-
         const newValue = name === 'latitude' || name === 'longitude' ? Number(value) : value;
 
         setFormData(prev => prev ? { ...prev, [name]: newValue } : prev);
-
         setFieldWarnings(prev => ({ ...prev, [name]: String(value).length >= MAX_LENGTH }));
-
         setFieldErrors(prev => ({ ...prev, [name]: String(value).trim() === '' }));
+    };
+
+    const handleTypeChange = (event: SelectChangeEvent<string>) => {
+        const value = event.target.value;
+        setFormData(prev => prev ? { ...prev, type: value } : prev);
+        setFieldErrors(prev => ({ ...prev, type: value.trim() === '' }));
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -88,7 +92,7 @@ const EditSensorPage: React.FC = () => {
             {!isLoading && !isError && formData && (
                 <Paper elevation={6} sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px', backgroundColor: 'white' }}>
                     <form onSubmit={handleSubmit}>
-                        {['name', 'latitude', 'longitude', 'area', 'topic', 'type'].map((field) => (
+                        {['name', 'latitude', 'longitude', 'area', 'topic'].map((field) => (
                             <TextField
                                 key={field}
                                 label={field.charAt(0).toUpperCase() + field.slice(1)}
@@ -115,6 +119,21 @@ const EditSensorPage: React.FC = () => {
                                 }}
                             />
                         ))}
+
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel id="type-label">Type</InputLabel>
+                            <Select
+                                labelId="type-label"
+                                id="type-select"
+                                name="type"
+                                value={formData.type ?? ''}
+                                onChange={handleTypeChange}
+                                required
+                            >
+                                <MenuItem value="temperature">Temperature</MenuItem>
+                                <MenuItem value="humidity">Humidity</MenuItem>
+                            </Select>
+                        </FormControl>
 
                         <Button
                             type="submit"
