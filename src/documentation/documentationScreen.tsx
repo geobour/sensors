@@ -25,7 +25,7 @@ const DocumentationScreen = () => {
                         To send data without a username or password, use the following command:
                     </Typography>
                     <pre style={{ textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
-{`mosquitto_pub -h "broker-ip-address" -p 1883 -t "sensors/topic1" -m "{\"id\":523,\"value\":20.5,\"time\":\"2025-09-04 10:24:55\"}"`}
+{`mosquitto_pub -h "broker-ip-address" -p 1883 -t "sensors/topic1" -m "{\\"value\\":29.5}"`}
                     </pre>
                     <Typography paragraph color="text.secondary">
                         This command publishes a message to the topic <strong>"sensors/topic1"</strong> on the MQTT broker with the
@@ -33,11 +33,10 @@ const DocumentationScreen = () => {
                     </Typography>
                     <pre style={{ textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
 {`{
-    "id": 523,
-    "value": 20.5,
-    "time": "2025-09-04 10:24:55"
+    "value": 20.5
 }`}
-                    </pre>
+</pre>
+
                     <Typography paragraph color="text.secondary">
                         The Spring Boot application listens to this topic and processes the data, recording sensor
                         measurements based on the messages sent through the <strong>mosquitto_pub</strong> command.
@@ -46,11 +45,16 @@ const DocumentationScreen = () => {
                         If your broker requires authentication (username and password), you can use the following command:
                     </Typography>
                     <pre style={{ textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
-{`mosquitto_pub -h "broker-ip-address" -p 1883 -u "your-username" -P "your-password" -t "sensors/topic1" -m "{\"id\":523,\"value\":99.5,\"time\":\"2024-06-14 10:24:55\"}"`}
-                    </pre>
+{`mosquitto_pub -h "broker-ip-address" -p 1883 -u "your-username" -P "your-password" -t "sensors/topic1" -m '{ "value": 29.5}'`}
+</pre>
                     <Typography paragraph color="text.secondary">
                         In this case, you would specify your username using the <strong>-u</strong> option and your password with the <strong>-P</strong> option. This command is required when connecting to a secured MQTT broker.
                     </Typography>
+
+                    <Typography paragraph color="text.secondary">
+                        Additionally, the application allows you to dynamically connect to different MQTT brokers by specifying the broker URL and optional credentials through the user interface or REST API. By providing the broker URI, username, and password (if required), the system will automatically establish a connection, subscribe to all sensor topics, and process incoming messages. This ensures flexibility in connecting to different environments and simplifies testing with multiple brokers.
+                    </Typography>
+
                     <Typography paragraph color="text.secondary">
                         This system allows for efficient data exchange between IoT sensors and the backend application,
                         ensuring that sensor readings are processed and stored appropriately. Further details on the

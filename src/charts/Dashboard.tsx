@@ -5,6 +5,7 @@ import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import { useDashboardData } from '../hooks/useDashboardData';
+import MapBoxMany from "../map/MapBoxMany";
 
 const Clock: React.FC = () => {
     const [currentDateTime, setCurrentDateTime] = useState({
@@ -90,68 +91,124 @@ const ChartGrid: React.FC = React.memo(() => {
         plugins: { legend: { position: 'top', labels: { color: '#fff' } } },
     };
 
-    const activeCount = sensorData.filter((s: { status: any; }) => s.status).length;
+    const activeCount = sensorData.filter((s: { status: any }) => s.status).length;
     const inactiveCount = sensorData.length - activeCount;
 
     const pieChartData = {
         labels: ['Active', 'Inactive'],
-        datasets: [{ data: [activeCount, inactiveCount], backgroundColor: ['rgba(75,192,192,0.2)', 'rgba(255,99,132,0.2)'], borderColor: ['rgba(75,192,192,1)', 'rgba(255,99,132,1)'], borderWidth: 1 }],
+        datasets: [{
+            data: [activeCount, inactiveCount],
+            backgroundColor: ['rgba(75,192,192,0.2)', 'rgba(255,99,132,0.2)'],
+            borderColor: ['rgba(75,192,192,1)', 'rgba(255,99,132,1)'],
+            borderWidth: 1
+        }],
     };
 
     const barChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        scales: { y: { beginAtZero: true, ticks: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
                     color: '#fff',
-                    stepSize: 1,          // ensures only 0, 1, 2, … appear
-                    callback: function(value:any) {
-                        // Only show 0 or 1
-                        if (value === 0 || value === 1) return value;
-                        return '';
-                    },
-                }, grid: { display: false } }, x: { ticks: { color: '#fff' }, grid: { display: false } } },
+                    stepSize: 1,
+                    callback: (value: any) => (value === 0 || value === 1 ? value : ''),
+                },
+                grid: { display: false }
+            },
+            x: {
+                ticks: { color: '#fff' },
+                grid: { display: false }
+            }
+        },
         plugins: { legend: { display: true, labels: { color: '#fff' } } },
     };
 
     const barChartData = {
-        labels: sensorData.map((s: { name: string; }) => (s.name.length > 10 ? `${s.name.substring(0, 10)}...` : s.name)),
-        datasets: [{ label: 'Sensor Status', data: sensorData.map((s: { status: any; }) => (s.status ? 1 : 0.5)), backgroundColor: sensorData.map((s: { status: any; }) => (s.status ? 'rgba(75,192,192,0.2)' : 'rgba(255,99,132,0.2)')), borderColor: sensorData.map((s: { status: any; }) => (s.status ? 'rgba(75,192,192,1)' : 'rgba(255,99,132,1)')), borderWidth: 1 }],
+        labels: sensorData.map((s: { name: string }) =>
+            (s.name.length > 10 ? `${s.name.substring(0, 10)}...` : s.name)
+        ),
+        datasets: [{
+            label: 'Sensor Status',
+            data: sensorData.map((s: { status: any }) => (s.status ? 1 : 0.5)),
+            backgroundColor: sensorData.map((s: { status: any }) =>
+                (s.status ? 'rgba(75,192,192,0.2)' : 'rgba(255,99,132,0.2)')
+            ),
+            borderColor: sensorData.map((s: { status: any }) =>
+                (s.status ? 'rgba(75,192,192,1)' : 'rgba(255,99,132,1)')
+            ),
+            borderWidth: 1,
+            maxBarThickness: 50,
+        }],
     };
 
     return (
         <div style={{ backgroundColor: '#333', minHeight: '100vh', padding: '20px' }}>
             <Grid container spacing={2} justifyContent="center" alignItems="center" style={{ marginTop: '20px' }}>
                 <Grid item xs={4}><Clock /></Grid>
-                <Grid item xs={4} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Button onClick={handleCheckStatus} variant="contained" color="error" style={{ padding: '10px 20px' }}>Check Status</Button>
+                <Grid item xs={4}><MapBoxMany /></Grid>
+
+                <Grid item xs={4}>
+                    <div style={{ height: '300px' }}>
+                        <PieChartComponent data={pieChartData} options={pieChartOptions} />
+                    </div>
                 </Grid>
-                <Grid item xs={4}><div style={{ height: '300px' }}><PieChartComponent data={pieChartData} options={pieChartOptions} /></div></Grid>
+                <Grid item xs={4} style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                    <Button onClick={handleCheckStatus} variant="contained" color="error" style={{ padding: '10px 20px' }}>
+                        Check Status
+                    </Button>
+                </Grid>
+            </Grid>
+            <Grid container spacing={2} style={{ marginTop: '20px' }}>
+                <Grid item xs={12}>
+                    <div style={{ height: '300px' }}>
+                        <ChartComponent data={barChartData} options={barChartOptions} />
+                    </div>
+                </Grid>
+            </Grid>
+            <Grid container spacing={2} style={{ marginTop: '20px' }}>
+                {values.map((value: any, index: React.Key | null | undefined) => (
+                    <Grid key={index} item xs={2}>
+                        <div style={{
+                            backgroundColor: 'rgba(75,192,192,0.2)',
+                            padding: '20px',
+                            borderRadius: '8px',
+                            textAlign: 'center',
+                            height: '150px',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            color: '#fff'
+                        }}>
+                            <div>
+                                <Tooltip title={value.name} placement="top" arrow>
+                                    <Typography variant="h6" gutterBottom style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        width: '100px'
+                                    }}>{value.name}</Typography>
+                                </Tooltip>
+                                <Typography variant="body1">
+                                    {value.type === 'temperature' && `${value.currentValue}°C`}
+                                    {value.type === 'humidity' && `${parseFloat(String(value.currentValue)).toFixed(1)}%`}
+                                    {value.type !== 'temperature' && value.type !== 'humidity' && value.currentValue}
+                                </Typography>
+                                <Tooltip title={value.type} placement="top" arrow>
+                                    <Typography variant="h6" gutterBottom style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        width: '100px'
+                                    }}>{value.type}</Typography>
+                                </Tooltip>
+                            </div>
+                        </div>
+                    </Grid>
+                ))}
             </Grid>
 
-            <Grid container spacing={2} style={{ marginTop: '20px' }}>
-                <Grid item xs={12}><div style={{ height: '300px' }}><ChartComponent data={barChartData} options={barChartOptions} /></div></Grid>
-                <Grid container spacing={2} style={{ marginTop: '20px' }}>
-                    {values.map((value: { name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined; currentValue: any; }, index: React.Key | null | undefined) => (
-                        <Grid key={index} item xs={2}>
-                            <div style={{ backgroundColor: 'rgba(75,192,192,0.2)', padding: '20px', borderRadius: '8px', textAlign: 'center', height: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#fff' }}>
-                                <div>
-                                    <Tooltip title={value.name} placement="top" arrow>
-                                        <Typography variant="h6" gutterBottom style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100px' }}>{value.name}</Typography>
-                                    </Tooltip>
-                                    <Typography variant="body1">
-                                        {value.type === 'temperature' && `${value.currentValue}°C`}
-                                        {value.type === 'humidity' && `${parseFloat(String(value.currentValue)).toFixed(1)}%`}
-                                        {value.type !== 'temperature' && value.type !== 'humidity' && value.currentValue}
-                                    </Typography>
-                                    <Tooltip title={value.type} placement="top" arrow>
-                                        <Typography variant="h6" gutterBottom style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100px' }}>{value.type}</Typography>
-                                    </Tooltip>
-                                </div>
-                            </div>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Grid>
             <div style={{ height: '100px' }}></div>
         </div>
     );

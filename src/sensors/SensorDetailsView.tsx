@@ -118,7 +118,12 @@ const SensorDetailsView: React.FC = () => {
         }
     };
 
-    const handleMap = (e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); navigate(`map`); };
+
+    const handleMap = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        navigate(`/sensors/${sensorId}/map`);
+    };
+
     const handleLineChart = (e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); navigate(`line-chart`); };
     const handleMinChart = (e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); navigate(`bar-chart-min`); };
     const handleMaxChart = (e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); navigate(`bar-chart-max`); };
@@ -365,8 +370,6 @@ const SensorDetailsView: React.FC = () => {
                                 </Typography>
                             </DialogContent>
                         </Dialog>
-
-                        {/* No Data Dialog */}
                         <Dialog open={isNoDataDialogOpen} onClose={handleNoDataDialogClose}>
                             <DialogTitle>No Previous Year Data</DialogTitle>
                             <DialogContent>

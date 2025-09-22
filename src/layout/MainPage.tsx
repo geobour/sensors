@@ -12,15 +12,15 @@ import LineChart from "./../charts/LineChart";
 import Login from "../login/Login";
 import EditSensorPage from "../../src/sensors/EditSensorPage";
 import BarChartAvg from "../charts/BarChartAvg";
-import SensorMapComponent from "../map/SensorMapComponent";
 import Dashboard from "../charts/Dashboard";
 import PageNotFound from '../layout/PageNotFound';
+import MapPage from "../map/MapPage";
 
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
 
     useEffect(() => {
-        // Check if user is already logged in using localStorage or sessionStorage
+
         const userLoggedIn = localStorage.getItem('isLoggedIn') || sessionStorage.getItem('isLoggedIn');
         if (userLoggedIn) {
             setLoggedIn(true);
@@ -57,7 +57,7 @@ function MainPage() {
                         <Route path="/sensors/:sensorId/bar-chart-min" element={<BarChartMin/>}/>
                         <Route path="/sensors/:sensorId/line-chart" element={<LineChart/>}/>
                         <Route path="/Documentation" element={<DocumentationScreen/>}/>
-                        <Route path="/sensors/:sensorId/map" element={<SensorMapComponent/>}/>
+                        <Route path="/sensors/:sensorId/map" element={<MapPage/>}/>
                         <Route path="/logout" element={<Navigate to="/" replace/>}/>
                         <Route path="*" element={<PageNotFound />} />
                     </Routes>
