@@ -8,7 +8,10 @@ import {
     DialogContent,
     DialogActions,
     Typography,
+    Tooltip,
+    IconButton
 } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Footer from "./Footer";
 
 const HomePage = () => {
@@ -18,6 +21,7 @@ const HomePage = () => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState("");
     const [isError, setIsError] = useState(false);
+    const [instructionOpen, setInstructionOpen] = useState(false);
 
     const handleConnect = () => {
         if (!brokerUrl) return;
@@ -71,14 +75,23 @@ const HomePage = () => {
             }}
         >
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: 300 }}>
-                <TextField
-                    label="Broker URL"
-                    variant="outlined"
-                    size="medium"
-                    value={brokerUrl}
-                    onChange={(e) => setBrokerUrl(e.target.value)}
-                    sx={inputStyle}
-                />
+                <Tooltip title="Click to see connection instructions">
+                    <IconButton
+                        onClick={() => setInstructionOpen(true)}
+                        sx={{ ml: 35, color: "#D3A1FF" }}
+                    >
+                        <InfoOutlinedIcon />
+                    </IconButton>
+                </Tooltip>
+                    <TextField
+                        fullWidth
+                        label="Broker URL"
+                        variant="outlined"
+                        size="medium"
+                        value={brokerUrl}
+                        onChange={(e) => setBrokerUrl(e.target.value)}
+                        sx={inputStyle}
+                    />
                 <TextField
                     label="Username (optional)"
                     variant="outlined"
@@ -110,9 +123,7 @@ const HomePage = () => {
                 >
                     Connect
                 </Button>
-
             </Box>
-
             <Dialog open={dialogOpen} onClose={handleClose}>
                 <DialogTitle>Connection Status</DialogTitle>
                 <DialogContent>
@@ -133,6 +144,102 @@ const HomePage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Dialog open={instructionOpen} onClose={() => setInstructionOpen(false)}>
+                <DialogTitle>Connection Instructions</DialogTitle>
+                <DialogContent dividers>
+                    <Typography variant="body1" gutterBottom>
+                        1. Enter your MQTT broker URL (e.g., <b>tcp://localhost:1883</b>)
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                        2. Provide username and password if authentication is required.
+                    </Typography>
+                    <Typography variant="body1" gutterBottom>
+                        3. Click <b>Connect</b> to establish a connection.
+                    </Typography>
+
+                    <Typography variant="h6" sx={{ mt: 3, color: "#7B2CBF" }}>
+                        Mosquitto Configuration Examples
+                    </Typography>
+
+                    {/* --- No authentication example --- */}
+                    <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: "bold" }}>
+                        ➤ Without Username & Password:
+                    </Typography>
+                    <Typography
+                        component="pre"
+                        sx={{
+                            bgcolor: "#F5F5F5",
+                            p: 2,
+                            borderRadius: 1,
+                            fontSize: "0.85rem",
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                        }}
+                    >
+                        {`# mosquitto.conf
+listener 1883
+allow_anonymous true`}
+                    </Typography>
+
+                    {/* --- With username/password example --- */}
+                    <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: "bold" }}>
+                        ➤ With Username & Password:
+                    </Typography>
+                    <Typography
+                        component="pre"
+                        sx={{
+                            bgcolor: "#F5F5F5",
+                            p: 2,
+                            borderRadius: 1,
+                            fontSize: "0.85rem",
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                        }}
+                    >
+                        {`# mosquitto.conf
+listener 1883
+allow_anonymous false
+password_file /etc/mosquitto/passwd`}
+                    </Typography>
+
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                        To create the password file:
+                    </Typography>
+                    <Typography
+                        component="pre"
+                        sx={{
+                            bgcolor: "#F5F5F5",
+                            p: 2,
+                            borderRadius: 1,
+                            fontSize: "0.85rem",
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                        }}
+                    >
+                        {`sudo mosquitto_passwd -c /etc/mosquitto/passwd myuser
+# Enter your desired password
+sudo systemctl restart mosquitto`}
+                    </Typography>
+
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                        Replace <b>myuser</b> with your desired username.
+                    </Typography>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button
+                        onClick={() => setInstructionOpen(false)}
+                        sx={{
+                            backgroundColor: "#D3A1FF",
+                            color: "text.secondary",
+                            "&:hover": { backgroundColor: "#c089f2" },
+                        }}
+                    >
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
 
             <Footer />
         </div>

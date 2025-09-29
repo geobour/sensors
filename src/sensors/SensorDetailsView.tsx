@@ -365,8 +365,7 @@ const SensorDetailsView: React.FC = () => {
                             <DialogTitle>Upload File Instructions</DialogTitle>
                             <DialogContent>
                                 <Typography variant="body1">
-                                    Fill the Excel file with months in first row and data in subsequent rows.
-                                    Select metric and run algorithm. Export results as CSV.
+                                    Enter the historical minimum, maximum, and average values for the last years of the area near the sensor’s location into the Excel file, using the provided template. After filling in the data, select the desired metric and run the forecasting algorithm to predict values for the current year. These predictions can then be compared with the sensor’s current readings to analyze observations and draw conclusions about climate trends.
                                 </Typography>
                             </DialogContent>
                         </Dialog>
