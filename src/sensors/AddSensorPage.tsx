@@ -87,10 +87,16 @@ const AddSensorPage: React.FC = () => {
     }, [openModal, modalSuccess, navigate]);
 
     return (
-        <div style={{ backgroundColor: 'white', minHeight: '100vh', padding: '20px' }}>
+        <div style={{ backgroundColor: 'whitesmoke', minHeight: '100vh', padding: '20px' }}>
             <Paper
                 elevation={6}
-                sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px', backgroundColor: 'white' }}
+                sx={{
+                    padding: '40px',
+                    maxWidth: '400px',
+                    margin: 'auto',
+                    marginTop: '20px',
+                    backgroundColor: 'whitesmoke',
+                }}
             >
                 <form onSubmit={handleSubmit}>
                     {/* Text Inputs */}
@@ -131,6 +137,7 @@ const AddSensorPage: React.FC = () => {
                                 setSensorData(prev => ({ ...prev, type: e.target.value }))
                             }
                             required
+                            sx={{ backgroundColor: 'whitesmoke' }}
                         >
                             <MenuItem value="temperature">Temperature</MenuItem>
                             <MenuItem value="humidity">Humidity</MenuItem>

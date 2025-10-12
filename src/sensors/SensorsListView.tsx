@@ -38,7 +38,7 @@ const SensorsListView: React.FC = () => {
                 onSuccess: () => {
                     setModalMessage('Sensor deleted successfully!');
                     setModalSuccess(true);
-                    setModalOpen(true);
+                    setModalOpen(false);
                 },
                 onError: () => {
                     setModalMessage('Error deleting sensor.');
@@ -69,15 +69,23 @@ const SensorsListView: React.FC = () => {
     if (isError) return <Typography color="text.secondary">Error loading sensors</Typography>;
 
     return (
-        <Box sx={{ minHeight: '100vh', padding: 2 }}>
-            <Container>
-                <Paper elevation={3} sx={{ mt: 4, padding: '10px' }}>
+        <Box sx={{ minHeight: '100vh', padding: 2, bgcolor: 'whitesmoke' }}>
+            <Container sx={{ bgcolor: 'whitesmoke', py: 2 }}>
+                <Paper elevation={3} sx={{ mt: 4, padding: '10px', bgcolor: 'whitesmoke' }}>
                     <Typography variant="h4" align="center" fontWeight="bold" color="text.secondary">
                         Sensors List
                     </Typography>
                 </Paper>
 
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, mb: 2 }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        mt: 2,
+                        mb: 2,
+                        bgcolor: 'whitesmoke',
+                    }}
+                >
                     <Input
                         placeholder="Search by ID"
                         startAdornment={
@@ -103,14 +111,18 @@ const SensorsListView: React.FC = () => {
                     </Button>
                 </Box>
 
-                <TableContainer component={Paper} elevation={3} sx={{ maxHeight: '500px' }}>
+                <TableContainer
+                    component={Paper}
+                    elevation={3}
+                    sx={{ maxHeight: '500px', bgcolor: 'whitesmoke' }}
+                >
                     <Table sx={{ minWidth: 650 }} aria-label="sensor table">
-                        <TableHead>
+                        <TableHead sx={{ bgcolor: 'whitesmoke' }}>
                             <TableRow>
                                 {['Sensor ID','Sensor Name','Sensor Area','Topic','Type','Status','Actions'].map(col => (
                                     <TableCell
                                         key={col}
-                                        sx={{ fontWeight: 'bold', color: 'text.secondary' }}
+                                        sx={{ fontWeight: 'bold', color: 'text.secondary', bgcolor: 'whitesmoke' }}
                                     >
                                         <Typography variant="h6" color="text.secondary">{col}</Typography>
                                     </TableCell>
@@ -124,7 +136,7 @@ const SensorsListView: React.FC = () => {
                                     key={sensor.id}
                                     hover
                                     onClick={() => navigate(`${sensor.id}`)}
-                                    sx={{ cursor: 'pointer' }}
+                                    sx={{ cursor: 'pointer', bgcolor: 'whitesmoke' }}
                                 >
                                     <TableCell sx={{ color: 'text.secondary' }}>{sensor.id}</TableCell>
                                     <TableCell sx={{ color: 'text.secondary' }}>
@@ -200,11 +212,13 @@ const SensorsListView: React.FC = () => {
 
             {/* Delete confirmation dialog */}
             <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
-                <DialogTitle sx={{ color: 'text.secondary' }}>Confirm Delete</DialogTitle>
-                <DialogContent sx={{ color: 'text.secondary' }}>
+                <DialogTitle sx={{ color: 'text.secondary', bgcolor: 'whitesmoke' }}>
+                    Confirm Delete
+                </DialogTitle>
+                <DialogContent sx={{ color: 'text.secondary', bgcolor: 'whitesmoke' }}>
                     Are you sure you want to delete this sensor?
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={{ bgcolor: 'whitesmoke' }}>
                     <Button
                         onClick={cancelDelete}
                         sx={{
@@ -226,16 +240,15 @@ const SensorsListView: React.FC = () => {
                     >
                         Yes
                     </Button>
-
                 </DialogActions>
             </Dialog>
 
             {/* Success/Error modal after delete */}
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-                <DialogTitle sx={{ color: modalSuccess ? 'green' : 'red' }}>
+                <DialogTitle sx={{ color: modalSuccess ? 'green' : 'red', bgcolor: 'whitesmoke' }}>
                     {modalSuccess ? 'Success' : 'Error'}
                 </DialogTitle>
-                <DialogContent sx={{ color: modalSuccess ? 'green' : 'red' }}>
+                <DialogContent sx={{ color: modalSuccess ? 'green' : 'red', bgcolor: 'whitesmoke' }}>
                     {modalMessage}
                 </DialogContent>
             </Dialog>

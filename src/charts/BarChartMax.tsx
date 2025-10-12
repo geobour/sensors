@@ -52,7 +52,7 @@ const BarChartMax: React.FC = () => {
                 scales: {
                     x: { type: 'category', position: 'bottom' },
                     y: {
-                        beginAtZero: false, // allows negative values
+                        beginAtZero: false,
                         ticks: {
                             callback: function (value) {
                                 if (chartType === 'temperature') return value + ' °C';
@@ -82,6 +82,7 @@ const BarChartMax: React.FC = () => {
         <div
             className="barChart"
             style={{
+                backgroundColor: 'whitesmoke',
                 overflowY: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
@@ -91,7 +92,7 @@ const BarChartMax: React.FC = () => {
                 minHeight: '100vh',
             }}
         >
-            <FormControl sx={{ m: 2, minWidth: 120, borderRadius: 2, marginBottom: '16px' }}>
+            <FormControl sx={{ m: 2, minWidth: 120, borderRadius: 2 }}>
                 <InputLabel id="year-label">Year</InputLabel>
                 <Select
                     labelId="year-label"
@@ -100,6 +101,7 @@ const BarChartMax: React.FC = () => {
                     onChange={handleChangeYear}
                     autoWidth
                     label="Year"
+                    sx={{ backgroundColor: 'whitesmoke' }}
                 >
                     {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014].map(y => (
                         <MenuItem key={y} value={y}>{y}</MenuItem>
@@ -122,7 +124,8 @@ const BarChartMax: React.FC = () => {
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                maxWidth: '100%',
+                                marginBottom: '16px',
+                                backgroundColor: 'whitesmoke',
                             }}
                         >
                             <canvas ref={chartRef} />

@@ -15,10 +15,22 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useNavigate } from "react-router-dom";
 import SensorsIcon from '@mui/icons-material/Sensors';
 
-const avatarSettings = ['Logout'];
-const pages = ['HomePage','Sensors','Dashboard', 'Documentation'];
+interface ResponsiveAppBarProps {
+    isLoggedIn: boolean;
+    handleLogout: () => void;
+}
 
-function ResponsiveAppBar({ isLoggedIn, handleLogout }: { isLoggedIn: boolean, handleLogout: () => void }) {
+const avatarSettings = ['Logout'];
+
+const pages = [
+    { label: 'Home', path: '/homepage' },
+    { label: 'Sensors', path: '/sensors' },
+    { label: 'Dashboard', path: '/dashboard' },
+    { label: 'TTN Dasboard', path: '/sensors-ttn' },
+    { label: 'Documentation', path: '/documentation' },
+];
+
+const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleLogout }) => {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
@@ -44,7 +56,7 @@ function ResponsiveAppBar({ isLoggedIn, handleLogout }: { isLoggedIn: boolean, h
                 </Typography>
                 <Box sx={{ flexGrow: 0.01 }} />
 
-                {/* Mobile Menu */}
+                {/* ------------------ Mobile Menu ------------------ */}
                 <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                     <IconButton
                         size="large"
@@ -67,30 +79,39 @@ function ResponsiveAppBar({ isLoggedIn, handleLogout }: { isLoggedIn: boolean, h
                         sx={{ display: { xs: 'block', md: 'none' } }}
                     >
                         {pages.map((page) => (
-                            <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                <Typography textAlign="center" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
-                                    {page}
-                                </Typography>
+                            <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                                <Link
+                                    to={page.path}
+                                    style={{ textDecoration: 'none', color: 'inherit' }}
+                                >
+                                    <Typography textAlign="center" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
+                                        {page.label}
+                                    </Typography>
+                                </Link>
                             </MenuItem>
                         ))}
                     </Menu>
                 </Box>
 
-                {/* Desktop Menu */}
+                {/* ------------------ Desktop Menu ------------------ */}
                 <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                     {pages.map((page) => (
-                        <Link key={page} to={`/${page.toLowerCase()}`} style={{ textDecoration: 'none' }}>
+                        <Link
+                            key={page.label}
+                            to={page.path}
+                            style={{ textDecoration: 'none' }}
+                        >
                             <Button
                                 onClick={handleCloseNavMenu}
                                 sx={{ my: 2, color: 'text.secondary', fontWeight: 'bold', display: 'block' }}
                             >
-                                {page}
+                                {page.label}
                             </Button>
                         </Link>
                     ))}
                 </Box>
 
-                {/* Avatar + Settings */}
+                {/* ------------------ Avatar + Settings ------------------ */}
                 <Box sx={{ flexGrow: 0 }}>
                     <Tooltip title="Open settings">
                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 1 }}>
@@ -122,6 +143,6 @@ function ResponsiveAppBar({ isLoggedIn, handleLogout }: { isLoggedIn: boolean, h
             </Toolbar>
         </AppBar>
     );
-}
+};
 
 export default ResponsiveAppBar;

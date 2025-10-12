@@ -85,12 +85,21 @@ const EditSensorPage: React.FC = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', padding: '20px', backgroundColor: 'white' }}>
+        <div style={{ minHeight: '100vh', padding: '20px', backgroundColor: 'whitesmoke' }}>
             {isLoading && <div style={{ color: 'text.secondary' }}>Loading sensor data...</div>}
             {(isError || (!isLoading && !formData)) && <div style={{ color: 'text.secondary' }}>Error loading sensor data.</div>}
 
             {!isLoading && !isError && formData && (
-                <Paper elevation={6} sx={{ padding: '40px', maxWidth: '400px', margin: 'auto', marginTop: '20px', backgroundColor: 'white' }}>
+                <Paper
+                    elevation={6}
+                    sx={{
+                        padding: '40px',
+                        maxWidth: '400px',
+                        margin: 'auto',
+                        marginTop: '20px',
+                        backgroundColor: 'whitesmoke',
+                    }}
+                >
                     <form onSubmit={handleSubmit}>
                         {['name', 'latitude', 'longitude', 'area', 'topic'].map((field) => (
                             <TextField
@@ -129,6 +138,7 @@ const EditSensorPage: React.FC = () => {
                                 value={formData.type ?? ''}
                                 onChange={handleTypeChange}
                                 required
+                                sx={{ backgroundColor: 'whitesmoke' }}
                             >
                                 <MenuItem value="temperature">Temperature</MenuItem>
                                 <MenuItem value="humidity">Humidity</MenuItem>

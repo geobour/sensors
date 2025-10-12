@@ -1,19 +1,17 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import {useParams} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Footer from '../layout/Footer';
-import {useLineChartData} from '../hooks/useSensorData';
-import {LineChartProps} from "../api/ApiSensor";
+import { useLineChartData } from '../hooks/useSensorData';
+import { LineChartProps } from "../api/ApiSensor";
 
-
-const LineChart: React.FC<LineChartProps> = ({className}) => {
+const LineChart: React.FC<LineChartProps> = ({ className }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart<'line'> | null>(null);
-    const {sensorId} = useParams<{ sensorId: string }>();
-    const {data: sensorData = [], isLoading, isError} = useLineChartData(sensorId || '');
-console.log(sensorData)
+    const { sensorId } = useParams<{ sensorId: string }>();
+    const { data: sensorData = [], isLoading, isError } = useLineChartData(sensorId || '');
 
     useEffect(() => {
         if (chartRef.current && sensorData.length > 0) {
@@ -44,8 +42,8 @@ console.log(sensorData)
                 },
                 options: {
                     scales: {
-                        x: {type: 'category', position: 'bottom'},
-                        y: {beginAtZero: false},
+                        x: { type: 'category', position: 'bottom' },
+                        y: { beginAtZero: false },
                     },
                 },
             });
@@ -56,10 +54,9 @@ console.log(sensorData)
         };
     }, [sensorData]);
 
-
     return (
         <div
-            className="lineChart"
+            className={className || 'lineChart'}
             style={{
                 overflowY: 'hidden',
                 display: 'flex',
@@ -67,6 +64,7 @@ console.log(sensorData)
                 alignItems: 'center',
                 justifyContent: 'center',
                 minHeight: '100vh',
+                backgroundColor: 'whitesmoke',
             }}
         >
             <Grid container spacing={6} justifyContent="center" alignItems="center">
@@ -87,12 +85,12 @@ console.log(sensorData)
                                 alignItems: 'center',
                             }}
                         >
-                            <canvas ref={chartRef}/>
+                            <canvas ref={chartRef} />
                         </Paper>
                     )}
                 </Grid>
             </Grid>
-            <Footer/>
+            <Footer />
         </div>
     );
 };

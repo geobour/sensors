@@ -32,7 +32,6 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
         const labels = filteredData.map(data => getMonthName(data.month!));
         const avgValues = filteredData.map(data => data.averageValue || 0);
 
-        // Dynamically get the type from the first record
         const chartType = filteredData[0]?.type || 'temperature';
 
         chartInstance.current = new Chart(ctx, {
@@ -83,6 +82,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
         <div
             className={className || "barChart"}
             style={{
+                backgroundColor: 'whitesmoke',
                 overflowY: 'hidden',
                 height: '100vh',
                 display: 'flex',
@@ -102,6 +102,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
                     onChange={handleChangeYear}
                     autoWidth
                     label="Year"
+                    sx={{ backgroundColor: 'whitesmoke' }}
                 >
                     {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014].map(y => (
                         <MenuItem key={y} value={y}>{y}</MenuItem>
@@ -116,14 +117,18 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
                     ) : isError ? (
                         <p>Error: Failed to fetch data. Please try again.</p>
                     ) : (
-                        <Paper elevation={6} sx={{
-                            marginTop: 2,
-                            padding: 3,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginBottom: '16px'
-                        }}>
+                        <Paper
+                            elevation={6}
+                            sx={{
+                                marginTop: 2,
+                                padding: 3,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                marginBottom: '16px',
+                                backgroundColor: 'whitesmoke',
+                            }}
+                        >
                             <canvas ref={chartRef} />
                         </Paper>
                     )}

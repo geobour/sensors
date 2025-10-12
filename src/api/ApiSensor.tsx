@@ -55,6 +55,7 @@ export interface DashboardDto {
     name: string;
     type: string;
     currentValue: number;
+    status:boolean;
 }
 
 

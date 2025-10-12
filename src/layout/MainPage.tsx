@@ -12,9 +12,10 @@ import LineChart from "./../charts/LineChart";
 import Login from "../login/Login";
 import EditSensorPage from "../../src/sensors/EditSensorPage";
 import BarChartAvg from "../charts/BarChartAvg";
-import Dashboard from "../charts/Dashboard";
+import Dashboard from "../sensors/Dashboard";
 import PageNotFound from '../layout/PageNotFound';
 import MapPage from "../map/MapPage";
+import TtnSensorPage from "../sensors/TtnSensorPage";
 
 function MainPage() {
     const [loggedIn, setLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
@@ -49,6 +50,7 @@ function MainPage() {
                         <Route path="/HomePage" element={<HomePage />} />
                         <Route path="/dashboard" element={<Dashboard/>}/>
                         <Route path="/sensors" element={<SensorsListView/>}/>
+                        <Route path="/sensors-ttn" element={<TtnSensorPage/>}/>
                         <Route path="/sensors/:sensorId" element={<SensorDetailsView/>}/>
                         <Route path="/sensors/:sensorId/edit" element={<EditSensorPage/>}/>
                         <Route path="/sensors/add" element={<AddSensorPage/>}/>

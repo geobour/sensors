@@ -22,9 +22,7 @@ const BarChartMin: React.FC = () => {
     useEffect(() => {
         if (!chartRef.current || !sensorData || sensorData.length === 0) return;
 
-        if (chartInstance.current) {
-            chartInstance.current.destroy();
-        }
+        if (chartInstance.current) chartInstance.current.destroy();
 
         const ctx = chartRef.current.getContext('2d');
         if (!ctx) return;
@@ -53,7 +51,7 @@ const BarChartMin: React.FC = () => {
                 scales: {
                     x: { type: 'category', position: 'bottom' },
                     y: {
-                        beginAtZero: false, // allows negative values
+                        beginAtZero: false,
                         ticks: {
                             callback: function (value) {
                                 if (chartType === 'temperature') return value + ' °C';
@@ -83,6 +81,7 @@ const BarChartMin: React.FC = () => {
         <div
             className="barChart"
             style={{
+                backgroundColor: 'whitesmoke',
                 overflowY: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
@@ -92,7 +91,7 @@ const BarChartMin: React.FC = () => {
                 minHeight: '100vh',
             }}
         >
-            <FormControl sx={{ m: 2, minWidth: 120, borderRadius: 2, marginBottom: '16px' }}>
+            <FormControl sx={{ m: 2, minWidth: 120, borderRadius: 2 }}>
                 <InputLabel id="year-label">Year</InputLabel>
                 <Select
                     labelId="year-label"
@@ -101,6 +100,7 @@ const BarChartMin: React.FC = () => {
                     onChange={handleChangeYear}
                     autoWidth
                     label="Year"
+                    sx={{ backgroundColor: 'whitesmoke' }}
                 >
                     {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014].map(y => (
                         <MenuItem key={y} value={y}>{y}</MenuItem>
@@ -109,7 +109,7 @@ const BarChartMin: React.FC = () => {
             </FormControl>
 
             <Grid container spacing={6} justifyContent="center" alignItems="center" style={{ width: '100%' }}>
-                <Grid item xs={12} md={10} lg={8} style={{ height: 'auto', maxWidth: '100%' }}>
+                <Grid item xs={12} md={10} lg={8}>
                     {isLoading ? (
                         <p>Loading...</p>
                     ) : isError ? (
@@ -123,7 +123,8 @@ const BarChartMin: React.FC = () => {
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                maxWidth: '100%',
+                                marginBottom: '16px',
+                                backgroundColor: 'whitesmoke',
                             }}
                         >
                             <canvas ref={chartRef} />
