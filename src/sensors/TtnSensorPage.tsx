@@ -28,12 +28,17 @@ L.Icon.Default.mergeOptions({iconRetinaUrl, iconUrl, shadowUrl});
 
 const RecenterOnPositions = ({positions}) => {
     const map = useMap();
+
     useEffect(() => {
         if (positions.length > 0) {
             const bounds = L.latLngBounds(positions);
             map.fitBounds(bounds, {padding: [50, 50], maxZoom: 15});
+        } else {
+            // fallback to Athens
+            map.setView([37.9838, 23.7275], 10);
         }
     }, [positions, map]);
+
     return null;
 };
 
@@ -105,7 +110,6 @@ const TtnSensorPage = () => {
 
     const validCoords = latestPerDevice.filter(d => d.latitude && d.longitude);
     const positions = validCoords.map(d => [d.latitude, d.longitude]);
-    const center = positions.length > 0 ? positions[0] : [37.9838, 23.7275];
 
     if (showForm) {
         return (
@@ -142,15 +146,15 @@ const TtnSensorPage = () => {
             )}
 
             <MapContainer
-                center={center}
-                zoom={positions.length > 0 ? 6 : 10}
+                center={[37.9838, 23.7275]}
+                zoom={10}
                 style={{ height: "500px", width: "100%", marginBottom: "20px", borderRadius: "8px" }}
             >
                 <TileLayer
                     url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
                     attribution='Tiles &copy; Esri &mdash; Source: USGS, Esri, DeLorme, NGA, NPS'
                 />
-                {positions.length > 0 && <RecenterOnPositions positions={positions} />}
+                <RecenterOnPositions positions={positions} />
 
                 {latestPerDevice
                     .filter(r => r.latitude && r.longitude)
@@ -162,32 +166,28 @@ const TtnSensorPage = () => {
                                     <span>Temp: {record.temperature ?? "-"}°C</span>
                                     <span>Humidity: {record.humidity ?? "-"}%</span>
 
-                                    {/* Status from extraFields only */}
                                     {record.extraFields?.status !== undefined && (
                                         <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                Status:
-                <span
-                    style={{
-                        display: "inline-block",
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        backgroundColor: record.extraFields.status === 1 ? "green" : "red",
-                        marginLeft: 4,
-                        verticalAlign: "middle",
-                    }}
-                />
-              </span>
+                                            Status:
+                                            <span
+                                                style={{
+                                                    display: "inline-block",
+                                                    width: 12,
+                                                    height: 12,
+                                                    borderRadius: "50%",
+                                                    backgroundColor: record.extraFields.status === 1 ? "green" : "red",
+                                                    marginLeft: 4,
+                                                    verticalAlign: "middle",
+                                                }}
+                                            />
+                                        </span>
                                     )}
 
-                                    {/* Other extraFields */}
                                     {record.extraFields &&
                                         Object.entries(record.extraFields)
                                             .filter(([key]) => key !== "status")
                                             .map(([key, value]) => (
-                                                <div key={key}>
-                                                    {key}: {value}
-                                                </div>
+                                                <div key={key}>{key}: {value}</div>
                                             ))}
                                 </div>
                             </Popup>
@@ -200,39 +200,34 @@ const TtnSensorPage = () => {
                                     <span>Lat: {record.latitude ?? "-"}</span>
                                     <span>Lng: {record.longitude ?? "-"}</span>
 
-                                    {/* Status from extraFields only */}
                                     {record.extraFields?.status !== undefined && (
                                         <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                Status:
-                <span
-                    style={{
-                        display: "inline-block",
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        backgroundColor: record.extraFields.status === 1 ? "green" : "red",
-                        marginLeft: 4,
-                        verticalAlign: "middle",
-                    }}
-                />
-              </span>
+                                            Status:
+                                            <span
+                                                style={{
+                                                    display: "inline-block",
+                                                    width: 12,
+                                                    height: 12,
+                                                    borderRadius: "50%",
+                                                    backgroundColor: record.extraFields.status === 1 ? "green" : "red",
+                                                    marginLeft: 4,
+                                                    verticalAlign: "middle",
+                                                }}
+                                            />
+                                        </span>
                                     )}
 
-                                    {/* Other extraFields */}
                                     {record.extraFields &&
                                         Object.entries(record.extraFields)
                                             .filter(([key]) => key !== "status")
                                             .map(([key, value]) => (
-                                                <span key={key}>
-                    {key}: {value}
-                  </span>
+                                                <span key={key}>{key}: {value}</span>
                                             ))}
                                 </div>
                             </Tooltip>
                         </Marker>
                     ))}
             </MapContainer>
-
 
             <Grid container spacing={2}>
                 {latestPerDevice.map(record => (
@@ -290,7 +285,7 @@ const TtnSensorPage = () => {
 
                                 {record.extraFields &&
                                     Object.entries(record.extraFields)
-                                        .filter(([key]) => key !== "status") // exclude status since already displayed
+                                        .filter(([key]) => key !== "status")
                                         .map(([key, value]) => (
                                             <Typography variant="body2" color="textSecondary" key={key}>
                                                 {key}: <strong>{value}</strong>
@@ -300,8 +295,6 @@ const TtnSensorPage = () => {
                         </div>
                     </Grid>
                 ))}
-
-
             </Grid>
         </div>
     );

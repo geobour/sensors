@@ -15,6 +15,8 @@ import {
 import Footer from "./Footer";
 import { useMqttConnectionStore } from "../stores/useMqttConnectionStore";
 
+const API_BASE = "http://localhost:8080/api/mqtt"; // ✅ always points to backend
+
 export default function HomePage() {
     const [tab, setTab] = useState(0);
 
@@ -57,7 +59,8 @@ export default function HomePage() {
 
     const handleConnect = () => {
         if (!brokerUrl) return showError("Broker URL is required.");
-        doPost("/api/mqtt/connect", { brokerUri: brokerUrl, username, password });
+        // ✅ use absolute URL
+        doPost(`${API_BASE}/connect`, { brokerUri: brokerUrl, username, password });
     };
 
     const handlePublish = () => {
@@ -69,7 +72,8 @@ export default function HomePage() {
         const fullTopic = `sensors/${topic}`;
         const jsonMsg = JSON.stringify({ value: numericValue });
 
-        doPost("/api/mqtt/publishHive", { topic: fullTopic, message: jsonMsg });
+        // ✅ use absolute URL
+        doPost(`${API_BASE}/publishHive`, { topic: fullTopic, message: jsonMsg });
     };
 
     const showError = (msg) => {
@@ -78,12 +82,10 @@ export default function HomePage() {
         setDialogOpen(true);
     };
 
-    // ✅ handle dialog close behavior
     const handleDialogClose = () => {
         setDialogOpen(false);
 
         if (isError) {
-            // ❌ If error, reset everything
             setBrokerUrl("");
             setUsername("");
             setPassword("");
@@ -91,7 +93,6 @@ export default function HomePage() {
             setMessage("");
             setDisconnected();
         } else {
-            // ✅ On success, keep connection (form disappears)
             setBrokerUrl("");
             setUsername("");
             setPassword("");
@@ -197,7 +198,7 @@ export default function HomePage() {
                 )}
             </Box>
 
-            {/* ✅ Dialog for feedback */}
+            {/* Dialog for feedback */}
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
                 <DialogTitle>{isError ? "Error" : "Success"}</DialogTitle>
                 <DialogContent>
