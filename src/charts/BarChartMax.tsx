@@ -101,7 +101,7 @@ const BarChartMax: React.FC = () => {
                     onChange={handleChangeYear}
                     autoWidth
                     label="Year"
-                    sx={{ backgroundColor: 'whitesmoke' }}
+                    sx={{ backgroundColor: 'white' }}
                 >
                     {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014].map(y => (
                         <MenuItem key={y} value={y}>{y}</MenuItem>
@@ -125,7 +125,7 @@ const BarChartMax: React.FC = () => {
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 marginBottom: '16px',
-                                backgroundColor: 'whitesmoke',
+                                backgroundColor: 'white',
                             }}
                         >
                             <canvas ref={chartRef} />

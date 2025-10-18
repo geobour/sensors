@@ -194,20 +194,21 @@ const SensorDetailsView: React.FC = () => {
     }, [selectedType, maxSensorValues, minSensorValues, avgSensorValues, predictionData, type]);
 
     return (
-        <Box sx={{backgroundColor: 'whitesmoke', minHeight: '100vh', padding: 2}}>
+        <Box sx={{backgroundColor: 'white', minHeight: '100vh', padding: 2}}>
             <Grid container justifyContent="center" alignItems="center" spacing={3}>
                 <Grid item xs={12}>
-                    <Paper elevation={6} sx={{padding: 3, backgroundColor: 'whitesmoke'}}>
+                    <Paper elevation={6} sx={{padding: 3, backgroundColor: 'white'}}>
                         <Typography variant="h5" padding={2} fontWeight="bold" color="text.secondary">
                             Sensor Details
                         </Typography>
                         <Divider/>
-                        <TableContainer component={Paper} sx={{backgroundColor: 'whitesmoke'}}>
+
+                        <TableContainer component={Paper} sx={{backgroundColor: 'white'}}>
                             <Table>
                                 <TableHead>
                                     <TableRow>
                                         {['ID', 'Name', 'Area', 'Latitude', 'Longitude', 'Type', 'Topic', 'Status'].map(col => (
-                                            <TableCell key={col} sx={{fontWeight: 'bold', color: 'text.secondary'}}>
+                                            <TableCell key={col} sx={{fontWeight: 'bold', color: 'text.secondary', backgroundColor: 'white'}}>
                                                 {col}
                                             </TableCell>
                                         ))}
@@ -229,17 +230,16 @@ const SensorDetailsView: React.FC = () => {
                                             </TableCell>
                                         ))}
                                         <TableCell>
-    <span
-        style={{
-            display: 'inline-block',
-            width: '12px',
-            height: '12px',
-            borderRadius: '50%',
-            backgroundColor: sensors?.status ? 'green' : 'red',
-        }}
-    />
+                                            <span
+                                                style={{
+                                                    display: 'inline-block',
+                                                    width: '12px',
+                                                    height: '12px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: sensors?.status ? 'green' : 'red',
+                                                }}
+                                            />
                                         </TableCell>
-
                                     </TableRow>
                                 </TableBody>
                             </Table>
@@ -248,7 +248,7 @@ const SensorDetailsView: React.FC = () => {
                         <Divider sx={{my: 2}}/>
 
                         <div style={{marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap'}}>
-                            {['Map', 'Graph', 'Min', 'Max', 'Avg'].map((label, i) => {
+                            {['Map', 'Daily Graph Chart', 'Min Chart', 'Max Chart', 'Avg Chart'].map((label, i) => {
                                 const handlers = [handleMap, handleLineChart, handleMinChart, handleMaxChart, handleAvgChart];
                                 return (
                                     <Button
@@ -256,8 +256,8 @@ const SensorDetailsView: React.FC = () => {
                                         variant="contained"
                                         onClick={handlers[i]}
                                         sx={{
-                                            backgroundColor: '#D3A1FF',
-                                            color: 'text.secondary',
+                                            backgroundColor: '#512da8',
+                                            color: 'white',
                                             '&:hover': {backgroundColor: '#c089f2'},
                                         }}
                                     >
@@ -267,7 +267,7 @@ const SensorDetailsView: React.FC = () => {
                             })}
                         </div>
 
-                        <Paper elevation={6} sx={{padding: 3, mt: 3, backgroundColor: 'whitesmoke'}}>
+                        <Paper elevation={6} sx={{padding: 3, mt: 3, backgroundColor: 'white'}}>
                             <Typography variant="h5" fontWeight="bold" color="text.secondary">
                                 Upload File
                             </Typography>
@@ -312,15 +312,13 @@ const SensorDetailsView: React.FC = () => {
                                     variant="contained"
                                     onClick={handlePrediction}
                                     sx={{
-                                        backgroundColor: '#D3A1FF',
-                                        color: 'text.secondary',
+                                        backgroundColor: '#512da8',
+                                        color: 'white',
                                         mt: 1.2,
-                                        '&:hover': {
-                                            backgroundColor: '#b87de0',
-                                        },
+                                        '&:hover': {backgroundColor: '#c089f2'},
                                     }}
                                 >
-                                    Run
+                                    Run Algorithm
                                 </Button>
                                 {predictionData && (
                                     <Box sx={{display: 'flex', alignItems: 'center', mt: 1.2}}>
@@ -329,8 +327,8 @@ const SensorDetailsView: React.FC = () => {
                                             fileName="predictionResults"
                                             buttonProps={{
                                                 sx: {
-                                                    backgroundColor: '#D3A1FF',
-                                                    color: 'text.secondary',
+                                                    backgroundColor: '#512da8',
+                                                    color: 'white',
                                                     '&:hover': {backgroundColor: '#c089f2'},
                                                 },
                                             }}
@@ -340,10 +338,10 @@ const SensorDetailsView: React.FC = () => {
                             </Box>
                         </Paper>
 
-                        {/* Dialogs with whitesmoke background */}
+                        {/* Dialogs */}
                         <Dialog open={isDialogOpen} onClose={handleDialogClose} maxWidth="md" fullWidth>
-                            <DialogTitle sx={{backgroundColor: 'whitesmoke'}}>Upload File Instructions</DialogTitle>
-                            <DialogContent sx={{backgroundColor: 'whitesmoke'}}>
+                            <DialogTitle sx={{backgroundColor: 'white'}}>Upload File Instructions</DialogTitle>
+                            <DialogContent sx={{backgroundColor: 'white'}}>
                                 <Typography variant="body1">
                                     Enter the historical minimum, maximum, and average values for the last years of the
                                     area near the sensor’s location into the Excel file, using the provided template.
@@ -355,15 +353,15 @@ const SensorDetailsView: React.FC = () => {
                             </DialogContent>
                         </Dialog>
                         <Dialog open={isNoDataDialogOpen} onClose={handleNoDataDialogClose}>
-                            <DialogTitle sx={{backgroundColor: 'whitesmoke'}}>No Previous Year Data</DialogTitle>
-                            <DialogContent sx={{backgroundColor: 'whitesmoke'}}>
+                            <DialogTitle sx={{backgroundColor: 'white'}}>No Previous Year Data</DialogTitle>
+                            <DialogContent sx={{backgroundColor: 'white'}}>
                                 <Typography>No data available for the selected previous year. Please upload required
                                     data.</Typography>
                             </DialogContent>
                         </Dialog>
                         <Dialog open={isErrorDialogOpen} onClose={() => setIsErrorDialogOpen(false)}>
-                            <DialogTitle sx={{backgroundColor: 'whitesmoke'}}>Error</DialogTitle>
-                            <DialogContent sx={{backgroundColor: 'whitesmoke'}}>
+                            <DialogTitle sx={{backgroundColor: 'white'}}>Error</DialogTitle>
+                            <DialogContent sx={{backgroundColor: 'white'}}>
                                 <Typography>{errorMessage}</Typography>
                             </DialogContent>
                         </Dialog>

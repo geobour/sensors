@@ -62,7 +62,7 @@ const ExportToExcel: React.FC<Props> = ({ data, fileName, buttonProps }) => {
             onClick={exportToExcel}
             {...buttonProps}
         >
-            Export
+            Export Csv
         </Button>
     );
 };

@@ -1,132 +1,117 @@
-import React, {useEffect,  useState} from 'react';
+import React, { useState } from 'react';
 import Grid from '@mui/material/Grid';
-import {Box, Typography} from '@mui/material';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import {useDashboardData} from '../hooks/useDashboardData';
+import {Box, Typography, Button, Tooltip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
+import { useDashboardData } from '../hooks/useDashboardData';
 import MapBoxMany from "../map/MapBoxMany";
 
-const Clock: React.FC = () => {
-    const [currentDateTime, setCurrentDateTime] = useState({
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
-    });
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const now = new Date();
-            setCurrentDateTime({
-                date: now.toLocaleDateString(),
-                time: now.toLocaleTimeString(),
-            });
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    return (
-        <div style={{
-            height: '300px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center'
-        }}>
-            <div style={{
-                backgroundColor: 'forestgreen',
-                padding: '20px',
-                borderRadius: '8px',
-                textAlign: 'center'
-            }}>
-                <Typography variant="body1" style={{color: '#fff'}}>{currentDateTime.date}</Typography>
-                <Typography variant="body1" style={{color: '#fff'}}>{currentDateTime.time}</Typography>
-            </div>
-        </div>
-    );
-};
-
+const getStatusColor = (status: any) => status ? 'green' : 'red';
 
 const ChartGrid: React.FC = React.memo(() => {
-    const {sensorsQuery, valuesQuery, checkStatusMutation} = useDashboardData();
+    const { sensorsQuery, valuesQuery, checkStatusMutation } = useDashboardData();
+    const [selectedRecord, setSelectedRecord] = useState<any>(null);
 
     if (sensorsQuery.isLoading || valuesQuery.isLoading) return <div>Loading...</div>;
     if (sensorsQuery.isError || valuesQuery.isError) return <div>Error loading data</div>;
 
     const values = valuesQuery.data!;
-    const handleCheckStatus = async () => {
-        await checkStatusMutation.mutateAsync();
-    };
 
-
-
+    // @ts-ignore
     return (
-        <div style={{backgroundColor: "whitesmoke", minHeight: '100vh', padding: '20px'}}>
-            {/*<Grid container spacing={2} alignItems="center" style={{ marginTop: '20px' }}>*/}
-                {/*<Grid item xs={2}>*/}
-                    {/*<Box display="flex" flexDirection="column" alignItems="center" gap={2}>*/}
-                    {/*    <Clock />*/}
-                    {/*    <Button*/}
-                    {/*        onClick={handleCheckStatus}*/}
-                    {/*        variant="contained"*/}
-                    {/*        color="error"*/}
-                    {/*        sx={{ px: 2, py: 1 }}*/}
-                    {/*    >*/}
-                    {/*        Check Status*/}
-                    {/*    </Button>*/}
-                    {/*</Box>*/}
-                {/*</Grid>*/}
-                {/*<Grid item xs={12}>*/}
-                    <MapBoxMany />
-            {/*    </Grid>*/}
-            {/*</Grid>*/}
-
-            <Grid container spacing={2} style={{ marginTop: '20px' }}>
-                {values.map((value: any, index: React.Key | null | undefined) => (
-                    <Grid key={index} item xs={2}>
-                        <div style={{
-                            backgroundColor: value.status ? 'forestgreen' : 'darkred', // green if active, red if inactive
-                            padding: '20px',
-                            borderRadius: '8px',
-                            textAlign: 'center',
-                            height: '150px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            color: '#fff',
-                            cursor: 'pointer'
-                        }}>
-                            <div>
-                                <Tooltip title={value.name} placement="top" arrow>
-                                    <Typography variant="h6" gutterBottom style={{
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        width: '100px'
-                                    }}>{value.name}</Typography>
-                                </Tooltip>
-
-                                <Typography variant="body1">
-                                    {value.type === 'temperature' && `${value.currentValue}°C`}
-                                    {value.type === 'humidity' && `${parseFloat(String(value.currentValue)).toFixed(1)}%`}
-                                    {value.type !== 'temperature' && value.type !== 'humidity' && value.currentValue}
-                                </Typography>
-
-                                <Tooltip title={value.type} placement="top" arrow>
-                                    <Typography variant="h6" gutterBottom style={{
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        width: '100px'
-                                    }}>{value.type}</Typography>
-                                </Tooltip>
-                            </div>
-                        </div>
-                    </Grid>
-                ))}
-            </Grid>
+        <div style={{ backgroundColor: "whitesmoke", minHeight: '100vh', padding: '20px' }}>
+            <MapBoxMany />
+            <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2, marginTop:3 }}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Device Name</strong></TableCell>
+                            <TableCell><strong>Type</strong></TableCell>
+                            <TableCell><strong>Current Value</strong></TableCell>
+                            <TableCell><strong>Status</strong></TableCell>
+                            <TableCell><strong>Latitude</strong></TableCell>
+                            <TableCell><strong>Longitude</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {values.map((record: any, index: number) => (
+                            <TableRow key={index} hover>
+                                <TableCell>{record.name}</TableCell>
+                                <TableCell>{record.type}</TableCell>
+                                <TableCell>
+                                    {record.type === 'temperature' && `${record.currentValue}°C`}
+                                    {record.type === 'humidity' && `${parseFloat(String(record.currentValue)).toFixed(1)}%`}
+                                    {record.type !== 'temperature' && record.type !== 'humidity' && record.currentValue}
+                                </TableCell>
+                                <TableCell>
+                        <span
+                            style={{
+                                display: "inline-block",
+                                width: 12,
+                                height: 12,
+                                borderRadius: "50%",
+                                backgroundColor: getStatusColor(record.status),
+                            }}
+                        />
+                                </TableCell>
+                                <TableCell>{record.latitude ?? "-"}</TableCell>
+                                <TableCell>{record.longitude ?? "-"}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
 
-            <div style={{height: '100px'}}></div>
+            {/* Modal for full record details */}
+            <Dialog open={!!selectedRecord} onClose={() => setSelectedRecord(null)} maxWidth="sm" fullWidth>
+                <DialogTitle>Sensor Details</DialogTitle>
+                <DialogContent dividers>
+                    {selectedRecord && (
+                        <>
+                            <Typography variant="body1">Name: <strong>{selectedRecord.name}</strong></Typography>
+                            <Typography variant="body1">Type: <strong>{selectedRecord.type}</strong></Typography>
+                            <Typography variant="body1">Current Value: <strong>{selectedRecord.currentValue}</strong></Typography>
+                            <Typography variant="body1">
+                                Status:{" "}
+                                <span
+                                    style={{
+                                        display: "inline-block",
+                                        width: 12,
+                                        height: 12,
+                                        borderRadius: "50%",
+                                        backgroundColor: getStatusColor(selectedRecord.status),
+                                    }}
+                                />
+                            </Typography>
+
+                            {selectedRecord.extraFields && Object.keys(selectedRecord.extraFields).length > 0 && (
+                                <>
+                                    {Object.entries(selectedRecord.extraFields).map(([key, value]) => (
+                                        <Typography key={key} variant="body1">
+                                            {key}:{" "}
+                                            {key.toLowerCase() === "status" ? (
+                                                <span
+                                                    style={{
+                                                        display: "inline-block",
+                                                        width: 12,
+                                                        height: 12,
+                                                        borderRadius: "50%",
+                                                        backgroundColor: Number(value) === 1 ? "green" : "red",
+                                                    }}
+                                                />
+                                            ) : (
+                                                <strong>{String(value)}</strong>
+                                            )}
+                                        </Typography>
+                                    ))}
+                                </>
+                            )}
+                        </>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setSelectedRecord(null)} color="primary">Close</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 });

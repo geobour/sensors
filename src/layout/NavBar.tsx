@@ -25,8 +25,8 @@ const avatarSettings = ['Logout'];
 const pages = [
     { label: 'Home', path: '/homepage' },
     { label: 'Sensors', path: '/sensors' },
-    { label: 'Dashboard', path: '/dashboard' },
-    { label: 'TTN Dasboard', path: '/sensors-ttn' },
+    { label: 'Sensors Dashboard', path: '/dashboard' },
+    { label: 'TTN Dashboard', path: '/sensors-ttn' },
     { label: 'Documentation', path: '/documentation' },
 ];
 
@@ -47,13 +47,10 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
     };
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: '#d3d3d3' }}>
+        <AppBar position="static" sx={{ backgroundColor: '#512da8' }}>
             <Toolbar disableGutters>
                 <Box sx={{ flexGrow: 0.01 }} />
-                <SensorsIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, color: 'text.secondary' }} />
-                <Typography sx={{ color: 'text.secondary', fontWeight: 'bold', ml: 1 }}>
-                    MY APP
-                </Typography>
+                <SensorsIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, color: 'white' }} />
                 <Box sx={{ flexGrow: 0.01 }} />
 
                 {/* ------------------ Mobile Menu ------------------ */}
@@ -64,7 +61,7 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                         aria-controls="menu-appbar"
                         aria-haspopup="true"
                         onClick={handleOpenNavMenu}
-                        sx={{ color: 'text.secondary' }}
+                        sx={{ color: 'white' }}
                     >
                         <MenuIcon />
                     </IconButton>
@@ -84,7 +81,7 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                                     to={page.path}
                                     style={{ textDecoration: 'none', color: 'inherit' }}
                                 >
-                                    <Typography textAlign="center" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
+                                    <Typography textAlign="center" sx={{ color: 'white', fontWeight: 'bold' }}>
                                         {page.label}
                                     </Typography>
                                 </Link>
@@ -103,7 +100,13 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                         >
                             <Button
                                 onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'text.secondary', fontWeight: 'bold', display: 'block' }}
+                                sx={{
+                                    my: 2,
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                    display: 'block',
+                                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' },
+                                }}
                             >
                                 {page.label}
                             </Button>
@@ -115,7 +118,21 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                 <Box sx={{ flexGrow: 0 }}>
                     <Tooltip title="Open settings">
                         <IconButton onClick={handleOpenUserMenu} sx={{ p: 1 }}>
-                            <Avatar alt="GB" src="/static/images/avatar/2.jpg" />
+                            <Avatar
+                                alt="GB"
+                                sx={{
+                                    bgcolor: '#7e57c2',
+                                    color: 'white',
+                                    '&:hover': {
+                                        boxShadow: '0 0 10px rgba(126, 87, 194, 0.6)',
+                                        transform: 'scale(1.05)',
+                                        transition: 'all 0.3s ease',
+                                    },
+                                }}
+                            >
+                                GB
+                            </Avatar>
+
                         </IconButton>
                     </Tooltip>
                     <Menu
@@ -132,13 +149,26 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                             <MenuItem
                                 key={setting}
                                 onClick={setting === 'Logout' ? handleLogoutClick : handleCloseUserMenu}
+                                sx={{
+                                    backgroundColor: setting === 'Logout' ? 'whitesmoke' : 'inherit',
+                                    '&:hover': {
+                                        backgroundColor: setting === 'Logout' ? 'whitesmoke' : 'inherit',
+                                    },
+                                }}
                             >
-                                <Typography textAlign="center" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
+                                <Typography
+                                    textAlign="center"
+                                    sx={{
+                                        color: setting === 'Logout' ? '#7e57c2' : '#7e57c2',
+                                        fontWeight: 'bold',
+                                    }}
+                                >
                                     {setting}
                                 </Typography>
                             </MenuItem>
                         ))}
                     </Menu>
+
                 </Box>
             </Toolbar>
         </AppBar>

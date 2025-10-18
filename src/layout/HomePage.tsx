@@ -150,9 +150,22 @@ export default function HomePage() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     sx={inputStyle}
                                 />
-                                <Button variant="contained" sx={{ mt: 2 }} onClick={handleConnect}>
+                                <Button
+                                    variant="contained"
+                                    sx={{
+                                        mt: 2,
+                                        backgroundColor: '#512da8',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                        '&:hover': {
+                                            backgroundColor: '#7e57c2',
+                                        },
+                                    }}
+                                    onClick={handleConnect}
+                                >
                                     Connect
                                 </Button>
+
                             </Box>
                         ) : (
                             <Box sx={{ textAlign: "center", mt: 3 }}>
@@ -191,9 +204,22 @@ export default function HomePage() {
                             inputProps={{ min: -50, max: 101, step: "any" }}
                             sx={inputStyle}
                         />
-                        <Button variant="contained" sx={{ mt: 2 }} onClick={handlePublish}>
+                        <Button
+                            variant="contained"
+                            sx={{
+                                mt: 2,
+                                backgroundColor: '#512da8',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                '&:hover': {
+                                    backgroundColor: '#7e57c2',
+                                },
+                            }}
+                            onClick={handlePublish}
+                        >
                             Publish
                         </Button>
+
                     </Box>
                 )}
             </Box>
