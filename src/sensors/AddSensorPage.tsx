@@ -125,7 +125,6 @@ const AddSensorPage: React.FC = () => {
                         />
                     ))}
 
-                    {/* Type Select */}
                     <FormControl fullWidth margin="normal">
                         <InputLabel id="type-label">Type</InputLabel>
                         <Select

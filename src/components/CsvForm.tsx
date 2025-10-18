@@ -17,12 +17,10 @@ const CsvExportForm = () => {
             if (toDate) params.toDate = toDate;
             if (sensorId) params.deviceId = sensorId;
 
-            // Fetch data from backend
             const response = await axios.get("http://localhost:8080/api/ttn/records/filter", { params });
             const data = response.data;
 
 
-            // ✅ Flatten extraFields JSON into separate columns
             const flattenedData = data.map(item => {
                 const flat = { ...item };
                 if (item.extraFields) {
@@ -41,12 +39,10 @@ const CsvExportForm = () => {
                 return flat;
             });
 
-            // ✅ Collect all unique headers dynamically
             const headers = Array.from(new Set(flattenedData.flatMap(obj => Object.keys(obj))));
 
-            // ✅ Build CSV rows
             const csvRows = [
-                headers.join(","), // header row
+                headers.join(","),
                 ...flattenedData.map(row =>
                     headers
                         .map(field => {
@@ -60,12 +56,10 @@ const CsvExportForm = () => {
                 ),
             ];
 
-            // ✅ Create CSV and trigger download
             const csvContent = csvRows.join("\n");
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
             saveAs(blob, "ttn_sensors.csv");
 
-            // ✅ Reset form fields after export
             setFromDate("");
             setToDate("");
             setSensorId("");
@@ -115,7 +109,6 @@ const CsvExportForm = () => {
                 sx={{ width: 120 }}
             />
 
-            {/* 💜 Tooltip + Styled Purple Button */}
             <Tooltip title="Export filtered sensor data to CSV" arrow>
                 <Button
                     variant="outlined"

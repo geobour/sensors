@@ -21,7 +21,7 @@ interface PredictionData {
 interface Props {
     data: PredictionData;
     fileName: string;
-    buttonProps?: ButtonProps; // optional extra props for the button
+    buttonProps?: ButtonProps;
 }
 
 const ExportToExcel: React.FC<Props> = ({ data, fileName, buttonProps }) => {

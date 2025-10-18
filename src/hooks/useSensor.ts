@@ -42,7 +42,7 @@ export const useUpdateSensor = () => {
     );
 };
 
-// Fetch all sensors
+
 export const useSensors = () => {
     return useQuery<SensorDto[], Error>(
         ['sensors'],
@@ -53,7 +53,7 @@ export const useSensors = () => {
     );
 };
 
-// Delete sensor
+
 export const useDeleteSensor = () => {
     const queryClient = useQueryClient();
     return useMutation(
@@ -68,7 +68,7 @@ export const useDeleteSensor = () => {
     );
 };
 
-// Restore sensor
+
 export const useRestoreSensor = () => {
     const queryClient = useQueryClient();
     return useMutation(

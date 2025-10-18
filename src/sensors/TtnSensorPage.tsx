@@ -37,7 +37,6 @@ const API_BASE = "http://localhost:8080/api/ttn";
 delete L.Icon.Default.prototype["_getIconUrl"];
 L.Icon.Default.mergeOptions({ iconRetinaUrl, iconUrl, shadowUrl });
 
-// Map auto-zoom to show all positions
 const RecenterOnPositions = ({ positions }) => {
     const map = useMap();
     useEffect(() => {
@@ -57,17 +56,13 @@ const TtnSensorPage = () => {
     const queryClient = useQueryClient();
     const { connected, showForm, setConnected, setDisconnected, toggleForm } =
         useTtnConnectionStore();
-
     const [appId, setAppId] = useState("");
     const [accessKey, setAccessKey] = useState("");
     const [region, setRegion] = useState("");
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
-
-    // Pagination state
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-
     const purpleIcon = new L.Icon({
         iconUrl:
             "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png",
@@ -78,7 +73,6 @@ const TtnSensorPage = () => {
         shadowSize: [41, 41],
     });
 
-    // Connect mutation
     const connectMutation = useMutation(
         () =>
             axios.post("http://localhost:8080/api/mqtt/connect-ttn", null, {
@@ -100,7 +94,6 @@ const TtnSensorPage = () => {
         }
     );
 
-    // Disconnect handler
     const handleDisconnect = async () => {
         try {
             await axios.post("http://localhost:8080/api/mqtt/disconnect-ttn");
@@ -116,14 +109,12 @@ const TtnSensorPage = () => {
         }
     };
 
-    // Fetch all records (no backend pagination)
     const { data, isLoading } = useQuery(
         "ttnSensors",
         async () => (await axios.get(`${API_BASE}/records`)).data,
         { enabled: connected, refetchInterval: 60000 }
     );
 
-    // Keep only the latest record per device
     const latestPerDevice = data
         ? Object.values(
             data.reduce((acc, record) => {
@@ -136,7 +127,6 @@ const TtnSensorPage = () => {
         )
         : [];
 
-    // For mapping
     const validCoords = latestPerDevice.filter((d) => d.latitude && d.longitude);
     const positions = validCoords.map((d) => [d.latitude, d.longitude]);
 
@@ -307,7 +297,6 @@ const TtnSensorPage = () => {
             </MapContainer>
             <CsvExportForm></CsvExportForm>
 
-            {/* Table */}
             <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2 }}>
                 <Table size="small">
                     <TableHead>
@@ -365,7 +354,6 @@ const TtnSensorPage = () => {
                     </TableBody>
                 </Table>
 
-                {/* Client-side pagination */}
                 <TablePagination
                     component="div"
                     count={latestPerDevice.length}
@@ -380,7 +368,6 @@ const TtnSensorPage = () => {
                 />
             </TableContainer>
 
-            {/* Modal for full info */}
             <Dialog open={!!selectedRecord} onClose={() => setSelectedRecord(null)} maxWidth="sm" fullWidth>
                 <DialogTitle>Sensor Details</DialogTitle>
                 <DialogContent dividers>

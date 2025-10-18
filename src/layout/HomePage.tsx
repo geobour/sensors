@@ -15,27 +15,19 @@ import {
 import Footer from "./Footer";
 import { useMqttConnectionStore } from "../stores/useMqttConnectionStore";
 
-const API_BASE = "http://localhost:8080/api/mqtt"; // ✅ always points to backend
+const API_BASE = "http://localhost:8080/api/mqtt";
 
 export default function HomePage() {
     const [tab, setTab] = useState(0);
-
-    // MQTT form fields
     const [brokerUrl, setBrokerUrl] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
-    // Publish form fields
     const [topic, setTopic] = useState("");
     const [message, setMessage] = useState("");
-
-    // Dialog
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState("");
     const [isError, setIsError] = useState(false);
-
-    // Zustand store
-    const { connected, formDisappear, setConnected, setDisconnected } = useMqttConnectionStore();
+    const {formDisappear, setConnected, setDisconnected } = useMqttConnectionStore();
 
     const doPost = async (url, data) => {
         try {
@@ -49,7 +41,7 @@ export default function HomePage() {
             setIsError(false);
             setDialogMessage(txt);
             setDialogOpen(true);
-            setConnected(); // ✅ mark connected after success
+            setConnected();
         } catch (err) {
             setIsError(true);
             setDialogMessage("❌ " + err.message);
@@ -59,7 +51,6 @@ export default function HomePage() {
 
     const handleConnect = () => {
         if (!brokerUrl) return showError("Broker URL is required.");
-        // ✅ use absolute URL
         doPost(`${API_BASE}/connect`, { brokerUri: brokerUrl, username, password });
     };
 
@@ -72,7 +63,6 @@ export default function HomePage() {
         const fullTopic = `sensors/${topic}`;
         const jsonMsg = JSON.stringify({ value: numericValue });
 
-        // ✅ use absolute URL
         doPost(`${API_BASE}/publishHive`, { topic: fullTopic, message: jsonMsg });
     };
 
@@ -124,8 +114,6 @@ export default function HomePage() {
                     <Tab label="MQTT Connect" />
                     <Tab label="Test Publish" />
                 </Tabs>
-
-                {/* MQTT CONNECT */}
                 {tab === 0 && (
                     <>
                         {!formDisappear ? (
@@ -184,8 +172,6 @@ export default function HomePage() {
                         )}
                     </>
                 )}
-
-                {/* PUBLISH */}
                 {tab === 1 && (
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
                         <TextField
@@ -223,8 +209,6 @@ export default function HomePage() {
                     </Box>
                 )}
             </Box>
-
-            {/* Dialog for feedback */}
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
                 <DialogTitle>{isError ? "Error" : "Success"}</DialogTitle>
                 <DialogContent>

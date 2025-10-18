@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
-import Grid from '@mui/material/Grid';
-import {Box, Typography, Button, Tooltip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
-import { useDashboardData } from '../hooks/useDashboardData';
+import React, {useState} from 'react';
+import {
+    Typography,
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
+} from '@mui/material';
+import {useDashboardData} from '../hooks/useDashboardData';
 import MapBoxMany from "../map/MapBoxMany";
 
 const getStatusColor = (status: any) => status ? 'green' : 'red';
 
 const ChartGrid: React.FC = React.memo(() => {
-    const { sensorsQuery, valuesQuery, checkStatusMutation } = useDashboardData();
+    const {sensorsQuery, valuesQuery} = useDashboardData();
     const [selectedRecord, setSelectedRecord] = useState<any>(null);
 
     if (sensorsQuery.isLoading || valuesQuery.isLoading) return <div>Loading...</div>;
@@ -17,9 +30,9 @@ const ChartGrid: React.FC = React.memo(() => {
 
     // @ts-ignore
     return (
-        <div style={{ backgroundColor: "whitesmoke", minHeight: '100vh', padding: '20px' }}>
-            <MapBoxMany />
-            <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2, marginTop:3 }}>
+        <div style={{backgroundColor: "whitesmoke", minHeight: '100vh', padding: '20px'}}>
+            <MapBoxMany/>
+            <TableContainer component={Paper} sx={{borderRadius: 2, boxShadow: 2, marginTop: 3}}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -60,8 +73,6 @@ const ChartGrid: React.FC = React.memo(() => {
                 </Table>
             </TableContainer>
 
-
-            {/* Modal for full record details */}
             <Dialog open={!!selectedRecord} onClose={() => setSelectedRecord(null)} maxWidth="sm" fullWidth>
                 <DialogTitle>Sensor Details</DialogTitle>
                 <DialogContent dividers>
@@ -69,7 +80,8 @@ const ChartGrid: React.FC = React.memo(() => {
                         <>
                             <Typography variant="body1">Name: <strong>{selectedRecord.name}</strong></Typography>
                             <Typography variant="body1">Type: <strong>{selectedRecord.type}</strong></Typography>
-                            <Typography variant="body1">Current Value: <strong>{selectedRecord.currentValue}</strong></Typography>
+                            <Typography variant="body1">Current
+                                Value: <strong>{selectedRecord.currentValue}</strong></Typography>
                             <Typography variant="body1">
                                 Status:{" "}
                                 <span

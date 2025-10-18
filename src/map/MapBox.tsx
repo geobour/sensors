@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { LatLngExpression } from 'leaflet';
 import { useSensor } from "../hooks/useSensor";
 
-// Custom purple-like marker
+
 const purpleIcon = new L.DivIcon({
     html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="42">
         <path fill="#D3A1FF" stroke="#8000FF" stroke-width="1" d="M12 2C8 2 5 5 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-4-3-7-7-7z"/>
@@ -31,7 +31,6 @@ const MapBox: React.FC = () => {
         Number(sensor.longitude),
     ];
 
-    // Circle HTML for status
     const statusCircle = sensor.status
         ? `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:green;margin-left:5px;"></span>`
         : `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:red;margin-left:5px;"></span>`;
@@ -43,7 +42,7 @@ const MapBox: React.FC = () => {
                 center={position}
                 zoom={10}
                 style={{ width: '100%', height: '100%' }}
-                scrollWheelZoom={false} // disable scroll zoom
+                scrollWheelZoom={false}
             >
                 <TileLayer
                     url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"

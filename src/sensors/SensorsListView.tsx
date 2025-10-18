@@ -157,7 +157,6 @@ const SensorsListView: React.FC = () => {
                                     </TableCell>
                                     <TableCell sx={{ color: 'text.secondary' }}>{sensor.type}</TableCell>
 
-                                    {/* Status indicator with tooltip */}
                                     <TableCell align="center">
                                         <Tooltip title={sensor?.status ? "Active" : "Inactive"} arrow>
                                             <Box
@@ -191,7 +190,6 @@ const SensorsListView: React.FC = () => {
                                             </Button>
                                         </Tooltip>
 
-                                        {/* Delete Button with Tooltip */}
                                         <Tooltip title="Delete Sensor" arrow>
                                             <Button
                                                 variant="contained"
@@ -209,7 +207,6 @@ const SensorsListView: React.FC = () => {
                                             </Button>
                                         </Tooltip>
 
-                                        {/* Restore Button with Tooltip */}
                                         <Tooltip title="Restore Sensor Status" arrow>
                                             <Button
                                                 variant="contained"
@@ -266,7 +263,6 @@ const SensorsListView: React.FC = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Success/Error modal after delete */}
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
                 <DialogTitle sx={{ color: modalSuccess ? 'green' : 'red', bgcolor: 'white' }}>
                     {modalSuccess ? 'Success' : 'Error'}
