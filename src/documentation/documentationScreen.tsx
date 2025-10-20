@@ -1,65 +1,223 @@
 import React from 'react';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
+import { Paper, Grid, Typography, Divider, Box } from '@mui/material';
 
 const DocumentationScreen = () => {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12}>
-                <Paper elevation={6} sx={{ padding: 2 }}>
+                <Paper elevation={6} sx={{ padding: 4, borderRadius: 3 }}>
                     <Typography variant="h4" gutterBottom color="text.secondary">
                         MQTT Broker and Data Transmission
                     </Typography>
                     <Typography paragraph color="text.secondary">
-                        The MQTT (Message Queuing Telemetry Transport) protocol is used for sending data between devices
-                        in IoT systems. In this application, the MQTT broker used is Mosquitto, which allows for the
-                        transmission of sensor data to the Spring Boot application.
+                        This application uses the <strong>MQTT protocol</strong> to exchange real-time sensor data between edge devices and the backend system.
+                        It supports two main connection modes: <strong>HiveMQ / Custom MQTT</strong> for generic IoT sensors, and <strong>TTN (The Things Network)</strong> for LoRaWAN devices.
                     </Typography>
-                    <Typography paragraph color="text.secondary">
-                        It's important to note that for this setup, no username and password are required for broker access.
-                        Detailed configurations of the broker, including connection settings, are provided in the text of the thesis.
-                        You can refer to those sections for a deeper understanding of the broker settings and security mechanisms.
-                    </Typography>
-                    <Typography paragraph color="text.secondary">
-                        To send data without a username or password, use the following command:
-                    </Typography>
-                    <pre style={{ textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
-{`mosquitto_pub -h "broker-ip-address" -p 1883 -t "sensors/topic1" -m "{\\"value\\":29.5}"`}
-                    </pre>
-                    <Typography paragraph color="text.secondary">
-                        This command publishes a message to the topic <strong>"sensors/topic1"</strong> on the MQTT broker with the
-                        following JSON payload:
-                    </Typography>
-                    <pre style={{ textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
-{`{
-    "value": 20.5
+
+                    <Divider sx={{ marginY: 3 }} />
+
+                    {/* HIVE SECTION */}
+                    <Box sx={{ marginBottom: 4 }}>
+                        <Typography variant="h5" gutterBottom color="primary">
+                            🐝 HiveMQ / Local MQTT Implementation
+                        </Typography>
+
+                        <Typography paragraph color="text.secondary">
+                            The <strong>custom HiveMQ implementation</strong> is designed with a focus on <strong>low-power communication efficiency</strong> and <strong>edge simplicity</strong>.
+                            Each sensor transmits only a minimal JSON payload (e.g., <code>{"{ \"value\": 28.5 }"}</code>), which significantly reduces data transmission size.
+                            This approach aligns with <em>LoRaWAN low-energy design principles</em>, minimizing uplink overhead and optimizing device battery lifespan.
+                        </Typography>
+
+                        <Typography paragraph color="text.secondary">
+                            Upon receiving this lightweight payload, the backend enriches it with contextual metadata such as <code>sensorId</code>, <code>type</code>, <code>unit</code>, and a timestamp.
+                            This enrichment is performed by the <code>MqttDataService</code>, which dynamically maps each topic (e.g., <code>sensors/topic1</code>) to a registered sensor in the database.
+                            The result is a full <strong>SensorRecord</strong> object stored for analytics and visualization purposes.
+                        </Typography>
+
+                        <Typography paragraph color="text.secondary">
+                            From an architectural perspective, this approach supports a <strong>multi-network and multi-sensor ecosystem</strong>.
+                            The same backend is capable of connecting to both <strong>HiveMQ (standard MQTT)</strong> and <strong>TTN (LoRaWAN)</strong> brokers dynamically, allowing users to integrate sensors from various communication protocols under a unified data processing layer.
+                            This enables the application to act as a <strong>multi-application IoT hub</strong> that scales horizontally across diverse IoT infrastructures.
+                        </Typography>
+
+                        {/* Academic Insight Box */}
+                        <Box sx={{
+                            bgcolor: '#e8f0fe',
+                            borderLeft: '4px solid #1976d2',
+                            padding: 2,
+                            borderRadius: 2,
+                            marginY: 2
+                        }}>
+                            <Typography variant="subtitle2" color="primary" gutterBottom>
+                                💡 Academic Insight:
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                By transmitting only the numeric sensor value and delegating metadata enrichment to the backend, the system achieves significant energy efficiency and protocol independence — essential for LoRa-based low-power networks and scalable multi-sensor IoT systems.
+                            </Typography>
+                        </Box>
+
+                        <Typography variant="subtitle1" gutterBottom>
+                            <strong>Example HiveMQ Publish Command:</strong>
+                        </Typography>
+                        <Typography
+                            sx={{
+                                backgroundColor: '#f5f5f5',
+                                padding: 2,
+                                borderRadius: 2,
+                                fontFamily: 'monospace',
+                                fontSize: '0.9rem',
+                            }}
+                        >
+                            {`Topic:
+"sensors/topic1"
+
+Message:
+{"value": 28.5}`}
+                        </Typography>
+
+                        <Typography paragraph color="text.secondary" sx={{ mt: 2 }}>
+                            The frontend (or any MQTT client) publishes to the topic pattern <code>sensors/&lt;sensor-topic&gt;</code> with a minimal payload containing only the <code>value</code>.
+                            The backend automatically finds the corresponding sensor in the database and enriches the record with metadata (type, unit, sensorId, timestamp, etc.).
+                        </Typography>
+
+                        <Typography paragraph color="text.secondary" sx={{ mt: 1 }}>
+                            <strong>Stored Record Example (After Backend Enrichment):</strong>
+                        </Typography>
+                        <Typography
+                            sx={{
+                                backgroundColor: '#f5f5f5',
+                                padding: 2,
+                                borderRadius: 2,
+                                fontFamily: 'monospace',
+                                fontSize: '0.9rem',
+                            }}
+                        >
+                            {`{
+  "id": 1023,
+  "sensorId": "sensor-001",
+  "type": "temperature",
+  "value": 28.5,
+  "time": "2025-10-20T15:40:30Z"
 }`}
-</pre>
+                        </Typography>
+                    </Box>
 
-                    <Typography paragraph color="text.secondary">
-                        The Spring Boot application listens to this topic and processes the data, recording sensor
-                        measurements based on the messages sent through the <strong>mosquitto_pub</strong> command.
-                    </Typography>
-                    <Typography paragraph color="text.secondary">
-                        If your broker requires authentication (username and password), you can use the following command:
-                    </Typography>
-                    <pre style={{ textAlign: 'left', backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px' }}>
-{`mosquitto_pub -h "broker-ip-address" -p 1883 -u "your-username" -P "your-password" -t "sensors/topic1" -m '{ "value": 29.5}'`}
-</pre>
-                    <Typography paragraph color="text.secondary">
-                        In this case, you would specify your username using the <strong>-u</strong> option and your password with the <strong>-P</strong> option. This command is required when connecting to a secured MQTT broker.
-                    </Typography>
+                    <Divider sx={{ marginY: 3 }} />
 
-                    <Typography paragraph color="text.secondary">
-                        Additionally, the application allows you to dynamically connect to different MQTT brokers by specifying the broker URL and optional credentials through the user interface or REST API. By providing the broker URI, username, and password (if required), the system will automatically establish a connection, subscribe to all sensor topics, and process incoming messages. This ensures flexibility in connecting to different environments and simplifies testing with multiple brokers.
-                    </Typography>
+                    {/* TTN SECTION */}
+                    <Box sx={{ marginBottom: 4 }}>
+                        <Typography variant="h5" gutterBottom color="primary">
+                            🛰️ The Things Network (TTN) Integration
+                        </Typography>
+                        <Typography paragraph color="text.secondary">
+                            TTN integration allows LoRaWAN sensors to send uplink messages to your application via the TTN MQTT broker.
+                            The backend connects to the TTN region broker using your <strong>Application ID</strong> and <strong>Access Key</strong>, and subscribes to the topic pattern <code>v3/&lt;appId&gt;@ttn/devices/+/up</code>.
+                        </Typography>
 
-                    <Typography paragraph color="text.secondary">
-                        This system allows for efficient data exchange between IoT sensors and the backend application,
-                        ensuring that sensor readings are processed and stored appropriately. Further details on the
-                        broker configuration and example code for the Spring Boot listener are also provided in the thesis.
-                    </Typography>
+                        <Typography variant="subtitle1" gutterBottom>
+                            <strong>TTN Uplink Structure:</strong>
+                        </Typography>
+                        <Typography paragraph color="text.secondary">
+                            TTN sends uplink messages containing a Base64-encoded <code>frm_payload</code>.
+                            Users define a <strong>Decoder Function</strong> in the TTN Console under <em>Payload Formatters</em> to convert bytes into structured data.
+                        </Typography>
+
+                        <Typography sx={{
+                            backgroundColor: '#1e1e1e',
+                            color: '#d4d4d4',
+                            padding: 2,
+                            borderRadius: 2,
+                            fontFamily: 'monospace',
+                            fontSize: '0.85rem'
+                        }}>
+                            {`function decodeUplink(input) {
+  const bytes = input.bytes;
+  const data = {};
+  if (!bytes || bytes.length === 0) return { data };
+
+  data.temperature = (bytes[0] << 24 >> 24) / 10.0;  // signed int8 / 10
+  data.humidity = bytes[1];
+  const latRaw = (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
+  const lonRaw = (bytes[6] << 24) | (bytes[7] << 16) | (bytes[8] << 8) | bytes[9];
+  data.latitude = latRaw / 1e7;
+  data.longitude = lonRaw / 1e7;
+  data.status = bytes[10];
+  return { data };
+}`}
+                        </Typography>
+
+                        <Typography paragraph color="text.secondary" sx={{ marginTop: 2 }}>
+                            After decoding, the uplink message includes a structured <code>decoded_payload</code> object which your backend automatically parses.
+                        </Typography>
+
+                        <Typography variant="subtitle1" gutterBottom>
+                            <strong>Decoded Payload Example:</strong>
+                        </Typography>
+                        <Typography sx={{
+                            backgroundColor: '#f5f5f5',
+                            padding: 2,
+                            borderRadius: 2,
+                            fontFamily: 'monospace',
+                            fontSize: '0.9rem'
+                        }}>
+                            {`{
+  "temperature": -2.5,
+  "humidity": 57,
+  "latitude": 37.7858548,
+  "longitude": 22.2273054,
+  "status": 1
+}`}
+                        </Typography>
+
+                        <Typography paragraph color="text.secondary" sx={{ marginTop: 2 }}>
+                            The backend’s <code>MqttDataServiceTtn</code> stores and processes this decoded payload, linking it to the correct TTN device ID and timestamp.
+                        </Typography>
+
+                        <Typography variant="subtitle1" gutterBottom>
+                            <strong>Complete TTN Message Sample:</strong>
+                        </Typography>
+                        <Typography sx={{
+                            backgroundColor: '#f5f5f5',
+                            padding: 2,
+                            borderRadius: 2,
+                            fontFamily: 'monospace',
+                            fontSize: '0.8rem',
+                            overflowX: 'auto'
+                        }}>
+                            {`{
+  "end_device_ids": {
+    "device_id": "my-new-device",
+    "application_ids": { "application_id": "gbapp" }
+  },
+  "uplink_message": {
+    "frm_payload": "5zkWhan0DT+eHgH/EjSrzQ==",
+    "decoded_payload": {
+      "temperature": -2.5,
+      "humidity": 57,
+      "latitude": 37.7858548,
+      "longitude": 22.2273054,
+      "status": 1
+    },
+    "rx_metadata": [{ "gateway_ids": { "gateway_id": "test" }, "rssi": 42, "snr": 4.2 }],
+    "received_at": "2025-10-20T15:40:30.195257463Z"
+  }
+}`}
+                        </Typography>
+                    </Box>
+
+                    <Divider sx={{ marginY: 3 }} />
+
+                    {/* Summary Section */}
+                    <Box>
+                        <Typography variant="h5" gutterBottom color="primary">
+                            ⚙️ Data Flow Summary
+                        </Typography>
+                        <Typography paragraph color="text.secondary">
+                            - <strong>HiveMQ Mode:</strong> Sensor values are published as minimal JSON containing only <code>value</code> and automatically mapped to the corresponding sensor based on MQTT topic.
+                            - <strong>TTN Mode:</strong> The Things Network decodes binary payloads using user-defined JavaScript functions and forwards the resulting JSON payloads to your backend via MQTT.
+                            Both data streams ultimately create <code>SensorRecord</code> entities in your database.
+                        </Typography>
+                    </Box>
                 </Paper>
             </Grid>
         </Grid>

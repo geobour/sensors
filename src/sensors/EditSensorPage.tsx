@@ -85,7 +85,7 @@ const EditSensorPage: React.FC = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', padding: '20px', backgroundColor: 'whitesmoke' }}>
+        <div style={{ minHeight: '100vh', padding: '20px', backgroundColor: 'white' }}>
             {isLoading && <div style={{ color: 'text.secondary' }}>Loading sensor data...</div>}
             {(isError || (!isLoading && !formData)) && <div style={{ color: 'text.secondary' }}>Error loading sensor data.</div>}
 
@@ -97,7 +97,7 @@ const EditSensorPage: React.FC = () => {
                         maxWidth: '400px',
                         margin: 'auto',
                         marginTop: '20px',
-                        backgroundColor: 'whitesmoke',
+                        backgroundColor: 'white',
                     }}
                 >
                     <form onSubmit={handleSubmit}>
@@ -138,7 +138,7 @@ const EditSensorPage: React.FC = () => {
                                 value={formData.type ?? ''}
                                 onChange={handleTypeChange}
                                 required
-                                sx={{ backgroundColor: 'whitesmoke' }}
+                                sx={{ backgroundColor: 'white' }}
                             >
                                 <MenuItem value="temperature">Temperature</MenuItem>
                                 <MenuItem value="humidity">Humidity</MenuItem>

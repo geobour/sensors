@@ -52,6 +52,14 @@ const RecenterOnPositions = ({ positions }) => {
 
 const getStatusColor = (status) => (Number(status) === 1 ? "green" : "red");
 
+const isOlderThan6Hours = (dateString) => {
+    const receivedDate = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - receivedDate;
+    const diffHours = diffMs / (1000 * 60 * 60);
+    return diffHours > 6;
+};
+
 const TtnSensorPage = () => {
     const queryClient = useQueryClient();
     const { connected, showForm, setConnected, setDisconnected, toggleForm } =
@@ -63,6 +71,7 @@ const TtnSensorPage = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+
     const purpleIcon = new L.Icon({
         iconUrl:
             "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png",
@@ -138,7 +147,6 @@ const TtnSensorPage = () => {
         );
     }
 
-    // Show connection form if disconnected
     if (showForm) {
         return (
             <div
@@ -269,7 +277,13 @@ const TtnSensorPage = () => {
                             <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                                 {record.deviceId}
                             </Typography>
-                            <Typography variant="body2">
+                            <Typography
+                                variant="body2"
+                                style={{
+                                    color: isOlderThan6Hours(record.receivedAt) ? "red" : "inherit",
+                                    fontWeight: isOlderThan6Hours(record.receivedAt) ? "bold" : "normal",
+                                }}
+                            >
                                 Received At: {new Date(record.receivedAt).toLocaleString()}
                             </Typography>
                             <Typography variant="body2">Temperature: {record.temperature ?? "-"} °C</Typography>
@@ -295,7 +309,7 @@ const TtnSensorPage = () => {
                     </Marker>
                 ))}
             </MapContainer>
-            <CsvExportForm></CsvExportForm>
+            <CsvExportForm />
 
             <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2 }}>
                 <Table size="small">
@@ -317,21 +331,28 @@ const TtnSensorPage = () => {
                             .map((record) => (
                                 <TableRow key={record.id} hover>
                                     <TableCell>{record.deviceId}</TableCell>
-                                    <TableCell>{new Date(record.receivedAt).toLocaleString()}</TableCell>
+                                    <TableCell
+                                        style={{
+                                            color: isOlderThan6Hours(record.receivedAt) ? "red" : "inherit",
+                                            fontWeight: isOlderThan6Hours(record.receivedAt) ? "bold" : "normal",
+                                        }}
+                                    >
+                                        {new Date(record.receivedAt).toLocaleString()}
+                                    </TableCell>
                                     <TableCell>{record.temperature ?? "-"}</TableCell>
                                     <TableCell>{record.humidity ?? "-"}</TableCell>
                                     <TableCell>{record.latitude ?? "-"}</TableCell>
                                     <TableCell>{record.longitude ?? "-"}</TableCell>
                                     <TableCell>
-                    <span
-                        style={{
-                            display: "inline-block",
-                            width: 12,
-                            height: 12,
-                            borderRadius: "50%",
-                            backgroundColor: getStatusColor(record.extraFields?.status),
-                        }}
-                    />
+                                        <span
+                                            style={{
+                                                display: "inline-block",
+                                                width: 12,
+                                                height: 12,
+                                                borderRadius: "50%",
+                                                backgroundColor: getStatusColor(record.extraFields?.status),
+                                            }}
+                                        />
                                     </TableCell>
                                     <TableCell align="center">
                                         <Button
@@ -376,7 +397,13 @@ const TtnSensorPage = () => {
                             <Typography variant="body1">
                                 Device ID: <strong>{selectedRecord.deviceId}</strong>
                             </Typography>
-                            <Typography variant="body1">
+                            <Typography
+                                variant="body1"
+                                style={{
+                                    color: isOlderThan6Hours(selectedRecord.receivedAt) ? "red" : "inherit",
+                                    fontWeight: isOlderThan6Hours(selectedRecord.receivedAt) ? "bold" : "normal",
+                                }}
+                            >
                                 Received At: <strong>{new Date(selectedRecord.receivedAt).toLocaleString()}</strong>
                             </Typography>
                             <Typography variant="body1">
@@ -415,7 +442,15 @@ const TtnSensorPage = () => {
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setSelectedRecord(null)} color="primary">
+                    <Button
+                        onClick={() => setSelectedRecord(null)}
+                        sx={{
+                            backgroundColor: "#7b1fa2",
+                            color: "#fff",
+                            fontWeight: "bold",
+                            ":hover": { backgroundColor: "#6a1b9a" },
+                        }}
+                    >
                         Close
                     </Button>
                 </DialogActions>
