@@ -151,36 +151,35 @@ const CsvExportForm = () => {
                 />
 
                 <Tooltip title="Export filtered sensor data to CSV" arrow>
-          <span>
-            <Button
-                variant="outlined"
-                sx={{
-                    borderColor: "#512da8",
-                    color: "#512da8",
-                    fontWeight: "bold",
-                    height: "36px",
-                    "&:hover": {
-                        borderColor: "#512da8",
-                        backgroundColor: "rgba(81,45,168,0.1)",
-                    },
-                    "&:active": {
-                        backgroundColor: "rgba(81,45,168,0.2)",
-                    },
-                    "&:focus": {
-                        outline: "none",
-                        boxShadow: "0 0 0 2px rgba(81,45,168,0.3)",
-                    },
-                }}
-                onClick={handleExport}
-                disabled={exporting || !fromDate || !toDate || !sensorId}
-            >
-              {exporting ? "Exporting..." : "CSV Export"}
-            </Button>
-          </span>
+                    <span>
+                        <Button
+                            variant="outlined"
+                            sx={{
+                                borderColor: "#512da8",
+                                color: "#512da8",
+                                fontWeight: "bold",
+                                height: "36px",
+                                "&:hover": {
+                                    borderColor: "#512da8",
+                                    backgroundColor: "rgba(81,45,168,0.1)",
+                                },
+                                "&:active": {
+                                    backgroundColor: "rgba(81,45,168,0.2)",
+                                },
+                                "&:focus": {
+                                    outline: "none",
+                                    boxShadow: "0 0 0 2px rgba(81,45,168,0.3)",
+                                },
+                            }}
+                            onClick={handleExport}
+                            disabled={exporting || !fromDate || !toDate || !sensorId}
+                        >
+                            {exporting ? "Exporting..." : "CSV Export"}
+                        </Button>
+                    </span>
                 </Tooltip>
             </Box>
 
-            {/* Dialog for errors */}
             <Dialog open={dialogOpen} onClose={handleCloseDialog}>
                 <DialogTitle>Error</DialogTitle>
                 <DialogContent>
