@@ -27,7 +27,7 @@ export default function HomePage() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState("");
     const [isError, setIsError] = useState(false);
-    const {formDisappear, setConnected, setDisconnected } = useMqttConnectionStore();
+    const { formDisappear, setConnected, setDisconnected } = useMqttConnectionStore();
 
     const doPost = async (url, data) => {
         try {
@@ -36,18 +36,25 @@ export default function HomePage() {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: new URLSearchParams(data),
             });
-            if (!res.ok) throw new Error(await res.text());
+
+            if (!res.ok) {
+                // Always show generic user-friendly connection error
+                throw new Error("❌ Connection failed. Please check Broker URL, Username, or Password.");
+            }
+
             const txt = await res.text();
             setIsError(false);
             setDialogMessage(txt);
             setDialogOpen(true);
             setConnected();
         } catch (err) {
+            // Regardless of server error, show same friendly message
             setIsError(true);
-            setDialogMessage("❌ " + err.message);
+            setDialogMessage("❌ Connection failed. Please check Broker URL, Username, or Password.");
             setDialogOpen(true);
         }
     };
+
 
     const handleConnect = () => {
         if (!brokerUrl) return showError("Broker URL is required.");
@@ -56,13 +63,10 @@ export default function HomePage() {
 
     const handlePublish = () => {
         if (!topic || !message) return showError("Topic and Value required.");
-
         const numericValue = parseFloat(message);
         if (numericValue > 101) return showError("Value cannot be greater than 101.");
-
         const fullTopic = `sensors/${topic}`;
         const jsonMsg = JSON.stringify({ value: numericValue });
-
         doPost(`${API_BASE}/publishHive`, { topic: fullTopic, message: jsonMsg });
     };
 
@@ -74,7 +78,6 @@ export default function HomePage() {
 
     const handleDialogClose = () => {
         setDialogOpen(false);
-
         if (isError) {
             setBrokerUrl("");
             setUsername("");
@@ -86,6 +89,27 @@ export default function HomePage() {
             setBrokerUrl("");
             setUsername("");
             setPassword("");
+        }
+    };
+
+    // New Disconnect handler to call backend
+    const handleDisconnect = async () => {
+        try {
+            const res = await fetch(`${API_BASE}/disconnect`, { method: "POST" });
+            const text = await res.text();
+            setDialogMessage(text);
+            setDialogOpen(true);
+            setIsError(false);
+            setDisconnected(); // update store state
+            setBrokerUrl("");
+            setUsername("");
+            setPassword("");
+            setTopic("");
+            setMessage("");
+        } catch (err) {
+            setDialogMessage("❌ " + err.message);
+            setDialogOpen(true);
+            setIsError(true);
         }
     };
 
@@ -142,18 +166,17 @@ export default function HomePage() {
                                     variant="contained"
                                     sx={{
                                         mt: 2,
-                                        backgroundColor: '#512da8',
-                                        color: 'white',
-                                        fontWeight: 'bold',
-                                        '&:hover': {
-                                            backgroundColor: '#7e57c2',
+                                        backgroundColor: "#512da8",
+                                        color: "white",
+                                        fontWeight: "bold",
+                                        "&:hover": {
+                                            backgroundColor: "#7e57c2",
                                         },
                                     }}
                                     onClick={handleConnect}
                                 >
                                     Connect
                                 </Button>
-
                             </Box>
                         ) : (
                             <Box sx={{ textAlign: "center", mt: 3 }}>
@@ -164,7 +187,7 @@ export default function HomePage() {
                                     variant="contained"
                                     color="secondary"
                                     sx={{ mt: 2 }}
-                                    onClick={setDisconnected}
+                                    onClick={handleDisconnect} // updated to call backend
                                 >
                                     Disconnect
                                 </Button>
@@ -194,30 +217,53 @@ export default function HomePage() {
                             variant="contained"
                             sx={{
                                 mt: 2,
-                                backgroundColor: '#512da8',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                '&:hover': {
-                                    backgroundColor: '#7e57c2',
+                                backgroundColor: "#512da8",
+                                color: "white",
+                                fontWeight: "bold",
+                                "&:hover": {
+                                    backgroundColor: "#7e57c2",
                                 },
                             }}
                             onClick={handlePublish}
                         >
                             Publish
                         </Button>
-
                     </Box>
                 )}
             </Box>
-            <Dialog open={dialogOpen} onClose={handleDialogClose}>
-                <DialogTitle>{isError ? "Error" : "Success"}</DialogTitle>
-                <DialogContent>
-                    <Typography color={isError ? "error" : "primary"}>{dialogMessage}</Typography>
+
+            <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
+                <DialogTitle sx={{ color: isError ? "red" : "#512da8" }}>
+                    {isError ? "Error" : "Success"}
+                </DialogTitle>
+                <DialogContent dividers>
+                    <Typography
+                        sx={{
+                            color: isError ? "red" : "#512da8",
+                            whiteSpace: "pre-wrap",
+                            fontFamily: "monospace",
+                        }}
+                    >
+                        {typeof dialogMessage === "string"
+                            ? dialogMessage
+                            : JSON.stringify(dialogMessage, null, 2)}
+                    </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogClose}>OK</Button>
+                    <Button
+                        onClick={handleDialogClose}
+                        sx={{
+                            backgroundColor: "#512da8",
+                            color: "#fff",
+                            fontWeight: "bold",
+                            ":hover": { backgroundColor: "#7e57c2" },
+                        }}
+                    >
+                        OK
+                    </Button>
                 </DialogActions>
             </Dialog>
+
 
             <Footer />
         </div>

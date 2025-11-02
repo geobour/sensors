@@ -42,8 +42,27 @@ export const useUpdateSensor = () => {
     );
 };
 
+export interface PagedResponse<T> {
+    content: T[];
+    pageNumber: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+}
 
-export const useSensors = () => {
+
+export const useSensors = (page = 0, size = 10) => {
+    return useQuery<PagedResponse<SensorDto>, Error>({
+        queryKey: ['sensors', page, size],
+        queryFn: async () => {
+            const response = await axios.get<PagedResponse<SensorDto>>(`${API_SENSOR}/show-sensors-paging`, {
+                params: { page, size },
+            });
+            return response.data;
+        },
+    });
+};
+export const useSensorsMap= () => {
     return useQuery<SensorDto[], Error>(
         ['sensors'],
         async () => {
@@ -52,6 +71,7 @@ export const useSensors = () => {
         }
     );
 };
+
 
 
 export const useDeleteSensor = () => {

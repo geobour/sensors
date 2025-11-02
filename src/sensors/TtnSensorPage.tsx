@@ -21,6 +21,7 @@ import {
     DialogActions,
     TablePagination,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -68,6 +69,8 @@ const TtnSensorPage = () => {
     const [accessKey, setAccessKey] = useState("");
     const [region, setRegion] = useState("");
     const [selectedRecord, setSelectedRecord] = useState(null);
+    const [recordToDelete, setRecordToDelete] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -93,12 +96,30 @@ const TtnSensorPage = () => {
                 toggleForm(false);
                 queryClient.invalidateQueries("ttnSensors");
             },
-            onError: (error) => {
-                const msg =
-                    error.response?.data || "Failed to connect due to network/server error.";
-                setErrorMessage(msg);
+            onError: () => {
+                // Always show the same friendly error message
+                setErrorMessage(
+                    "❌ Connection failed. Please check App ID, Access Key, and Region."
+                );
                 setDisconnected();
                 toggleForm(true);
+            },
+        }
+    );
+
+    // Delete mutation
+    const deleteMutation = useMutation(
+        (id) => axios.delete(`${API_BASE}/records/${id}`),
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries("ttnSensors");
+                setDeleteDialogOpen(false);
+                setRecordToDelete(null);
+            },
+            onError: (error) => {
+                console.error("Failed to delete record:", error);
+                setDeleteDialogOpen(false);
+                setRecordToDelete(null);
             },
         }
     );
@@ -160,63 +181,55 @@ const TtnSensorPage = () => {
                 }}
             >
                 <Card sx={{ mt: 8, p: 4, maxWidth: 420, width: "100%", borderRadius: 3 }}>
-                    <Typography
-                        variant="h5"
-                        align="center"
-                        sx={{ mb: 3, fontWeight: "bold", color: "#512da8" }}
-                    >
+                    <Typography variant="h5" align="center" sx={{ mb: 3, fontWeight: "bold", color: "#512da8" }}>
                         Connect to TTN
                     </Typography>
 
-                    <TextField
-                        label="App ID"
-                        value={appId}
-                        onChange={(e) => setAppId(e.target.value)}
-                        fullWidth
-                        size="small"
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        label="Access Key"
-                        value={accessKey}
-                        onChange={(e) => setAccessKey(e.target.value)}
-                        fullWidth
-                        size="small"
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        label="Region"
-                        value={region}
-                        onChange={(e) => setRegion(e.target.value)}
-                        fullWidth
-                        size="small"
-                        sx={{ mb: 2 }}
-                    />
+                    <TextField label="App ID" value={appId} onChange={(e) => setAppId(e.target.value)} fullWidth size="small" sx={{ mb: 2 }} />
+                    <TextField label="Access Key" value={accessKey} onChange={(e) => setAccessKey(e.target.value)} fullWidth size="small" sx={{ mb: 2 }} />
+                    <TextField label="Region" value={region} onChange={(e) => setRegion(e.target.value)} fullWidth size="small" sx={{ mb: 2 }} />
 
                     <Button
                         fullWidth
                         variant="contained"
-                        sx={{
-                            backgroundColor: "#7b1fa2",
-                            ":hover": { backgroundColor: "#6a1b9a" },
-                            fontWeight: "bold",
-                            py: 1,
-                        }}
+                        sx={{ backgroundColor: "#7b1fa2", ":hover": { backgroundColor: "#6a1b9a" }, fontWeight: "bold", py: 1 }}
                         onClick={() => connectMutation.mutate()}
                         disabled={connectMutation.isLoading || !appId || !accessKey || !region}
                     >
                         {connectMutation.isLoading ? "Connecting..." : "Connect"}
                     </Button>
 
-                    <Dialog open={!!errorMessage} onClose={() => setErrorMessage("")}>
-                        <DialogTitle>Connection Error</DialogTitle>
-                        <DialogContent>
-                            <Typography>{errorMessage}</Typography>
+                    <Dialog open={!!errorMessage} onClose={() => setErrorMessage("")} maxWidth="sm" fullWidth>
+                        <DialogTitle sx={{ color: "red" }}>Connection Error</DialogTitle>
+                        <DialogContent dividers>
+                            <Typography
+                                sx={{
+                                    color: "red",
+                                    whiteSpace: "pre-wrap",
+                                    fontFamily: "monospace",
+                                }}
+                            >
+                                {typeof errorMessage === "string"
+                                    ? errorMessage
+                                    : JSON.stringify(errorMessage, null, 2)}
+                            </Typography>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => setErrorMessage("")}>Close</Button>
+                            <Button
+                                onClick={() => setErrorMessage("")}
+                                sx={{
+                                    backgroundColor: "#7b1fa2",
+                                    color: "#fff",
+                                    fontWeight: "bold",
+                                    ":hover": { backgroundColor: "#6a1b9a" },
+                                }}
+                            >
+                                Close
+                            </Button>
                         </DialogActions>
                     </Dialog>
+
+
                 </Card>
             </div>
         );
@@ -224,66 +237,24 @@ const TtnSensorPage = () => {
 
     return (
         <div style={{ padding: "20px", minHeight: "100vh", backgroundColor: "#f4f3f8" }}>
-            <Typography
-                variant="h5"
-                sx={{
-                    color: "#333",
-                    mb: 2,
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    letterSpacing: "0.5px",
-                }}
-            >
+            <Typography variant="h5" sx={{ color: "#333", mb: 2, textAlign: "center", fontWeight: "bold", letterSpacing: "0.5px" }}>
                 TTN Sensors — Latest Device Data
             </Typography>
+
             <div style={{ textAlign: "center", marginBottom: "15px" }}>
-                <Button
-                    variant="outlined"
-                    onClick={() => toggleForm(true)}
-                    sx={{ mr: 2, borderColor: "#512da8", color: "#512da8", fontWeight: "bold" }}
-                >
-                    Connect TTN App
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={handleDisconnect}
-                    sx={{ borderColor: "#c62828", color: "#c62828", fontWeight: "bold" }}
-                >
-                    Disconnect
-                </Button>
+                <Button variant="outlined" onClick={() => toggleForm(true)} sx={{ mr: 2, borderColor: "#512da8", color: "#512da8", fontWeight: "bold" }}>Connect TTN App</Button>
+                <Button variant="outlined" color="error" onClick={handleDisconnect} sx={{ borderColor: "#c62828", color: "#c62828", fontWeight: "bold" }}>Disconnect</Button>
             </div>
 
             {/* Map */}
-            <MapContainer
-                center={[37.9838, 23.7275]}
-                zoom={8}
-                style={{
-                    height: "450px",
-                    width: "100%",
-                    borderRadius: "10px",
-                    marginBottom: "25px",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                }}
-            >
-                <TileLayer
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
-                    attribution='Tiles &copy; Esri — Source: USGS, Esri, DeLorme, NGA, NPS'
-                />
+            <MapContainer center={[37.9838, 23.7275]} zoom={8} style={{ height: "450px", width: "100%", borderRadius: "10px", marginBottom: "25px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+                <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" attribution='Tiles &copy; Esri — Source: USGS, Esri, DeLorme, NGA, NPS' />
                 <RecenterOnPositions positions={positions} />
                 {validCoords.map((record) => (
                     <Marker key={record.id} position={[record.latitude, record.longitude]} icon={purpleIcon}>
                         <Popup>
-                            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                                {record.deviceId}
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                style={{
-                                    color: isOlderThan6Hours(record.receivedAt) ? "red" : "inherit",
-                                    fontWeight: isOlderThan6Hours(record.receivedAt) ? "bold" : "normal",
-                                }}
-                            >
+                            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>{record.deviceId}</Typography>
+                            <Typography variant="body2" style={{ color: isOlderThan6Hours(record.receivedAt) ? "red" : "inherit", fontWeight: isOlderThan6Hours(record.receivedAt) ? "bold" : "normal" }}>
                                 Received At: {new Date(record.receivedAt).toLocaleString()}
                             </Typography>
                             <Typography variant="body2">Temperature: {record.temperature ?? "-"} °C</Typography>
@@ -292,25 +263,17 @@ const TtnSensorPage = () => {
                             <Typography variant="body2">Longitude: {record.longitude ?? "-"}</Typography>
                             {record.extraFields?.status !== undefined && (
                                 <Typography variant="body2">
-                                    Status:{" "}
-                                    <span
-                                        style={{
-                                            display: "inline-block",
-                                            width: 12,
-                                            height: 12,
-                                            borderRadius: "50%",
-                                            backgroundColor: Number(record.extraFields.status) === 1 ? "green" : "red",
-                                            marginLeft: 4,
-                                        }}
-                                    />
+                                    Status: <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: "50%", backgroundColor: Number(record.extraFields.status) === 1 ? "green" : "red", marginLeft: 4 }} />
                                 </Typography>
                             )}
                         </Popup>
                     </Marker>
                 ))}
             </MapContainer>
+
             <CsvExportForm />
 
+            {/* Table */}
             <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2 }}>
                 <Table size="small">
                     <TableHead>
@@ -322,137 +285,77 @@ const TtnSensorPage = () => {
                             <TableCell><strong>Latitude</strong></TableCell>
                             <TableCell><strong>Longitude</strong></TableCell>
                             <TableCell><strong>Status</strong></TableCell>
-                            <TableCell align="center"><strong>More Info</strong></TableCell>
+                            <TableCell align="center"><strong>Actions</strong></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {latestPerDevice
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((record) => (
-                                <TableRow key={record.id} hover>
-                                    <TableCell>{record.deviceId}</TableCell>
-                                    <TableCell
-                                        style={{
-                                            color: isOlderThan6Hours(record.receivedAt) ? "red" : "inherit",
-                                            fontWeight: isOlderThan6Hours(record.receivedAt) ? "bold" : "normal",
-                                        }}
-                                    >
-                                        {new Date(record.receivedAt).toLocaleString()}
-                                    </TableCell>
-                                    <TableCell>{record.temperature ?? "-"}</TableCell>
-                                    <TableCell>{record.humidity ?? "-"}</TableCell>
-                                    <TableCell>{record.latitude ?? "-"}</TableCell>
-                                    <TableCell>{record.longitude ?? "-"}</TableCell>
-                                    <TableCell>
-                                        <span
-                                            style={{
-                                                display: "inline-block",
-                                                width: 12,
-                                                height: 12,
-                                                borderRadius: "50%",
-                                                backgroundColor: getStatusColor(record.extraFields?.status),
-                                            }}
-                                        />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Button
-                                            variant="outlined"
-                                            size="small"
-                                            onClick={() => setSelectedRecord(record)}
-                                            sx={{
-                                                textTransform: "none",
-                                                borderColor: "#512da8",
-                                                color: "#512da8",
-                                                fontWeight: "bold",
-                                                "&:hover": { backgroundColor: "#ede7f6" },
-                                            }}
-                                        >
-                                            More
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                        {latestPerDevice.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((record) => (
+                            <TableRow key={record.id} hover>
+                                <TableCell>{record.deviceId}</TableCell>
+                                <TableCell style={{ color: isOlderThan6Hours(record.receivedAt) ? "red" : "inherit", fontWeight: isOlderThan6Hours(record.receivedAt) ? "bold" : "normal" }}>
+                                    {new Date(record.receivedAt).toLocaleString()}
+                                </TableCell>
+                                <TableCell>{record.temperature ?? "-"}</TableCell>
+                                <TableCell>{record.humidity ?? "-"}</TableCell>
+                                <TableCell>{record.latitude ?? "-"}</TableCell>
+                                <TableCell>{record.longitude ?? "-"}</TableCell>
+                                <TableCell>
+                                    <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: "50%", backgroundColor: getStatusColor(record.extraFields?.status) }} />
+                                </TableCell>
+                                <TableCell align="center">
+                                    <Button variant="outlined" size="small" onClick={() => setSelectedRecord(record)} sx={{ textTransform: "none", borderColor: "#512da8", color: "#512da8", fontWeight: "bold", "&:hover": { backgroundColor: "#ede7f6" }, mr: 1 }}>
+                                        More Info
+                                    </Button>
+                                    <Button variant="outlined" size="small" startIcon={<DeleteIcon />} sx={{ textTransform: "none", borderColor: "#512da8", color: "#512da8", fontWeight: "bold", "&:hover": { backgroundColor: "#ede7f6" } }} onClick={() => { setRecordToDelete(record); setDeleteDialogOpen(true); }}>
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
 
-                <TablePagination
-                    component="div"
-                    count={latestPerDevice.length}
-                    page={page}
-                    onPageChange={(e, newPage) => setPage(newPage)}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={(e) => {
-                        setRowsPerPage(parseInt(e.target.value, 10));
-                        setPage(0);
-                    }}
-                    rowsPerPageOptions={[5, 10, 25, 50]}
-                />
+                <TablePagination component="div" count={latestPerDevice.length} page={page} onPageChange={(e, newPage) => setPage(newPage)} rowsPerPage={rowsPerPage} onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }} rowsPerPageOptions={[5, 10, 25, 50]} />
             </TableContainer>
 
+            {/* Dialogs */}
             <Dialog open={!!selectedRecord} onClose={() => setSelectedRecord(null)} maxWidth="sm" fullWidth>
                 <DialogTitle>Sensor Details</DialogTitle>
                 <DialogContent dividers>
                     {selectedRecord && (
                         <>
-                            <Typography variant="body1">
-                                Device ID: <strong>{selectedRecord.deviceId}</strong>
-                            </Typography>
-                            <Typography
-                                variant="body1"
-                                style={{
-                                    color: isOlderThan6Hours(selectedRecord.receivedAt) ? "red" : "inherit",
-                                    fontWeight: isOlderThan6Hours(selectedRecord.receivedAt) ? "bold" : "normal",
-                                }}
-                            >
+                            <Typography variant="body1">Device ID: <strong>{selectedRecord.deviceId}</strong></Typography>
+                            <Typography variant="body1" style={{ color: isOlderThan6Hours(selectedRecord.receivedAt) ? "red" : "inherit", fontWeight: isOlderThan6Hours(selectedRecord.receivedAt) ? "bold" : "normal" }}>
                                 Received At: <strong>{new Date(selectedRecord.receivedAt).toLocaleString()}</strong>
                             </Typography>
-                            <Typography variant="body1">
-                                Temperature: <strong>{selectedRecord.temperature ?? "-"}</strong> °C
-                            </Typography>
-                            <Typography variant="body1">
-                                Humidity: <strong>{selectedRecord.humidity ?? "-"}</strong> %
-                            </Typography>
-                            <Typography variant="body1">
-                                Latitude: <strong>{selectedRecord.latitude ?? "-"}</strong>
-                            </Typography>
-                            <Typography variant="body1">
-                                Longitude: <strong>{selectedRecord.longitude ?? "-"}</strong>
-                            </Typography>
+                            <Typography variant="body1">Temperature: <strong>{selectedRecord.temperature ?? "-"}</strong> °C</Typography>
+                            <Typography variant="body1">Humidity: <strong>{selectedRecord.humidity ?? "-"}</strong> %</Typography>
+                            <Typography variant="body1">Latitude: <strong>{selectedRecord.latitude ?? "-"}</strong></Typography>
+                            <Typography variant="body1">Longitude: <strong>{selectedRecord.longitude ?? "-"}</strong></Typography>
 
-                            {selectedRecord.extraFields &&
-                                Object.entries(selectedRecord.extraFields).map(([key, value]) => (
-                                    <Typography key={key} variant="body1">
-                                        {key}:{" "}
-                                        {key.toLowerCase() === "status" ? (
-                                            <span
-                                                style={{
-                                                    display: "inline-block",
-                                                    width: 12,
-                                                    height: 12,
-                                                    borderRadius: "50%",
-                                                    backgroundColor: Number(value) === 1 ? "green" : "red",
-                                                }}
-                                            />
-                                        ) : (
-                                            <strong>{value}</strong>
-                                        )}
-                                    </Typography>
-                                ))}
+                            {selectedRecord.extraFields && Object.entries(selectedRecord.extraFields).map(([key, value]) => (
+                                <Typography key={key} variant="body1">
+                                    {key}: {key.toLowerCase() === "status" ? <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: "50%", backgroundColor: Number(value) === 1 ? "green" : "red" }} /> : <strong>{value}</strong>}
+                                </Typography>
+                            ))}
                         </>
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        onClick={() => setSelectedRecord(null)}
-                        sx={{
-                            backgroundColor: "#7b1fa2",
-                            color: "#fff",
-                            fontWeight: "bold",
-                            ":hover": { backgroundColor: "#6a1b9a" },
-                        }}
-                    >
+                    <Button onClick={() => setSelectedRecord(null)} sx={{ backgroundColor: "#7b1fa2", color: "#fff", fontWeight: "bold", ":hover": { backgroundColor: "#6a1b9a" } }}>
                         Close
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete sensor <strong>{recordToDelete?.deviceId}</strong>?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                    <Button color="error" onClick={() => deleteMutation.mutate(recordToDelete?.id)}>Delete</Button>
                 </DialogActions>
             </Dialog>
         </div>

@@ -55,7 +55,10 @@ export interface DashboardDto {
     name: string;
     type: string;
     currentValue: number;
+    currentTime: string;
     status:boolean;
+    latitude: string;
+    longitude: string;
 }
 
 

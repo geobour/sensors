@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Container, Typography, Paper, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Button, Input, InputAdornment, Box, Tooltip, Dialog,
-    DialogTitle, DialogContent, DialogActions
+    TableHead, TableRow, Button, TextField, InputAdornment, Box, Tooltip, Dialog,
+    DialogTitle, DialogContent, DialogActions, TablePagination, IconButton
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -14,17 +15,23 @@ import { SensorDto } from '../api/ApiSensor';
 import { useDeleteSensor, useRestoreSensor, useSensors } from "../hooks/useSensor";
 
 const SensorsListView: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [searchTerm, setSearchTerm] = useState('');
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [sensorToDelete, setSensorToDelete] = useState<number | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [modalSuccess, setModalSuccess] = useState(true);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const navigate = useNavigate();
-    const { data: sensorList = [], isLoading, isError } = useSensors();
+    const { data, isLoading, isError } = useSensors(0, 1000);
     const deleteSensor = useDeleteSensor();
     const restoreSensor = useRestoreSensor();
+
+    useEffect(() => {
+        setPage(0);
+    }, [searchTerm, rowsPerPage]);
 
     const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>, sensorId: number) => {
         e.stopPropagation();
@@ -61,12 +68,37 @@ const SensorsListView: React.FC = () => {
         restoreSensor.mutate(sensor);
     };
 
-    const filteredSensors = sensorList.filter(sensor =>
-        sensor.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const handleClearSearch = () => {
+        setSearchTerm('');
+        setPage(0);
+    };
 
     if (isLoading) return <Typography color="text.secondary">Loading sensors...</Typography>;
     if (isError) return <Typography color="text.secondary">Error loading sensors</Typography>;
+
+    const allSensors: SensorDto[] = data?.content ?? [];
+
+    const filteredSensors = allSensors.filter(sensor =>
+        sensor.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sensor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sensor.area.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sensor.topic.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sensor.type.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const paginatedSensors = filteredSensors.slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+    );
+
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     return (
         <Box sx={{ minHeight: '100vh', padding: 2, bgcolor: 'white' }}>
@@ -77,25 +109,27 @@ const SensorsListView: React.FC = () => {
                     </Typography>
                 </Paper>
 
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        mt: 2,
-                        mb: 2,
-                        bgcolor: 'white',
-                    }}
-                >
-                    <Input
-                        placeholder="Search by ID"
-                        startAdornment={
-                            <InputAdornment position="start">
-                                <SearchIcon sx={{ color: 'text.secondary' }} />
-                            </InputAdornment>
-                        }
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, mb: 2 }}>
+                    <TextField
+                        placeholder="Search by ID, name, area, topic, or type"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        sx={{ color: 'text.secondary' }}
+                        size="small"
+                        sx={{ width: '300px' }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon sx={{ color: 'text.secondary' }} />
+                                </InputAdornment>
+                            ),
+                            endAdornment: searchTerm && (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={handleClearSearch} size="small">
+                                        <ClearIcon sx={{ color: 'text.secondary' }} />
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
                     />
                     <Button
                         variant="contained"
@@ -105,118 +139,89 @@ const SensorsListView: React.FC = () => {
                             backgroundColor: '#512da8',
                             color: 'white',
                             '&:hover': { backgroundColor: '#c089f2' },
-                            fontWeight: 'bold',
+                            fontWeight: 'bold'
                         }}
                     >
                         Add Sensor
                     </Button>
                 </Box>
 
-                <TableContainer
-                    component={Paper}
-                    elevation={3}
-                    sx={{ maxHeight: '500px', bgcolor: 'white' }}
-                >
+                <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
                     <Table sx={{ minWidth: 650 }} aria-label="sensor table">
-                        <TableHead sx={{ bgcolor: 'white' }}>
+                        <TableHead>
                             <TableRow>
-                                {['Sensor ID','Sensor Name','Sensor Area','Topic','Type','Status','Actions'].map(col => (
-                                    <TableCell
-                                        key={col}
-                                        sx={{ fontWeight: 'bold', color: 'text.secondary', bgcolor: 'white' }}
-                                    >
-                                        <Typography variant="h6" color="text.secondary">{col}</Typography>
+                                {['Sensor ID', 'Sensor Name', 'Sensor Area', 'Topic', 'Type', 'Status', 'Actions'].map(col => (
+                                    <TableCell key={col}>
+                                        <Typography variant="subtitle1" fontWeight="bold" color="text.secondary">
+                                            {col}
+                                        </Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
                         </TableHead>
-
                         <TableBody>
-                            {filteredSensors.map((sensor) => (
+                            {paginatedSensors.map(sensor => (
                                 <TableRow
                                     key={sensor.id}
                                     hover
                                     onClick={() => navigate(`${sensor.id}`)}
                                     sx={{ cursor: 'pointer', bgcolor: 'white' }}
                                 >
-                                    <TableCell sx={{ color: 'text.secondary' }}>{sensor.id}</TableCell>
-                                    <TableCell sx={{ color: 'text.secondary' }}>
-                                        <Tooltip title={sensor.name} arrow>
-                                            <span>{sensor.name}</span>
-                                        </Tooltip>
+                                    <TableCell>{sensor.id}</TableCell>
+                                    <TableCell>
+                                        <Tooltip title={sensor.name} arrow><span>{sensor.name}</span></Tooltip>
                                     </TableCell>
-                                    <TableCell sx={{ color: 'text.secondary' }}>
-                                        <Tooltip title={sensor.area} arrow>
-                                            <span>{sensor.area}</span>
-                                        </Tooltip>
+                                    <TableCell>
+                                        <Tooltip title={sensor.area} arrow><span>{sensor.area}</span></Tooltip>
                                     </TableCell>
-                                    <TableCell sx={{ color: 'text.secondary' }}>
-                                        <Tooltip title={sensor.topic} arrow>
-                                            <span>{sensor.topic}</span>
-                                        </Tooltip>
+                                    <TableCell>
+                                        <Tooltip title={sensor.topic} arrow><span>{sensor.topic}</span></Tooltip>
                                     </TableCell>
-                                    <TableCell sx={{ color: 'text.secondary' }}>{sensor.type}</TableCell>
-
+                                    <TableCell>{sensor.type}</TableCell>
                                     <TableCell align="center">
                                         <Tooltip title={sensor?.status ? "Active" : "Inactive"} arrow>
-                                            <Box
-                                                sx={{
-                                                    width: 12,
-                                                    height: 12,
-                                                    borderRadius: '50%',
-                                                    bgcolor: sensor?.status ? 'green' : 'red',
-                                                    margin: '0 auto',
-                                                }}
-                                            />
+                                            <Box sx={{
+                                                width: 12, height: 12, borderRadius: '50%',
+                                                bgcolor: sensor?.status ? 'green' : 'red',
+                                                margin: '0 auto'
+                                            }} />
                                         </Tooltip>
                                     </TableCell>
-
                                     <TableCell>
-                                        {/* Edit Button with Tooltip */}
                                         <Tooltip title="Edit Sensor" arrow>
                                             <Button
                                                 variant="contained"
-                                                onClick={(e) => { e.stopPropagation(); navigate(`${sensor.id}/edit`) }}
+                                                onClick={(e) => { e.stopPropagation(); navigate(`${sensor.id}/edit`); }}
                                                 sx={{
-                                                    mr: 1,
-                                                    backgroundColor: '#512da8',
-                                                    color: 'white',
-                                                    minWidth: '40px',
-                                                    padding: '6px',
-                                                    '&:hover': { backgroundColor: '#c089f2' },
+                                                    mr: 1, backgroundColor: '#512da8', color: 'white',
+                                                    minWidth: '40px', p: '6px',
+                                                    '&:hover': { backgroundColor: '#c089f2' }
                                                 }}
                                             >
                                                 <EditIcon />
                                             </Button>
                                         </Tooltip>
-
                                         <Tooltip title="Delete Sensor" arrow>
                                             <Button
                                                 variant="contained"
                                                 onClick={(e) => handleDeleteClick(e, sensor.id)}
                                                 sx={{
-                                                    mr: 1,
-                                                    backgroundColor: '#512da8',
-                                                    color: 'white',
-                                                    minWidth: '40px',
-                                                    padding: '6px',
-                                                    '&:hover': { backgroundColor: '#c089f2' },
+                                                    mr: 1, backgroundColor: '#512da8', color: 'white',
+                                                    minWidth: '40px', p: '6px',
+                                                    '&:hover': { backgroundColor: '#c089f2' }
                                                 }}
                                             >
                                                 <DeleteIcon />
                                             </Button>
                                         </Tooltip>
-
                                         <Tooltip title="Restore Sensor Status" arrow>
                                             <Button
                                                 variant="contained"
                                                 onClick={(e) => handleRestoreClick(e, sensor)}
                                                 sx={{
-                                                    backgroundColor: '#512da8',
-                                                    color: 'white',
-                                                    minWidth: '40px',
-                                                    padding: '6px',
-                                                    '&:hover': { backgroundColor: '#c089f2' },
+                                                    backgroundColor: '#512da8', color: 'white',
+                                                    minWidth: '40px', p: '6px',
+                                                    '&:hover': { backgroundColor: '#c089f2' }
                                                 }}
                                             >
                                                 <RestoreIcon />
@@ -227,47 +232,33 @@ const SensorsListView: React.FC = () => {
                             ))}
                         </TableBody>
                     </Table>
+
+                    <TablePagination
+                        component="div"
+                        count={filteredSensors.length}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        rowsPerPageOptions={[5, 10, 25, 50]}
+                    />
                 </TableContainer>
             </Container>
 
-            {/* Delete confirmation dialog */}
             <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
-                <DialogTitle sx={{ color: 'text.secondary', bgcolor: 'white' }}>
-                    Confirm Delete
-                </DialogTitle>
-                <DialogContent sx={{ color: 'text.secondary', bgcolor: 'white' }}>
-                    Are you sure you want to delete this sensor?
-                </DialogContent>
-                <DialogActions sx={{ bgcolor: 'white' }}>
-                    <Button
-                        onClick={cancelDelete}
-                        sx={{
-                            backgroundColor: '#512da8',
-                            color: 'white',
-                            '&:hover': { backgroundColor: '#c089f2' },
-                        }}
-                    >
-                        No
-                    </Button>
-
-                    <Button
-                        onClick={confirmDelete}
-                        sx={{
-                            backgroundColor: '#512da8',
-                            color: 'white',
-                            '&:hover': { backgroundColor: '#c089f2' },
-                        }}
-                    >
-                        Yes
-                    </Button>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>Are you sure you want to delete this sensor?</DialogContent>
+                <DialogActions>
+                    <Button onClick={cancelDelete} sx={{ backgroundColor: '#512da8', color: 'white', '&:hover': { backgroundColor: '#c089f2' } }}>No</Button>
+                    <Button onClick={confirmDelete} sx={{ backgroundColor: '#512da8', color: 'white', '&:hover': { backgroundColor: '#c089f2' } }}>Yes</Button>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-                <DialogTitle sx={{ color: modalSuccess ? 'green' : 'red', bgcolor: 'white' }}>
+                <DialogTitle sx={{ color: modalSuccess ? 'green' : 'red' }}>
                     {modalSuccess ? 'Success' : 'Error'}
                 </DialogTitle>
-                <DialogContent sx={{ color: modalSuccess ? 'green' : 'red', bgcolor: 'white' }}>
+                <DialogContent sx={{ color: modalSuccess ? 'green' : 'red' }}>
                     {modalMessage}
                 </DialogContent>
             </Dialog>

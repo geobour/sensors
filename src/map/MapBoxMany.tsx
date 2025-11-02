@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-l
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
 import { LatLngExpression } from 'leaflet';
-import { useSensors } from "../hooks/useSensor";
+import { useSensorsMap} from "../hooks/useSensor";
 import { SensorDto } from "../api/ApiSensor";
 
 const iconRetinaUrl = require('leaflet/dist/images/marker-icon-2x.png');
@@ -41,7 +41,7 @@ const RecenterOnPositions: React.FC<{ positions: LatLngExpression[] }> = ({ posi
 
 const MapBoxMany: React.FC = () => {
     // @ts-ignore
-    const { data: sensorList = [], isLoading, isError } = useSensors<SensorDto[]>();
+    const { data: sensorList = [], isLoading, isError } = useSensorsMap<SensorDto[]>();
 
     if (isLoading) return <div>Loading map...</div>;
     if (isError) return <div>Error loading sensors</div>;

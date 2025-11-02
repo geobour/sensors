@@ -1,53 +1,27 @@
-import {useMutation, useQuery, useQueryClient} from 'react-query';
+// hooks/useDashboardData.ts
+import { useQuery } from 'react-query';
 import axios from 'axios';
-import {DashboardDto, SensorDto} from '../api/ApiSensor';
+import { DashboardDto } from '../api/ApiSensor';
 
 const API_BASE = 'http://localhost:8080/api';
 
+export interface PagedResponse<T> {
+    content: T[];
+    pageNumber: number;
+    pageSize: number;
+    totalElements: number;
+    totalPages: number;
+}
 
-const fetchSensors = async (): Promise<SensorDto[]> => {
-    const response = await axios.get<SensorDto[]>(`${API_BASE}/sensor/show-sensors`);
+const fetchDashboardValues = async (page = 0, size = 10): Promise<PagedResponse<DashboardDto>> => {
+    const response = await axios.get<PagedResponse<DashboardDto>>(`${API_BASE}/dashboard/current-values`, {
+        params: { page, size }
+    });
     return response.data;
 };
 
-
-const fetchDashboardValues = async (): Promise<DashboardDto[]> => {
-    const response = await axios.get<DashboardDto[]>(`${API_BASE}/dashboard/current-values`);
-    return response.data;
-};
-
-
-const checkSensors = async (): Promise<void> => {
-    await axios.get(`${API_BASE}/sensor/check`);
-};
-
-export const useDashboardData = () => {
-    const queryClient = useQueryClient();
-
-
-    const sensorsQuery = useQuery({
-        queryKey: ['sensors'],
-        queryFn: fetchSensors,
-        refetchInterval: 60 * 1000,
+export const useDashboardData = (page = 0, size = 10) => {
+    return useQuery(['dashboardValues', page, size], () => fetchDashboardValues(page, size), {
+        keepPreviousData: true
     });
-
-    const valuesQuery = useQuery({
-        queryKey: ['dashboardValues'],
-        queryFn: fetchDashboardValues,
-        refetchInterval: 60 * 1000,
-    });
-
-
-    const checkStatusMutation = useMutation({
-        mutationFn: checkSensors,
-        onSuccess: () => {
-            queryClient.invalidateQueries(['sensors']);
-        },
-    });
-
-    return {
-        sensorsQuery,
-        valuesQuery,
-        checkStatusMutation,
-    };
 };
