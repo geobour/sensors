@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -9,14 +9,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
-import {useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ExportToExcel from '../export/ExportToExcel';
-import {useQuery} from 'react-query';
+import { useQuery } from 'react-query';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import {
     Box,
     Dialog,
-    DialogContent, DialogTitle,
+    DialogContent,
+    DialogTitle,
     Divider,
     FormControl,
     InputLabel,
@@ -27,13 +28,13 @@ import {
     Tooltip
 } from '@mui/material';
 import axios from 'axios';
-import {SensorDto, FileData, SensorDataDto, PredictionData} from "../api/ApiSensor";
+import { SensorDto, FileData, SensorDataDto, PredictionData } from "../api/ApiSensor";
 import Chart from "chart.js/auto";
 import InfoIcon from '@mui/icons-material/Info';
 import FileSaver from "file-saver";
 
 const SensorDetailsView: React.FC = () => {
-    const {sensorId} = useParams<{ sensorId: string }>();
+    const { sensorId } = useParams<{ sensorId: string }>();
     const [year, setYear] = useState<number>(2025);
     const navigate = useNavigate();
     const [minValues, setMinValues] = useState<number[]>([]);
@@ -49,8 +50,9 @@ const SensorDetailsView: React.FC = () => {
     const [isNoDataDialogOpen, setIsNoDataDialogOpen] = useState(false);
     const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isSelectFileMetricDialogOpen, setIsSelectFileMetricDialogOpen] = useState(false);
 
-    const {data: sensors} = useQuery<SensorDto, Error>(
+    const { data: sensors } = useQuery<SensorDto, Error>(
         ['sensorData', sensorId],
         async () => {
             const response = await axios.get<SensorDto>(`http://localhost:8080/api/sensor/get-sensor/${sensorId}`);
@@ -59,7 +61,7 @@ const SensorDetailsView: React.FC = () => {
         }
     );
 
-    const {data: sensorData, isLoading, isError} = useQuery<SensorDataDto[], Error>(
+    const { data: sensorData } = useQuery<SensorDataDto[], Error>(
         ['sensorData', sensorId, year],
         async () => {
             const response = await axios.get<SensorDataDto[]>(`http://localhost:8080/api/sensor/load/sensor-data/${sensorId}/${year}`);
@@ -74,6 +76,17 @@ const SensorDetailsView: React.FC = () => {
     const handleChangeType = (event: SelectChangeEvent<string>) => setSelectedType(event.target.value);
 
     const handlePrediction = async () => {
+        if (avgValues.length === 0 && minValues.length === 0 && maxValues.length === 0) {
+            setErrorMessage("Please upload a file before running the algorithm.");
+            setIsErrorDialogOpen(true);
+            return;
+        }
+
+        if (!selectedType) {
+            setIsSelectFileMetricDialogOpen(true);
+            return;
+        }
+
         try {
             const response = await axios.get<PredictionData>('http://localhost:8080/api/predict');
             setPredictionData(response.data);
@@ -106,7 +119,7 @@ const SensorDetailsView: React.FC = () => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await axios.put<FileData[]>(`http://localhost:8080/api/sensor/upload`, formData, {headers: {'Content-Type': 'multipart/form-data'}});
+            const response = await axios.put<FileData[]>(`http://localhost:8080/api/sensor/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
             setMinValues(response.data.map(d => d.min ?? 0));
             setMaxValues(response.data.map(d => d.max ?? 0));
             setAvgValues(response.data.map(d => d.avg ?? 0));
@@ -139,7 +152,7 @@ const SensorDetailsView: React.FC = () => {
 
     const handleDownloadTemplate = () => {
         const csvHeaders = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const blob = new Blob([csvHeaders.join(',') + "\n"], {type: 'text/csv;charset=utf-8;'});
+        const blob = new Blob([csvHeaders.join(',') + "\n"], { type: 'text/csv;charset=utf-8;' });
         FileSaver.saveAs(blob, 'template.csv');
     };
 
@@ -194,21 +207,21 @@ const SensorDetailsView: React.FC = () => {
     }, [selectedType, maxSensorValues, minSensorValues, avgSensorValues, predictionData, type]);
 
     return (
-        <Box sx={{backgroundColor: 'white', minHeight: '100vh', padding: 2}}>
+        <Box sx={{ backgroundColor: 'white', minHeight: '100vh', padding: 2 }}>
             <Grid container justifyContent="center" alignItems="center" spacing={3}>
                 <Grid item xs={12}>
-                    <Paper elevation={6} sx={{padding: 3, backgroundColor: 'white'}}>
+                    <Paper elevation={6} sx={{ padding: 3, backgroundColor: 'white' }}>
                         <Typography variant="h5" padding={2} fontWeight="bold" color="text.secondary">
                             Sensor Details
                         </Typography>
-                        <Divider/>
+                        <Divider />
 
-                        <TableContainer component={Paper} sx={{backgroundColor: 'white'}}>
+                        <TableContainer component={Paper} sx={{ backgroundColor: 'white' }}>
                             <Table>
                                 <TableHead>
                                     <TableRow>
                                         {['ID', 'Name', 'Area', 'Latitude', 'Longitude', 'Type', 'Topic', 'Status'].map(col => (
-                                            <TableCell key={col} sx={{fontWeight: 'bold', color: 'text.secondary', backgroundColor: 'white'}}>
+                                            <TableCell key={col} sx={{ fontWeight: 'bold', color: 'text.secondary', backgroundColor: 'white' }}>
                                                 {col}
                                             </TableCell>
                                         ))}
@@ -245,9 +258,9 @@ const SensorDetailsView: React.FC = () => {
                             </Table>
                         </TableContainer>
 
-                        <Divider sx={{my: 2}}/>
+                        <Divider sx={{ my: 2 }} />
 
-                        <div style={{marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap'}}>
+                        <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                             {['Map', 'Daily Graph Chart', 'Min Chart', 'Max Chart', 'Avg Chart'].map((label, i) => {
                                 const handlers = [handleMap, handleLineChart, handleMinChart, handleMaxChart, handleAvgChart];
                                 return (
@@ -258,7 +271,7 @@ const SensorDetailsView: React.FC = () => {
                                         sx={{
                                             backgroundColor: '#512da8',
                                             color: 'white',
-                                            '&:hover': {backgroundColor: '#c089f2'},
+                                            '&:hover': { backgroundColor: '#c089f2' },
                                         }}
                                     >
                                         {label}
@@ -267,14 +280,14 @@ const SensorDetailsView: React.FC = () => {
                             })}
                         </div>
 
-                        <Paper elevation={6} sx={{padding: 3, mt: 3, backgroundColor: 'white'}}>
+                        <Paper elevation={6} sx={{ padding: 3, mt: 3, backgroundColor: 'white' }}>
                             <Typography variant="h5" fontWeight="bold" color="text.secondary">
                                 Upload File
                             </Typography>
-                            <input type="file" accept=".xlsx, .xls" onChange={handleChange}/>
+                            <input type="file" accept=".xlsx, .xls, .ods" onChange={handleChange} />
 
-                            <Box sx={{display: 'flex', alignItems: 'center', mt: 2, gap: 2}}>
-                                <FormControl sx={{minWidth: 100}}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 2 }}>
+                                <FormControl sx={{ minWidth: 100 }}>
                                     <InputLabel>Metric</InputLabel>
                                     <Select value={selectedType} onChange={handleChangeType}>
                                         <MenuItem value=""><em>None</em></MenuItem>
@@ -284,30 +297,31 @@ const SensorDetailsView: React.FC = () => {
                                     </Select>
                                 </FormControl>
 
-                                <FormControl sx={{minWidth: 100}}>
+                                <FormControl sx={{ minWidth: 100 }}>
                                     <InputLabel>Year</InputLabel>
                                     <Select value={year} onChange={handleChangeYear}>
                                         <MenuItem value=""><em>None</em></MenuItem>
-                                        <MenuItem value={2025}>Current</MenuItem>
-                                        <MenuItem value={2024}>Previous</MenuItem>
+                                        {[2025, 2026, 2027, 2028, 2029, 2030].map(y => (
+                                            <MenuItem key={y} value={y}>{y}</MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
 
                                 <IconButton onClick={handleDownloadTemplate}>
-                                    <CloudDownloadIcon/>
+                                    <CloudDownloadIcon />
                                 </IconButton>
 
                                 <IconButton onClick={handleDialogOpen}>
-                                    <InfoIcon/>
+                                    <InfoIcon />
                                 </IconButton>
                             </Box>
 
-                            <Box sx={{width: '700px', height: '400px', mt: 2}}>
+                            <Box sx={{ width: '700px', height: '400px', mt: 2 }}>
                                 <canvas
                                     id={selectedType === "Max" ? 'maxChart' : selectedType === "Min" ? 'minChart' : 'avgChart'}
                                     width="700" height="400"></canvas>
                             </Box>
-                            <Box sx={{display: 'flex', alignItems: 'center', gap: 2, mt: 2}}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 2 }}>
                                 <Button
                                     variant="contained"
                                     onClick={handlePrediction}
@@ -315,13 +329,13 @@ const SensorDetailsView: React.FC = () => {
                                         backgroundColor: '#512da8',
                                         color: 'white',
                                         mt: 1.2,
-                                        '&:hover': {backgroundColor: '#c089f2'},
+                                        '&:hover': { backgroundColor: '#c089f2' },
                                     }}
                                 >
                                     Run Algorithm
                                 </Button>
                                 {predictionData && (
-                                    <Box sx={{display: 'flex', alignItems: 'center', mt: 1.2}}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 1.2 }}>
                                         <ExportToExcel
                                             data={predictionData}
                                             fileName="predictionResults"
@@ -329,7 +343,7 @@ const SensorDetailsView: React.FC = () => {
                                                 sx: {
                                                     backgroundColor: '#512da8',
                                                     color: 'white',
-                                                    '&:hover': {backgroundColor: '#c089f2'},
+                                                    '&:hover': { backgroundColor: '#c089f2' },
                                                 },
                                             }}
                                         />
@@ -340,9 +354,11 @@ const SensorDetailsView: React.FC = () => {
 
                         {/* Dialogs */}
                         <Dialog open={isDialogOpen} onClose={handleDialogClose} maxWidth="md" fullWidth>
-                            <DialogTitle sx={{backgroundColor: 'white'}}>Upload File Instructions</DialogTitle>
-                            <DialogContent sx={{backgroundColor: 'white'}}>
-                                <Typography variant="body1">
+                            <DialogTitle sx={{ backgroundColor: 'white', color: '#512da8', fontWeight: 'bold' }}>
+                                Upload File Instructions
+                            </DialogTitle>
+                            <DialogContent sx={{ backgroundColor: 'white' }}>
+                                <Typography variant="body1" sx={{ color: '#512da8' }}>
                                     Enter the historical minimum, maximum, and average values for the last years of the
                                     area near the sensor’s location into the Excel file, using the provided template.
                                     After filling in the data, select the desired metric and run the forecasting
@@ -352,18 +368,39 @@ const SensorDetailsView: React.FC = () => {
                                 </Typography>
                             </DialogContent>
                         </Dialog>
+
+
                         <Dialog open={isNoDataDialogOpen} onClose={handleNoDataDialogClose}>
-                            <DialogTitle sx={{backgroundColor: 'white'}}>No Previous Year Data</DialogTitle>
-                            <DialogContent sx={{backgroundColor: 'white'}}>
+                            <DialogTitle sx={{ backgroundColor: 'white' }}>No Previous Year Data</DialogTitle>
+                            <DialogContent sx={{ backgroundColor: 'white' }}>
                                 <Typography>No data available for the selected previous year. Please upload required
                                     data.</Typography>
                             </DialogContent>
                         </Dialog>
+
                         <Dialog open={isErrorDialogOpen} onClose={() => setIsErrorDialogOpen(false)}>
-                            <DialogTitle sx={{backgroundColor: 'white'}}>Error</DialogTitle>
-                            <DialogContent sx={{backgroundColor: 'white'}}>
-                                <Typography>{errorMessage}</Typography>
+                            <DialogTitle sx={{ backgroundColor: 'white',color: '#512da8', }}>Warning</DialogTitle>
+                            <DialogContent sx={{ backgroundColor: 'white' }}>
+                                <Typography sx={{ color: '#512da8', fontWeight: 'bold' }}>
+                                    {errorMessage}
+                                </Typography>
                             </DialogContent>
+                        </Dialog>
+
+
+                        <Dialog
+                            open={isSelectFileMetricDialogOpen}
+                            onClose={() => setIsSelectFileMetricDialogOpen(false)}
+                        >
+                            <DialogTitle sx={{ backgroundColor: 'white', color: '#512da8', fontWeight: 'bold' }}>
+                                Missing Selections
+                            </DialogTitle>
+                            <DialogContent sx={{ backgroundColor: 'white' }}>
+                                <Typography sx={{ color: '#512da8' }}>
+                                    Please select both a file and a metric before running the algorithm.
+                                </Typography>
+                            </DialogContent>
+
                         </Dialog>
                     </Paper>
                 </Grid>

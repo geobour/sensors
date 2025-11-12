@@ -13,13 +13,7 @@ export const useMqttConnectionStore = create(
         }),
         {
             name: "mqtt-connection-store",
-            version: 1,
-            onRehydrateStorage: () => (state) => {
-                if (state) {
-                    state.connected = false;
-                    state.formDisappear = false;
-                }
-            },
+            version: 1
         }
     )
 );

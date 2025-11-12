@@ -187,7 +187,7 @@ export default function HomePage() {
                                     variant="contained"
                                     color="secondary"
                                     sx={{ mt: 2 }}
-                                    onClick={handleDisconnect} // updated to call backend
+                                    onClick={handleDisconnect}
                                 >
                                     Disconnect
                                 </Button>

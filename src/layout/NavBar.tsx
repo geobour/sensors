@@ -23,7 +23,7 @@ interface ResponsiveAppBarProps {
 const avatarSettings = ['Logout'];
 
 const pages = [
-    { label: 'Home', path: '/homepage' },
+    // { label: 'Home', path: '/homepage' },
     { label: 'Sensors', path: '/sensors' },
     { label: 'Sensors Dashboard', path: '/dashboard' },
     { label: 'TTN Dashboard', path: '/sensors-ttn' },
@@ -54,7 +54,13 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                 <Box sx={{ flexGrow: 0.01 }} />
 
                 {/* ------------------ Mobile Menu ------------------ */}
-                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                <Box
+                    sx={{
+                        flexGrow: 1,
+                        display: { xs: 'flex', md: 'none' },
+                        backgroundColor: '#512da8',
+                    }}
+                >
                     <IconButton
                         size="large"
                         aria-label="menu"
@@ -73,7 +79,12 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                         open={Boolean(anchorElNav)}
                         onClose={handleCloseNavMenu}
-                        sx={{ display: { xs: 'block', md: 'none' } }}
+                        sx={{
+                            display: { xs: 'block', md: 'none' },
+                            '& .MuiPaper-root': {
+                                backgroundColor: '#512da8',
+                            },
+                        }}
                     >
                         {pages.map((page) => (
                             <MenuItem key={page.label} onClick={handleCloseNavMenu}>
@@ -81,7 +92,10 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                                     to={page.path}
                                     style={{ textDecoration: 'none', color: 'inherit' }}
                                 >
-                                    <Typography textAlign="center" sx={{ color: 'white', fontWeight: 'bold' }}>
+                                    <Typography
+                                        textAlign="center"
+                                        sx={{ color: 'white', fontWeight: 'bold' }}
+                                    >
                                         {page.label}
                                     </Typography>
                                 </Link>
@@ -89,6 +103,7 @@ const ResponsiveAppBar: React.FC<ResponsiveAppBarProps> = ({ isLoggedIn, handleL
                         ))}
                     </Menu>
                 </Box>
+
 
                 {/* ------------------ Desktop Menu ------------------ */}
                 <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>

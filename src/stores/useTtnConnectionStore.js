@@ -13,14 +13,7 @@ export const useTtnConnectionStore = create(
         }),
         {
             name: "ttn-connection-store",
-            version: 1,
-            // This ensures the state resets to disconnected on reload
-            onRehydrateStorage: () => (state) => {
-                if (state) {
-                    state.connected = false;
-                    state.showForm = true;
-                }
-            },
+            version: 1
         }
     )
 );

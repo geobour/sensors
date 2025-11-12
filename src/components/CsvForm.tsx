@@ -10,7 +10,9 @@ import {
     DialogContent,
     DialogActions,
     Typography,
+    IconButton,
 } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { saveAs } from "file-saver";
 import axios from "axios";
 
@@ -29,15 +31,50 @@ const CsvExportForm = () => {
 
     const handleCloseDialog = () => {
         setDialogOpen(false);
-        // Reset form on dialog close
         setFromDate("");
         setToDate("");
         setSensorId("");
     };
 
-    const handleExport = async () => {
-        setExporting(true);
+    const downloadCsv = (data, filename = "ttn_sensors.csv") => {
+        const flattenedData = data.map((item) => {
+            const flat = { ...item };
 
+            // Flatten extraFields if present
+            if (item.extraFields) {
+                try {
+                    const parsed =
+                        typeof item.extraFields === "string"
+                            ? JSON.parse(item.extraFields.replace(/;/g, ","))
+                            : item.extraFields;
+                    Object.entries(parsed).forEach(([key, val]) => (flat[key] = val));
+                } catch (e) {
+                    console.warn("Could not parse extraFields:", e);
+                }
+            }
+
+            // Keep all other fields, don't delete anything
+            return flat;
+        });
+
+        // Collect all unique keys from all rows
+        const headers = Array.from(
+            new Set(flattenedData.flatMap((obj) => Object.keys(obj)))
+        );
+
+        const csvRows = [
+            headers.join(","), // Header row
+            ...flattenedData.map((row) =>
+                headers.map((field) => `"${row[field] ?? ""}"`).join(",")
+            ),
+        ];
+
+        const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8" });
+        saveAs(blob, filename);
+    };
+
+    const handleExportFiltered = async () => {
+        setExporting(true);
         try {
             const params = { deviceId: sensorId, fromDate, toDate };
             const response = await axios.get(
@@ -45,60 +82,42 @@ const CsvExportForm = () => {
                 { params, validateStatus: () => true }
             );
 
-            if (response.status === 400) {
-                showDialog(response.data?.error || "Bad request: missing or invalid parameters.");
+            if (response.status !== 200) {
+                showDialog(
+                    response.data?.error ||
+                    "Error fetching filtered data. Status: " + response.status
+                );
                 return;
             }
 
-            if (response.status === 204) {
-                showDialog("No records found for the given date or device Id.");
-                return;
-            }
+            downloadCsv(response.data);
+        } catch (error) {
+            console.error(error);
+            showDialog("Network error: Could not reach the server.");
+        } finally {
+            setExporting(false);
+        }
+    };
 
-            if (response.status >= 500) {
-                showDialog("Server error while fetching data. Please try again later.");
-                return;
-            }
+    const handleExportAll = async () => {
+        setExporting(true);
+        try {
+            const response = await axios.get(
+                "http://localhost:8080/api/ttn/records/all",
+                { validateStatus: () => true }
+            );
 
             if (response.status !== 200) {
-                showDialog("Unexpected response from server: " + response.status);
+                showDialog(
+                    response.data?.error ||
+                    "Error fetching all records. Status: " + response.status
+                );
                 return;
             }
 
-            const data = response.data;
-
-            const flattenedData = data.map((item) => {
-                const flat = { ...item };
-                if (item.extraFields) {
-                    try {
-                        const parsed =
-                            typeof item.extraFields === "string"
-                                ? JSON.parse(item.extraFields.replace(/;/g, ","))
-                                : item.extraFields;
-                        Object.entries(parsed).forEach(([key, val]) => (flat[key] = val));
-                    } catch (e) {
-                        console.warn("Could not parse extraFields:", e);
-                    }
-                }
-                delete flat.extraFields;
-                return flat;
-            });
-
-            const headers = Array.from(
-                new Set(flattenedData.flatMap((obj) => Object.keys(obj)))
-            );
-            const csvRows = [
-                headers.join(","),
-                ...flattenedData.map((row) =>
-                    headers.map((field) => `"${row[field] ?? ""}"`).join(",")
-                ),
-            ];
-
-            const csvContent = csvRows.join("\n");
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
-            saveAs(blob, "ttn_sensors.csv");
+            downloadCsv(response.data, "ttn_sensors_all.csv");
         } catch (error) {
-            console.error("Request failed:", error);
+            console.error(error);
             showDialog("Network error: Could not reach the server.");
         } finally {
             setExporting(false);
@@ -129,7 +148,6 @@ const CsvExportForm = () => {
                     size="small"
                     sx={{ width: 150 }}
                 />
-
                 <TextField
                     required
                     type="date"
@@ -140,7 +158,6 @@ const CsvExportForm = () => {
                     size="small"
                     sx={{ width: 150 }}
                 />
-
                 <TextField
                     required
                     label="Sensor ID"
@@ -153,42 +170,80 @@ const CsvExportForm = () => {
                 <Tooltip title="Export filtered sensor data to CSV" arrow>
                     <span>
                         <Button
-                            variant="outlined"
+                            variant="contained"
                             sx={{
-                                borderColor: "#512da8",
-                                color: "#512da8",
+                                backgroundColor: "#7b1fa2",
+                                color: "#fff",
                                 fontWeight: "bold",
                                 height: "36px",
-                                "&:hover": {
-                                    borderColor: "#512da8",
-                                    backgroundColor: "rgba(81,45,168,0.1)",
-                                },
-                                "&:active": {
-                                    backgroundColor: "rgba(81,45,168,0.2)",
-                                },
-                                "&:focus": {
-                                    outline: "none",
-                                    boxShadow: "0 0 0 2px rgba(81,45,168,0.3)",
-                                },
+                                "&:hover": { backgroundColor: "#9c27b0" },
                             }}
-                            onClick={handleExport}
+                            onClick={handleExportFiltered}
                             disabled={exporting || !fromDate || !toDate || !sensorId}
                         >
-                            {exporting ? "Exporting..." : "CSV Export"}
+                            {exporting ? "Exporting..." : "Export"}
                         </Button>
                     </span>
+                </Tooltip>
+
+                <Tooltip title="Export all sensor data to CSV" arrow>
+                    <span>
+                        <Button
+                            variant="contained"
+                            sx={{
+                                backgroundColor: "#7b1fa2",
+                                color: "#fff",
+                                fontWeight: "bold",
+                                height: "36px",
+                                "&:hover": { backgroundColor: "#9c27b0" },
+                            }}
+                            onClick={handleExportAll}
+                            disabled={exporting}
+                        >
+                            {exporting ? "Exporting..." : "Export All"}
+                        </Button>
+                    </span>
+                </Tooltip>
+
+                <Tooltip
+                    title={
+                        <Box sx={{ p: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                                CSV Export Info
+                            </Typography>
+                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                • <strong>Export</strong>: Downloads csv records filtered by
+                                <br /> device ID and date range.
+                            </Typography>
+                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                • <strong>Export All</strong>: Downloads <u>all</u> records
+                                from every device.
+                            </Typography>
+                        </Box>
+                    }
+                    arrow
+                    placement="right"
+                >
+                    <IconButton sx={{ color: "#512da8", height: "36px" }}>
+                        <InfoOutlinedIcon />
+                    </IconButton>
                 </Tooltip>
             </Box>
 
             <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-                <DialogTitle>Error</DialogTitle>
+                <DialogTitle sx={{ color: "#512da8", fontWeight: "bold" }}>Notice</DialogTitle>
                 <DialogContent>
                     <Typography sx={{ color: "#512da8" }}>{dialogMessage}</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button
                         onClick={handleCloseDialog}
-                        sx={{ color: "#512da8", fontWeight: "bold" }}
+                        sx={{
+                            backgroundColor: "#512da8",
+                            color: "#fff",
+                            fontWeight: "bold",
+                            "&:hover": { backgroundColor: "#6a1b9a" },
+                        }}
                         autoFocus
                     >
                         Close

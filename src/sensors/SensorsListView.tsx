@@ -111,7 +111,7 @@ const SensorsListView: React.FC = () => {
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, mb: 2 }}>
                     <TextField
-                        placeholder="Search by ID, name, area, topic, or type"
+                        placeholder="Search by ID, name, area, topic ..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         size="small"

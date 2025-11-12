@@ -24,17 +24,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
 
     const login = (username: string, password: string) => {
-        // Your authentication logic here (e.g., API call to backend)
-        // Set user if authentication is successful
+
     };
 
     const register = (username: string, email: string, password: string) => {
-        // Your registration logic here (e.g., API call to backend)
-        // Set user if registration is successful
+
     };
 
     const logout = () => {
-        // Clear user data (e.g., remove token)
         setUser(null);
     };
 

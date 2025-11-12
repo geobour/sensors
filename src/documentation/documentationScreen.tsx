@@ -19,11 +19,11 @@ const DocumentationScreen = () => {
                     {/* HIVE SECTION */}
                     <Box sx={{ marginBottom: 4 }}>
                         <Typography variant="h5" gutterBottom color="primary">
-                            🐝 HiveMQ / Local MQTT Implementation
+                            🐝 HiveMQ / 🐙 Mosquitto Local MQTT Implementation
                         </Typography>
 
                         <Typography paragraph color="text.secondary">
-                            The <strong>custom HiveMQ implementation</strong> is designed with a focus on <strong>low-power communication efficiency</strong> and <strong>edge simplicity</strong>.
+                            The <strong>custom HiveMQ and Mosquitto implementation</strong> is designed with a focus on <strong>low-power communication efficiency</strong> and <strong>edge simplicity</strong>.
                             Each sensor transmits only a minimal JSON payload (e.g., <code>{"{ \"value\": 28.5 }"}</code>), which significantly reduces data transmission size.
                             This approach aligns with <em>LoRaWAN low-energy design principles</em>, minimizing uplink overhead and optimizing device battery lifespan.
                         </Typography>
@@ -36,9 +36,10 @@ const DocumentationScreen = () => {
 
                         <Typography paragraph color="text.secondary">
                             From an architectural perspective, this approach supports a <strong>multi-network and multi-sensor ecosystem</strong>.
-                            The same backend is capable of connecting to both <strong>HiveMQ (standard MQTT)</strong> and <strong>TTN (LoRaWAN)</strong> brokers dynamically, allowing users to integrate sensors from various communication protocols under a unified data processing layer.
-                            This enables the application to act as a <strong>multi-application IoT hub</strong> that scales horizontally across diverse IoT infrastructures.
+                            The same backend is capable of connecting to both <strong>HiveMQ</strong> and <strong>Mosquitto</strong> (standard MQTT brokers), as well as <strong>TTN (LoRaWAN)</strong> brokers dynamically.
+                            This allows users to integrate sensors from various communication protocols under a unified data processing layer, enabling the application to act as a <strong>multi-application IoT hub</strong> that scales horizontally across diverse IoT infrastructures.
                         </Typography>
+
 
                         {/* Academic Insight Box */}
                         <Box sx={{
@@ -213,10 +214,13 @@ Message:
                             ⚙️ Data Flow Summary
                         </Typography>
                         <Typography paragraph color="text.secondary">
-                            - <strong>HiveMQ Mode:</strong> Sensor values are published as minimal JSON containing only <code>value</code> and automatically mapped to the corresponding sensor based on MQTT topic.
+                            - <strong>HiveMQ / Mosquitto Mode:</strong> Sensor values are published as minimal JSON containing only <code>value</code> and automatically mapped to the corresponding sensor based on MQTT topic. Both HiveMQ and Mosquitto brokers are fully supported by the backend.
+                            <br />
                             - <strong>TTN Mode:</strong> The Things Network decodes binary payloads using user-defined JavaScript functions and forwards the resulting JSON payloads to your backend via MQTT.
+                            <br />
                             Both data streams ultimately create <code>SensorRecord</code> entities in your database.
                         </Typography>
+
                     </Box>
                 </Paper>
             </Grid>

@@ -104,7 +104,7 @@ const BarChartAvg: React.FC<BarChartProps> = ({ className }) => {
                     label="Year"
                     sx={{ backgroundColor: 'white' }}
                 >
-                    {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014].map(y => (
+                    {[2025, 2026, 2027, 2028, 2029, 2030].map(y => (
                         <MenuItem key={y} value={y}>{y}</MenuItem>
                     ))}
                 </Select>
