@@ -10,7 +10,7 @@ import {
     Divider,
     Box,
 } from "@mui/material";
-import {useHeaders} from "../hooks/useHeaders";
+import { useHeaders } from "../hooks/useHeaders";
 
 const isOlderThan6Hours = (dateString) => {
     const receivedDate = new Date(dateString);
@@ -21,7 +21,13 @@ const isOlderThan6Hours = (dateString) => {
 
 const SensorDetailsDialog = ({ open, record, onClose }) => {
     const { headers } = useHeaders();
+
     if (!record) return null;
+
+    const sensorKeys = Object.keys(record).filter((k) =>
+        k.toLowerCase().includes("value")
+    );
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <DialogTitle sx={{ color: "#512da8", fontWeight: "bold" }}>
@@ -43,10 +49,13 @@ const SensorDetailsDialog = ({ open, record, onClose }) => {
                     variant="body1"
                     sx={{
                         color: isOlderThan6Hours(record.receivedAt) ? "red" : "black",
-                        fontWeight: isOlderThan6Hours(record.receivedAt) ? "bold" : "normal",
+                        fontWeight: isOlderThan6Hours(record.receivedAt)
+                            ? "bold"
+                            : "normal",
                     }}
                 >
-                    Received At: <strong>{new Date(record.receivedAt).toLocaleString()}</strong>
+                    Received At:{" "}
+                    <strong>{new Date(record.receivedAt).toLocaleString()}</strong>
                 </Typography>
 
                 <Typography variant="body1">
@@ -71,32 +80,24 @@ const SensorDetailsDialog = ({ open, record, onClose }) => {
                 </Typography>
                 <Divider sx={{ mb: 1 }} />
 
-                <Box display="flex">
-                    <Box display="flex" flexDirection="column" mr={10}>
-                        <Typography variant="body1">
-                            {headers?.valueOne ?? "Value One"}: <strong>{record.valueOne ?? "-"}</strong>
+                <Box display="flex" flexWrap="wrap" gap={2}>
+                    {sensorKeys.length > 0 ? (
+                        sensorKeys.map((key) => (
+                            <Typography
+                                key={key}
+                                variant="body1"
+                                sx={{ flexBasis: "45%" }}
+                            >
+                                {headers?.[key] ?? key}:{" "}
+                                <strong>{record[key] ?? "-"}</strong>
+                            </Typography>
+                        ))
+                    ) : (
+                        <Typography variant="body2" color="textSecondary">
+                            No sensor values found.
                         </Typography>
-                        <Typography variant="body1">
-                            {headers?.valueTwo ?? "Value Two"}: <strong>{record.valueTwo ?? "-"}</strong>
-                        </Typography>
-                        <Typography variant="body1">
-                            {headers?.valueThree ?? "Value Three"}: <strong>{record.valueThree ?? "-"}</strong>
-                        </Typography>
-                    </Box>
-                    <Box display="flex" flexDirection="column" >
-                        <Typography variant="body1">
-                            {headers?.valueFour ?? "Value Four"}: <strong>{record.valueFour ?? "-"}</strong>
-                        </Typography>
-                        <Typography variant="body1">
-                            {headers?.valueFive ?? "Value Five"}: <strong>{record.valueFive ?? "-"}</strong>
-                        </Typography>
-                        <Typography variant="body1">
-                            {headers?.valueSix ?? "Value Six"}: <strong>{record.valueSix ?? "-"}</strong>
-                        </Typography>
-                    </Box>
+                    )}
                 </Box>
-
-
 
                 {/* === Network Info === */}
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: 2 }}>
@@ -123,7 +124,10 @@ const SensorDetailsDialog = ({ open, record, onClose }) => {
                 {/* === Extra Fields === */}
                 {record.extraFields && Object.keys(record.extraFields).length > 0 && (
                     <>
-                        <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: 2 }}>
+                        <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: "bold", mt: 2 }}
+                        >
                             Extra Fields
                         </Typography>
                         <Divider sx={{ mb: 1 }} />
@@ -137,7 +141,8 @@ const SensorDetailsDialog = ({ open, record, onClose }) => {
                                             width: 12,
                                             height: 12,
                                             borderRadius: "50%",
-                                            backgroundColor: Number(value) === 1 ? "green" : "red",
+                                            backgroundColor:
+                                                Number(value) === 1 ? "green" : "red",
                                         }}
                                     />
                                 ) : (

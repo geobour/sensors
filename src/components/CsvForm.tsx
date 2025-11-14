@@ -40,7 +40,6 @@ const CsvExportForm = () => {
         const flattenedData = data.map((item) => {
             const flat = { ...item };
 
-            // Flatten extraFields if present
             if (item.extraFields) {
                 try {
                     const parsed =
@@ -172,11 +171,10 @@ const CsvExportForm = () => {
                         <Button
                             variant="contained"
                             sx={{
-                                backgroundColor: "#7b1fa2",
-                                color: "#fff",
-                                fontWeight: "bold",
-                                height: "36px",
-                                "&:hover": { backgroundColor: "#9c27b0" },
+                                backgroundColor: '#512da8',
+                                color: 'white',
+                                '&:hover': { backgroundColor: "#9c27b0" },
+                                fontWeight: 'bold'
                             }}
                             onClick={handleExportFiltered}
                             disabled={exporting || !fromDate || !toDate || !sensorId}
@@ -191,11 +189,10 @@ const CsvExportForm = () => {
                         <Button
                             variant="contained"
                             sx={{
-                                backgroundColor: "#7b1fa2",
-                                color: "#fff",
-                                fontWeight: "bold",
-                                height: "36px",
-                                "&:hover": { backgroundColor: "#9c27b0" },
+                                backgroundColor: '#512da8',
+                                color: 'white',
+                                '&:hover': { backgroundColor: "#9c27b0" },
+                                fontWeight: 'bold'
                             }}
                             onClick={handleExportAll}
                             disabled={exporting}

@@ -105,7 +105,7 @@ const SensorsListView: React.FC = () => {
             <Container sx={{ bgcolor: 'white', py: 2 }}>
                 <Paper elevation={3} sx={{ mt: 4, padding: '10px', bgcolor: 'white' }}>
                     <Typography variant="h4" align="center" fontWeight="bold" color="text.secondary">
-                        Sensors List
+                        Sensors
                     </Typography>
                 </Paper>
 
@@ -138,7 +138,7 @@ const SensorsListView: React.FC = () => {
                         sx={{
                             backgroundColor: '#512da8',
                             color: 'white',
-                            '&:hover': { backgroundColor: '#c089f2' },
+                            '&:hover': { backgroundColor: "#9c27b0" },
                             fontWeight: 'bold'
                         }}
                     >
@@ -195,7 +195,7 @@ const SensorsListView: React.FC = () => {
                                                 sx={{
                                                     mr: 1, backgroundColor: '#512da8', color: 'white',
                                                     minWidth: '40px', p: '6px',
-                                                    '&:hover': { backgroundColor: '#c089f2' }
+                                                    '&:hover': { backgroundColor: '#9c27b0' }
                                                 }}
                                             >
                                                 <EditIcon />
@@ -208,7 +208,7 @@ const SensorsListView: React.FC = () => {
                                                 sx={{
                                                     mr: 1, backgroundColor: '#512da8', color: 'white',
                                                     minWidth: '40px', p: '6px',
-                                                    '&:hover': { backgroundColor: '#c089f2' }
+                                                    '&:hover': { backgroundColor: '#9c27b0' }
                                                 }}
                                             >
                                                 <DeleteIcon />
@@ -221,7 +221,7 @@ const SensorsListView: React.FC = () => {
                                                 sx={{
                                                     backgroundColor: '#512da8', color: 'white',
                                                     minWidth: '40px', p: '6px',
-                                                    '&:hover': { backgroundColor: '#c089f2' }
+                                                    '&:hover': { backgroundColor: '#9c27b0' }
                                                 }}
                                             >
                                                 <RestoreIcon />
@@ -249,8 +249,8 @@ const SensorsListView: React.FC = () => {
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>Are you sure you want to delete this sensor?</DialogContent>
                 <DialogActions>
-                    <Button onClick={cancelDelete} sx={{ backgroundColor: '#512da8', color: 'white', '&:hover': { backgroundColor: '#c089f2' } }}>No</Button>
-                    <Button onClick={confirmDelete} sx={{ backgroundColor: '#512da8', color: 'white', '&:hover': { backgroundColor: '#c089f2' } }}>Yes</Button>
+                    <Button onClick={cancelDelete} sx={{ backgroundColor: '#512da8', color: 'white', '&:hover': { backgroundColor: '#9c27b0' } }}>No</Button>
+                    <Button onClick={confirmDelete} sx={{ backgroundColor: '#512da8', color: 'white', '&:hover': { backgroundColor: '#9c27b0' } }}>Yes</Button>
                 </DialogActions>
             </Dialog>
 

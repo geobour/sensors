@@ -1,5 +1,14 @@
-import React from "react";
-import { Box, Typography, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import React, { useEffect } from "react";
+import {
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+} from "@mui/material";
 
 interface MqttConnectionFormProps {
     brokerUrl: string;
@@ -27,14 +36,14 @@ const MqttConnectionForm: React.FC<MqttConnectionFormProps> = ({
                                                                    onCloseError,
                                                                }) => {
     const inputSx = {
-        backgroundColor: "rgba(129, 90, 210, 0.2)", // soft purple background
+        backgroundColor: "rgba(129, 90, 210, 0.2)",
         borderRadius: 1,
         "& .MuiOutlinedInput-root": {
             "& fieldset": { borderColor: "#512da8" },
             "&:hover fieldset": { borderColor: "#7e57c2" },
             "&.Mui-focused": {
                 borderColor: "#512da8",
-                backgroundColor: "rgba(129, 90, 210, 0.35)", // darker purple on focus
+                backgroundColor: "rgba(129, 90, 210, 0.35)",
             },
             "& input:-webkit-autofill": {
                 WebkitBoxShadow: "0 0 0 1000px rgba(129, 90, 210, 0.2) inset",
@@ -44,6 +53,14 @@ const MqttConnectionForm: React.FC<MqttConnectionFormProps> = ({
         "& label.Mui-focused": { color: "#512da8" },
     };
 
+    useEffect(() => {
+        if (!isLoading && !errorMessage) {
+            onChangeBrokerUrl("");
+            onChangeUsername("");
+            onChangePassword("");
+        }
+    }, [isLoading, errorMessage, onChangeBrokerUrl, onChangeUsername, onChangePassword]);
+
     return (
         <Box
             sx={{
@@ -51,7 +68,7 @@ const MqttConnectionForm: React.FC<MqttConnectionFormProps> = ({
                 display: "flex",
                 alignItems: "flex-start",
                 justifyContent: "center",
-                background: "#7e57c2",
+                backgroundColor: "rgba(129, 90, 210, 0.2)",
                 paddingTop: "6rem",
             }}
         >
@@ -117,11 +134,6 @@ const MqttConnectionForm: React.FC<MqttConnectionFormProps> = ({
                 <Dialog open={!!errorMessage} onClose={onCloseError} maxWidth="sm" fullWidth>
                     <DialogTitle sx={{ color: "red" }}>Connection Error</DialogTitle>
                     <DialogContent dividers>
-                        {/*<Typography sx={{ color: "red" }}>*/}
-                        {/*    {typeof errorMessage === "string"*/}
-                        {/*        ? errorMessage*/}
-                        {/*        : JSON.stringify(errorMessage, null, 2)}*/}
-                        {/*</Typography>*/}
                         <Typography sx={{ color: "red" }}>
                             ❌ Connection failed. Please check the Broker URL, Username, or Password.
                         </Typography>

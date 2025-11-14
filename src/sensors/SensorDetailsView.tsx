@@ -271,7 +271,7 @@ const SensorDetailsView: React.FC = () => {
                                         sx={{
                                             backgroundColor: '#512da8',
                                             color: 'white',
-                                            '&:hover': { backgroundColor: '#c089f2' },
+                                            '&:hover': { backgroundColor: '#9c27b0' },
                                         }}
                                     >
                                         {label}
@@ -329,7 +329,7 @@ const SensorDetailsView: React.FC = () => {
                                         backgroundColor: '#512da8',
                                         color: 'white',
                                         mt: 1.2,
-                                        '&:hover': { backgroundColor: '#c089f2' },
+                                        '&:hover': { backgroundColor: '#9c27b0' },
                                     }}
                                 >
                                     Run Algorithm
@@ -343,7 +343,7 @@ const SensorDetailsView: React.FC = () => {
                                                 sx: {
                                                     backgroundColor: '#512da8',
                                                     color: 'white',
-                                                    '&:hover': { backgroundColor: '#c089f2' },
+                                                    '&:hover': { backgroundColor: '#9c27b0' },
                                                 },
                                             }}
                                         />

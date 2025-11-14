@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
     Box,
     Typography,
@@ -36,18 +36,26 @@ const TtnConnectionForm: React.FC<TtnConnectionFormProps> = ({
                                                                  onCloseError,
                                                              }) => {
     const inputSx = {
-        backgroundColor: "rgba(129, 90, 210, 0.2)", // soft purple
+        backgroundColor: "rgba(129, 90, 210, 0.2)",
         borderRadius: 1,
         "& .MuiOutlinedInput-root": {
             "& fieldset": { borderColor: "#512da8" },
             "&:hover fieldset": { borderColor: "#7e57c2" },
             "&.Mui-focused": {
                 borderColor: "#512da8",
-                backgroundColor: "rgba(129, 90, 210, 0.35)", // darker on focus
+                backgroundColor: "rgba(129, 90, 210, 0.35)",
             },
         },
         "& label.Mui-focused": { color: "#512da8" },
     };
+
+    useEffect(() => {
+        if (!isLoading && !errorMessage) {
+            onChangeAppId("");
+            onChangeAccessKey("");
+            onChangeRegion("");
+        }
+    }, [isLoading, errorMessage, onChangeAppId, onChangeAccessKey, onChangeRegion]);
 
     return (
         <Box
@@ -56,7 +64,7 @@ const TtnConnectionForm: React.FC<TtnConnectionFormProps> = ({
                 display: "flex",
                 alignItems: "flex-start",
                 justifyContent: "center",
-                background: "#7e57c2",
+                backgroundColor: "rgba(129, 90, 210, 0.2)",
                 paddingTop: "6rem",
             }}
         >
@@ -121,15 +129,9 @@ const TtnConnectionForm: React.FC<TtnConnectionFormProps> = ({
                 <Dialog open={!!errorMessage} onClose={onCloseError} maxWidth="sm" fullWidth>
                     <DialogTitle sx={{ color: "red" }}>Connection Error</DialogTitle>
                     <DialogContent dividers>
-                        {/*<Typography sx={{ color: "red" }}>*/}
-                        {/*    {typeof errorMessage === "string"*/}
-                        {/*        ? errorMessage*/}
-                        {/*        : JSON.stringify(errorMessage, null, 2)}*/}
-                        {/*</Typography>*/}
                         <Typography sx={{ color: "red" }}>
                             ❌ Connection failed. Please check the App ID, Access Key, or Region.
                         </Typography>
-
                     </DialogContent>
                     <DialogActions>
                         <Button

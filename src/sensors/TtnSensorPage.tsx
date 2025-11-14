@@ -172,10 +172,15 @@ const TtnSensorPage = () => {
                         borderColor: "#c62828",
                         color: "#c62828",
                         fontWeight: "bold",
+                        "&:hover": {
+                            borderColor: "#8e0000",
+                            backgroundColor: "rgba(198, 40, 40, 0.04)",
+                        },
                     }}
                 >
                     Disconnect
                 </Button>
+
             </div>
 
             {/* Map */}

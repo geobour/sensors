@@ -72,7 +72,7 @@ const TtnSensorTable: React.FC<TtnSensorTableProps> = ({
             <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2 }}>
                 <Table size="small">
                     <TableHead>
-                        <TableRow>
+                        <TableRow sx={{ backgroundColor: "#ede7f6" }}>
                             <TableCell><strong>Device ID</strong></TableCell>
                             <TableCell><strong>Received At</strong></TableCell>
 
@@ -221,7 +221,7 @@ const TtnSensorTable: React.FC<TtnSensorTableProps> = ({
                             backgroundColor: "#512da8",
                             color: "#fff",
                             fontWeight: "bold",
-                            "&:hover": { backgroundColor: "#7e57c2" },
+                            "&:hover": { backgroundColor: '#9c27b0' },
                         }}
                     >
                         Cancel
@@ -233,7 +233,7 @@ const TtnSensorTable: React.FC<TtnSensorTableProps> = ({
                             backgroundColor: "#512da8",
                             color: "#fff",
                             fontWeight: "bold",
-                            "&:hover": { backgroundColor: "#7e57c2" },
+                            "&:hover": {backgroundColor: '#9c27b0' },
                         }}
                     >
                         Save

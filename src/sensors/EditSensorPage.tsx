@@ -100,7 +100,13 @@ const EditSensorPage: React.FC = () => {
                         backgroundColor: 'white',
                     }}
                 >
-                    <form onSubmit={handleSubmit}>
+                    <form
+                        onSubmit={handleSubmit}
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                        }}
+                    >
                         {['name', 'latitude', 'longitude', 'area', 'topic'].map((field) => (
                             <TextField
                                 key={field}
@@ -145,20 +151,25 @@ const EditSensorPage: React.FC = () => {
                             </Select>
                         </FormControl>
 
+                        {/* Updated Save button style */}
                         <Button
                             type="submit"
                             variant="contained"
                             sx={{
-                                marginTop: '20px',
-                                backgroundColor: '#D3A1FF',
-                                color: 'text.secondary',
-                                '&:hover': { backgroundColor: '#c089f2' },
+                                backgroundColor: '#512da8',
+                                color: 'white',
+                                '&:hover': { backgroundColor: '#9c27b0' },
+                                fontWeight: 'bold',
+                                mt: '15px',
+                                alignSelf: 'flex-end',
                             }}
                             disabled={mutation.isLoading}
                         >
-                            {mutation.isLoading ? 'Saving...' : 'Save'}
+                            {mutation.isLoading ? "Saving..." : "Save"}
                         </Button>
                     </form>
+
+
                 </Paper>
             )}
 

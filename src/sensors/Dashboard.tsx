@@ -184,25 +184,37 @@ const Dashboard: React.FC = () => {
                         color: "#6a1b9a",
                         borderColor: "#6a1b9a",
                         fontWeight: "bold",
-                        "&:hover": { backgroundColor: "#f3e5f5" },
+                        "&:hover": {
+                            borderColor: "#4a0072",
+                            backgroundColor: "#f3e5f5",
+                        },
                     }}
                     onClick={() => setPublishDialogOpen(true)}
                 >
                     Test Publish
                 </Button>
+
                 <Button
                     variant="outlined"
                     sx={{
                         color: "#c62828",
                         borderColor: "#c62828",
                         fontWeight: "bold",
-                        "&:hover": { backgroundColor: "#ffebee" },
+                        "&:hover": {
+                            borderColor: "#8e0000",
+                            backgroundColor: "#ffebee",
+                        },
+                        "&.Mui-disabled": {
+                            color: "#c6282880",
+                            borderColor: "#c6282880",
+                        },
                     }}
                     onClick={handleDisconnect}
                     disabled={isDisconnecting}
                 >
                     {isDisconnecting ? "Disconnecting..." : "Disconnect"}
                 </Button>
+
             </Box>
 
             {/* Publish Dialog */}
